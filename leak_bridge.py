@@ -15,7 +15,16 @@ LEAKERS = {
     "GhostyLeaks4": 1803432231710416898
 }
 
-TWSCRAPE_DB = r"C:\Users\user\Desktop\accounts.db"
+
+# Use the Railway persistent volume when available.
+# Otherwise, use accounts.db beside this script for local development.
+if os.path.exists("/data"):
+    TWSCRAPE_DB = "/data/accounts.db"
+else:
+    TWSCRAPE_DB = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "accounts.db"
+    )
 
 
 def clean_url(url):
@@ -68,6 +77,7 @@ async def main():
             f"ERROR: twscrape database not found: {TWSCRAPE_DB}",
             file=sys.stderr
         )
+
         sys.exit(1)
 
     api = API(TWSCRAPE_DB)
@@ -101,20 +111,27 @@ async def main():
 
                 results.append({
                     "id": str(tweet.id),
+
                     "username": username,
+
                     "displayName": display_name,
+
                     "text": getattr(
                         tweet,
                         "rawContent",
                         ""
                     ),
+
                     "date": tweet.date.isoformat(),
+
                     "url": (
                         f"https://x.com/"
                         f"{username}/status/"
                         f"{tweet.id}"
                     ),
+
                     "images": images,
+
                     "videos": videos
                 })
 
