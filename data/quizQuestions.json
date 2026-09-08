@@ -1,0 +1,662 @@
+[
+  {
+    "id": "q001",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which POI was introduced in Fortnite Chapter 1 Season 2?",
+    "correctAnswer": "Tilted Towers",
+    "wrongAnswers": [
+      "Lucky Landing",
+      "Paradise Palms",
+      "Lazy Links"
+    ]
+  },
+  {
+    "id": "q002",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which of these POIs was part of the original Chapter 1 Season 2 map?",
+    "correctAnswer": "Shifty Shafts",
+    "wrongAnswers": [
+      "Lazy Links",
+      "Frosty Flights",
+      "Sunny Steps"
+    ]
+  },
+  {
+    "id": "q003",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which item was part of the Chapter 1 Season 2 OG loot additions?",
+    "correctAnswer": "Boogie Bomb",
+    "wrongAnswers": [
+      "Shockwave Grenade",
+      "Port-A-Fortress",
+      "Chug Splash"
+    ]
+  },
+  {
+    "id": "q004",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which POI was known for its abandoned tombs and ruined architecture in Chapter 1 Season 2?",
+    "correctAnswer": "Haunted Hills",
+    "wrongAnswers": [
+      "Junk Junction",
+      "Wailing Woods",
+      "Flush Factory"
+    ]
+  },
+  {
+    "id": "q005",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 POI was described as a scrapyard filled with car stacks and piles of rubbish?",
+    "correctAnswer": "Junk Junction",
+    "wrongAnswers": [
+      "Retail Row",
+      "Dusty Divot",
+      "Greasy Grove"
+    ]
+  },
+  {
+    "id": "q001",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "In which year was Fortnite first released?",
+    "correctAnswer": "2017",
+    "wrongAnswers": [
+      "2015",
+      "2016",
+      "2018"
+    ]
+  },
+  {
+    "id": "q002",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "How many players can a standard Battle Royale match support?",
+    "correctAnswer": "100",
+    "wrongAnswers": [
+      "50",
+      "75",
+      "150"
+    ]
+  },
+  {
+    "id": "q003",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What is Fortnite's premium in-game currency called?",
+    "correctAnswer": "V-Bucks",
+    "wrongAnswers": [
+      "Battle Coins",
+      "V-Tokens",
+      "Victory Coins"
+    ]
+  },
+  {
+    "id": "q004",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What vehicle carries players over the island before they drop?",
+    "correctAnswer": "Battle Bus",
+    "wrongAnswers": [
+      "Loot Bus",
+      "Victory Bus",
+      "Drop Ship"
+    ]
+  },
+  {
+    "id": "q005",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which company developed Fortnite?",
+    "correctAnswer": "Epic Games",
+    "wrongAnswers": [
+      "Valve",
+      "Ubisoft",
+      "Activision"
+    ]
+  },
+  {
+    "id": "q006",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 season introduced Fortnite's first Battle Pass?",
+    "correctAnswer": "Season 2",
+    "wrongAnswers": [
+      "Season 1",
+      "Season 3",
+      "Season 4"
+    ]
+  },
+  {
+    "id": "q007",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What is the dangerous zone that continuously closes around players?",
+    "correctAnswer": "The Storm",
+    "wrongAnswers": [
+      "The Rift",
+      "The Void",
+      "The Surge"
+    ]
+  },
+  {
+    "id": "q008",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "Which rarity is higher than Epic?",
+    "correctAnswer": "Legendary",
+    "wrongAnswers": [
+      "Rare",
+      "Uncommon",
+      "Common"
+    ]
+  },
+  {
+    "id": "q009",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "What was Fortnite's original paid cooperative mode called?",
+    "correctAnswer": "Save the World",
+    "wrongAnswers": [
+      "Save the Island",
+      "Battle Royale",
+      "Creative"
+    ]
+  },
+  {
+    "id": "q010",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "What are the zombie-like enemies in Save the World called?",
+    "correctAnswer": "Husks",
+    "wrongAnswers": [
+      "Shadows",
+      "Raptors",
+      "Creeps"
+    ]
+  },
+  {
+    "id": "q011",
+    "category": "lore",
+    "difficulty": "medium",
+    "question": "What nickname did players give the mysterious purple cube?",
+    "correctAnswer": "Kevin",
+    "wrongAnswers": [
+      "Kyle",
+      "Kane",
+      "Krypton"
+    ]
+  },
+  {
+    "id": "q012",
+    "category": "events",
+    "difficulty": "medium",
+    "question": "Which artist headlined the famous Astronomical concert in Fortnite?",
+    "correctAnswer": "Travis Scott",
+    "wrongAnswers": [
+      "Marshmello",
+      "Ariana Grande",
+      "Drake"
+    ]
+  },
+  {
+    "id": "q013",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What harvesting tool does every Battle Royale player start with?",
+    "correctAnswer": "Pickaxe",
+    "wrongAnswers": [
+      "Hammer",
+      "Axe Launcher",
+      "Crowbar"
+    ]
+  },
+  {
+    "id": "q014",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 POI was transformed after a meteor impact in Season 4?",
+    "correctAnswer": "Dusty Depot",
+    "wrongAnswers": [
+      "Retail Row",
+      "Loot Lake",
+      "Tilted Towers"
+    ]
+  },
+  {
+    "id": "q015",
+    "category": "items",
+    "difficulty": "medium",
+    "question": "Which item creates a rift that lets you redeploy your glider?",
+    "correctAnswer": "Rift-to-Go",
+    "wrongAnswers": [
+      "Launch Pad",
+      "Shockwave Grenade",
+      "Rift Crystal"
+    ]
+  },
+  {
+    "id": "q016",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "How many weapon or utility slots can a player normally carry?",
+    "correctAnswer": "Five",
+    "wrongAnswers": [
+      "Three",
+      "Four",
+      "Six"
+    ]
+  },
+  {
+    "id": "q017",
+    "category": "characters",
+    "difficulty": "medium",
+    "question": "Which character is the famous anthropomorphic banana?",
+    "correctAnswer": "Peely",
+    "wrongAnswers": [
+      "Fishstick",
+      "Lil Whip",
+      "Bananaman"
+    ]
+  },
+  {
+    "id": "q018",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What are Fortnite's three classic building materials?",
+    "correctAnswer": "Wood, brick, and metal",
+    "wrongAnswers": [
+      "Wood, stone, and glass",
+      "Brick, steel, and glass",
+      "Wood, metal, and crystal"
+    ]
+  },
+  {
+    "id": "q019",
+    "category": "items",
+    "difficulty": "medium",
+    "question": "Which item can make nearby players dance uncontrollably?",
+    "correctAnswer": "Boogie Bomb",
+    "wrongAnswers": [
+      "Impulse Grenade",
+      "Shockwave Grenade",
+      "Dance Grenade"
+    ]
+  },
+  {
+    "id": "q020",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which vehicle was the first true drivable vehicle added to Fortnite Battle Royale?",
+    "correctAnswer": "All-Terrain Kart (ATK)",
+    "wrongAnswers": [
+      "Shopping Cart",
+      "Quadcrasher",
+      "Baller"
+    ]
+  },
+  {
+    "id": "q021",
+    "category": "maps",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 POI became famous for its tall buildings?",
+    "correctAnswer": "Tilted Towers",
+    "wrongAnswers": [
+      "Shifty Shafts",
+      "Junk Junction",
+      "Haunted Hills"
+    ]
+  },
+  {
+    "id": "q022",
+    "category": "maps",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 POI was a scrapyard?",
+    "correctAnswer": "Junk Junction",
+    "wrongAnswers": [
+      "Retail Row",
+      "Lucky Landing",
+      "Dusty Depot"
+    ]
+  },
+  {
+    "id": "q023",
+    "category": "maps",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 POI was known for abandoned tombs and ruins?",
+    "correctAnswer": "Haunted Hills",
+    "wrongAnswers": [
+      "Pleasant Park",
+      "Wailing Woods",
+      "Snobby Shores"
+    ]
+  },
+  {
+    "id": "q024",
+    "category": "maps",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 POI featured underground mining tunnels?",
+    "correctAnswer": "Shifty Shafts",
+    "wrongAnswers": [
+      "Junk Junction",
+      "Haunted Hills",
+      "Fatal Fields"
+    ]
+  },
+  {
+    "id": "q025",
+    "category": "maps",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 POI was known for wealthy residential houses?",
+    "correctAnswer": "Snobby Shores",
+    "wrongAnswers": [
+      "Retail Row",
+      "Greasy Grove",
+      "Lucky Landing"
+    ]
+  },
+  {
+    "id": "q026",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which item was part of the classic Chapter 1 Season 2 loot pool?",
+    "correctAnswer": "Boogie Bomb",
+    "wrongAnswers": [
+      "Bouncer",
+      "Harpoon Gun",
+      "Shield Keg"
+    ]
+  },
+  {
+    "id": "q027",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which weapon was included in the classic Chapter 1 Season 2 loot pool?",
+    "correctAnswer": "Minigun",
+    "wrongAnswers": [
+      "Heavy Sniper Rifle",
+      "Stinger SMG",
+      "Combat SMG"
+    ]
+  },
+  {
+    "id": "q028",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which healing item from the classic Chapter 1 Season 2 loot pool restores full health and full shield?",
+    "correctAnswer": "Chug Jug",
+    "wrongAnswers": [
+      "Medkit",
+      "Small Shield Potion",
+      "Bandage"
+    ]
+  },
+  {
+    "id": "q029",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which classic item lets players quickly launch themselves in a direction?",
+    "correctAnswer": "Impulse Grenade",
+    "wrongAnswers": [
+      "Boogie Bomb",
+      "Shield Bubble",
+      "Clinger"
+    ]
+  },
+  {
+    "id": "q030",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 outfit was associated with the original Battle Pass?",
+    "correctAnswer": "Black Knight",
+    "wrongAnswers": [
+      "Midas",
+      "Drift",
+      "The Reaper"
+    ]
+  },
+  {
+    "id": "q031",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 Season 2 outfit was known for its sparkling theme?",
+    "correctAnswer": "Sparkle Specialist",
+    "wrongAnswers": [
+      "Aura",
+      "Crystal",
+      "Luxe"
+    ]
+  },
+  {
+    "id": "q032",
+    "category": "events",
+    "difficulty": "medium",
+    "question": "Which Fortnite event ended Chapter 1 with the island disappearing into a black hole?",
+    "correctAnswer": "The End",
+    "wrongAnswers": [
+      "The Unvaulting",
+      "The Device",
+      "The Collision"
+    ]
+  },
+  {
+    "id": "q033",
+    "category": "events",
+    "difficulty": "medium",
+    "question": "Which event featured a giant monster fighting a giant robot?",
+    "correctAnswer": "The Final Showdown",
+    "wrongAnswers": [
+      "The End",
+      "The Device",
+      "Nexus War"
+    ]
+  },
+  {
+    "id": "q034",
+    "category": "events",
+    "difficulty": "medium",
+    "question": "Which character is strongly associated with the Imagined Order?",
+    "correctAnswer": "Doctor Slone",
+    "wrongAnswers": [
+      "Peely",
+      "Fishstick",
+      "Jonesy the First"
+    ]
+  },
+  {
+    "id": "q035",
+    "category": "lore",
+    "difficulty": "medium",
+    "question": "What does IO stand for in Fortnite lore?",
+    "correctAnswer": "Imagined Order",
+    "wrongAnswers": [
+      "Island Operations",
+      "Infinite Organization",
+      "Imagined Origins"
+    ]
+  },
+  {
+    "id": "q036",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 season introduced the B.R.U.T.E. mech?",
+    "correctAnswer": "Season X",
+    "wrongAnswers": [
+      "Season 7",
+      "Season 8",
+      "Season 9"
+    ]
+  },
+  {
+    "id": "q037",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 season introduced the alien-themed storyline with UFOs?",
+    "correctAnswer": "Chapter 2 Season 7",
+    "wrongAnswers": [
+      "Chapter 2 Season 4",
+      "Chapter 2 Season 5",
+      "Chapter 3 Season 1"
+    ]
+  },
+  {
+    "id": "q038",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which season featured the major Marvel crossover with characters such as Thor and Iron Man?",
+    "correctAnswer": "Chapter 2 Season 4",
+    "wrongAnswers": [
+      "Chapter 2 Season 2",
+      "Chapter 2 Season 5",
+      "Chapter 3 Season 3"
+    ]
+  },
+  {
+    "id": "q039",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 season introduced the desert biome?",
+    "correctAnswer": "Season 5",
+    "wrongAnswers": [
+      "Season 3",
+      "Season 4",
+      "Season 6"
+    ]
+  },
+  {
+    "id": "q040",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which Chapter 1 season introduced pets as cosmetic companions?",
+    "correctAnswer": "Season 6",
+    "wrongAnswers": [
+      "Season 4",
+      "Season 5",
+      "Season 7"
+    ]
+  },
+  {
+    "id": "q041",
+    "category": "events",
+    "difficulty": "medium",
+    "question": "Which musician performed the major virtual concert that took place before Travis Scott's Astronomical event?",
+    "correctAnswer": "Marshmello",
+    "wrongAnswers": [
+      "The Weeknd",
+      "Ariana Grande",
+      "Bruno Mars"
+    ]
+  },
+  {
+    "id": "q042",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What is the name for the special dance and movement animations players can equip?",
+    "correctAnswer": "Emotes",
+    "wrongAnswers": [
+      "Gestures",
+      "Expressions",
+      "Animations"
+    ]
+  },
+  {
+    "id": "q043",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "What do players earn when they are the last player or team standing?",
+    "correctAnswer": "Victory Royale",
+    "wrongAnswers": [
+      "Battle Crown",
+      "Island Champion",
+      "Victory Crown"
+    ]
+  },
+  {
+    "id": "q044",
+    "category": "gameplay",
+    "difficulty": "medium",
+    "question": "How many players are normally on a standard squad?",
+    "correctAnswer": "Four",
+    "wrongAnswers": [
+      "Two",
+      "Three",
+      "Five"
+    ]
+  },
+  {
+    "id": "q045",
+    "category": "items",
+    "difficulty": "medium",
+    "question": "Which item restores health by applying a full heal over time?",
+    "correctAnswer": "Medkit",
+    "wrongAnswers": [
+      "Small Shield Potion",
+      "Shield Potion",
+      "Ammo Box"
+    ]
+  },
+  {
+    "id": "q046",
+    "category": "items",
+    "difficulty": "medium",
+    "question": "Which consumable provides shield rather than directly restoring health?",
+    "correctAnswer": "Shield Potion",
+    "wrongAnswers": [
+      "Medkit",
+      "Bandage",
+      "Med-Mist"
+    ]
+  },
+  {
+    "id": "q047",
+    "category": "items",
+    "difficulty": "medium",
+    "question": "Which item was designed to provide a small 25-point shield boost?",
+    "correctAnswer": "Small Shield Potion",
+    "wrongAnswers": [
+      "Shield Potion",
+      "Chug Jug",
+      "Medkit"
+    ]
+  },
+  {
+    "id": "q048",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which vehicle allowed squads to travel together when it first arrived in Chapter 1?",
+    "correctAnswer": "All-Terrain Kart (ATK)",
+    "wrongAnswers": [
+      "Baller",
+      "Driftboard",
+      "Quadcrasher"
+    ]
+  },
+  {
+    "id": "q049",
+    "category": "history",
+    "difficulty": "medium",
+    "question": "Which mode was designed around defending objectives against Husks?",
+    "correctAnswer": "Save the World",
+    "wrongAnswers": [
+      "Battle Royale",
+      "Creative",
+      "Fortnite Festival"
+    ]
+  },
+  {
+    "id": "q050",
+    "category": "lore",
+    "difficulty": "medium",
+    "question": "What is the name of the mysterious energy point central to much of Fortnite's later storyline?",
+    "correctAnswer": "The Zero Point",
+    "wrongAnswers": [
+      "The Storm Core",
+      "The Nexus Crystal",
+      "The Reality Engine"
+    ]
+  }
+]

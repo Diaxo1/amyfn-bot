@@ -1,0 +1,637 @@
+const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
+
+const {
+    EmbedBuilder
+} = require('discord.js');
+
+const {
+    getServerConfig,
+    getAllServerConfigs
+} = require('./serverConfig');
+
+const BRIDGE_PATH = path.join(
+    __dirname,
+    '..',
+    'leak_bridge.py'
+);
+
+const SNAPSHOT_PATH = path.join(
+    __dirname,
+    '..',
+    'data',
+    'leakSnapshot.json'
+);
+
+const CHECK_INTERVAL = 60 * 1000;
+
+// ==========================================
+// DATA FOLDER
+// ==========================================
+
+function ensureDataFolder() {
+
+    const dataFolder = path.join(
+        __dirname,
+        '..',
+        'data'
+    );
+
+    if (!fs.existsSync(dataFolder)) {
+
+        fs.mkdirSync(
+            dataFolder,
+            {
+                recursive: true
+            }
+        );
+
+    }
+
+}
+
+// ==========================================
+// LOAD SNAPSHOT
+// ==========================================
+
+function loadSnapshot() {
+
+    ensureDataFolder();
+
+    if (!fs.existsSync(SNAPSHOT_PATH)) {
+
+        return {};
+
+    }
+
+    try {
+
+        return JSON.parse(
+            fs.readFileSync(
+                SNAPSHOT_PATH,
+                'utf8'
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            '❌ Failed to load leak snapshot:',
+            error
+        );
+
+        return {};
+
+    }
+
+}
+
+// ==========================================
+// SAVE SNAPSHOT
+// ==========================================
+
+function saveSnapshot(snapshot) {
+
+    ensureDataFolder();
+
+    fs.writeFileSync(
+        SNAPSHOT_PATH,
+        JSON.stringify(
+            snapshot,
+            null,
+            2
+        )
+    );
+
+}
+
+// ==========================================
+// PYTHON BRIDGE
+// ==========================================
+
+function runPythonBridge() {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const python =
+                spawn(
+                    'python',
+                    [BRIDGE_PATH],
+                    {
+                        windowsHide: true
+                    }
+                );
+
+            let stdout = '';
+            let stderr = '';
+
+            python.stdout.on(
+                'data',
+                data => {
+
+                    stdout +=
+                        data.toString();
+
+                }
+            );
+
+            python.stderr.on(
+                'data',
+                data => {
+
+                    stderr +=
+                        data.toString();
+
+                }
+            );
+
+            python.on(
+                'error',
+                error => {
+
+                    reject(error);
+
+                }
+            );
+
+            python.on(
+                'close',
+                code => {
+
+                    if (code !== 0) {
+
+                        reject(
+                            new Error(
+                                stderr ||
+                                `Python exited with code ${code}`
+                            )
+                        );
+
+                        return;
+
+                    }
+
+                    try {
+
+                        const tweets =
+                            JSON.parse(
+                                stdout
+                            );
+
+                        resolve(tweets);
+
+                    } catch (error) {
+
+                        console.error(
+                            '❌ Python bridge output:',
+                            stdout
+                        );
+
+                        reject(error);
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+// ==========================================
+// CREATE LEAK EMBED
+// ==========================================
+
+function createLeakEmbed(tweet) {
+
+    const embed =
+        new EmbedBuilder()
+
+            .setColor(0x1493ff)
+
+            .setAuthor({
+                name:
+                    `${tweet.displayName} (@${tweet.username})`,
+                url:
+                    tweet.url
+            })
+
+            .setDescription(
+                tweet.text ||
+                '*No tweet text*'
+            )
+
+            .setURL(
+                tweet.url
+            )
+
+            .setFooter({
+                text:
+                    'Amyfn • Fortnite Community'
+            })
+
+            .setTimestamp(
+                new Date(
+                    tweet.date
+                )
+            );
+
+    if (
+        tweet.images &&
+        tweet.images.length > 0
+    ) {
+
+        embed.setImage(
+            tweet.images[0]
+        );
+
+    }
+
+    return embed;
+
+}
+
+// ==========================================
+// SEND LEAK TO ONE GUILD
+// ==========================================
+
+async function sendLeakToGuild(
+    client,
+    guildId,
+    tweet,
+    pingRole = true
+) {
+
+    const config =
+        getServerConfig(
+            guildId
+        );
+
+    if (
+        !config ||
+        !config.updatesChannelId
+    ) {
+
+        return false;
+
+    }
+
+    try {
+
+        const channel =
+            await client.channels.fetch(
+                config.updatesChannelId
+            );
+
+        if (
+            !channel ||
+            !channel.isTextBased()
+        ) {
+
+            return false;
+
+        }
+
+        const content =
+            pingRole &&
+            config.updatesRoleId
+                ? `<@&${config.updatesRoleId}>`
+                : undefined;
+
+        await channel.send({
+
+            content,
+
+            embeds: [
+                createLeakEmbed(
+                    tweet
+                )
+            ],
+
+            allowedMentions:
+                config.updatesRoleId
+
+                    ? {
+                        roles: [
+                            config.updatesRoleId
+                        ]
+                    }
+
+                    : {
+                        roles: []
+                    }
+
+        });
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            `❌ Failed to send leak to guild ${guildId}:`,
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+// ==========================================
+// ANNOUNCE LEAK TO ALL SERVERS
+// ==========================================
+
+async function announceLeak(
+    client,
+    tweet
+) {
+
+    const configs =
+        getAllServerConfigs();
+
+    for (
+        const guildId of Object.keys(
+            configs
+        )
+    ) {
+
+        try {
+
+            await sendLeakToGuild(
+                client,
+                guildId,
+                tweet,
+                true
+            );
+
+        } catch (error) {
+
+            console.error(
+                `❌ Leak send failed (${guildId}):`,
+                error
+            );
+
+        }
+
+    }
+
+}
+
+// ==========================================
+// CHECK FOR LEAKS
+// ==========================================
+
+async function checkForLeaks(
+    client
+) {
+
+    try {
+
+        console.log(
+            '🕵️ Checking Fortnite leaks...'
+        );
+
+        const tweets =
+            await runPythonBridge();
+
+        if (
+            !Array.isArray(tweets)
+        ) {
+
+            console.error(
+                '❌ Leak bridge did not return an array.'
+            );
+
+            return;
+
+        }
+
+        const snapshot =
+            loadSnapshot();
+
+        // ==================================
+        // FIRST RUN
+        // ==================================
+
+        if (
+            !snapshot.initialized
+        ) {
+
+            tweets.forEach(
+                tweet => {
+
+                    snapshot[
+                        tweet.id
+                    ] = true;
+
+                }
+            );
+
+            snapshot.initialized =
+                true;
+
+            saveSnapshot(
+                snapshot
+            );
+
+            console.log(
+                `📸 Leak baseline saved (${tweets.length} tweets).`
+            );
+
+            return;
+
+        }
+
+        // ==================================
+        // FIND NEW LEAKS
+        // ==================================
+
+        const newTweets =
+            tweets
+
+                .filter(
+                    tweet =>
+                        !snapshot[
+                            tweet.id
+                        ]
+                )
+
+                .sort(
+                    (a, b) =>
+                        new Date(a.date) -
+                        new Date(b.date)
+                );
+
+        if (
+            newTweets.length === 0
+        ) {
+
+            console.log(
+                '🕵️ No new leaks.'
+            );
+
+            return;
+
+        }
+
+        console.log(
+            `🚨 Found ${newTweets.length} new leak(s)!`
+        );
+
+        // ==================================
+        // SEND NEW LEAKS
+        // ==================================
+
+        for (
+            const tweet of newTweets
+        ) {
+
+            await announceLeak(
+                client,
+                tweet
+            );
+
+            snapshot[
+                tweet.id
+            ] = true;
+
+        }
+
+        // ==================================
+        // LIMIT SNAPSHOT
+        // ==================================
+
+        const ids =
+            Object.keys(
+                snapshot
+            )
+
+                .filter(
+                    id =>
+                        id !== 'initialized'
+                )
+
+                .slice(-500);
+
+        const cleanedSnapshot = {
+            initialized: true
+        };
+
+        ids.forEach(
+            id => {
+
+                cleanedSnapshot[
+                    id
+                ] = true;
+
+            }
+        );
+
+        saveSnapshot(
+            cleanedSnapshot
+        );
+
+    } catch (error) {
+
+        console.error(
+            '❌ Leak tracker error:',
+            error
+        );
+
+    }
+
+}
+
+// ==========================================
+// START LEAK TRACKER
+// ==========================================
+
+function startLeakTracker(
+    client
+) {
+
+    console.log(
+        '🕵️ Starting Fortnite leak tracker...'
+    );
+
+    checkForLeaks(
+        client
+    );
+
+    setInterval(
+        () =>
+            checkForLeaks(
+                client
+            ),
+        CHECK_INTERVAL
+    );
+
+}
+
+// ==========================================
+// GET LATEST LEAKS
+// ==========================================
+
+async function getLatestLeaks() {
+
+    return await runPythonBridge();
+
+}
+
+// ==========================================
+// GET LEAK TRACKER STATUS
+// ==========================================
+
+function getLeakStatus() {
+
+    const snapshot =
+        loadSnapshot();
+
+    const tracked =
+        Object.keys(
+            snapshot
+        )
+            .filter(
+                id =>
+                    id !== 'initialized'
+            )
+            .length;
+
+    return {
+
+        active:
+            true,
+
+        interval:
+            60,
+
+        lastCheck:
+            null,
+
+        tracked
+
+    };
+
+}
+
+// ==========================================
+// EXPORTS
+// ==========================================
+
+module.exports = {
+
+    startLeakTracker,
+
+    getLatestLeaks,
+
+    getLeakStatus,
+
+    createLeakEmbed,
+
+    sendLeakToGuild
+
+};
