@@ -9,6 +9,10 @@ sys.stderr.reconfigure(encoding="utf-8")
 from twscrape import API
 
 
+# ==========================================
+# LEAK SOURCES
+# ==========================================
+
 LEAKERS = {
     "HYPEX": 2210485170,
     "ShiinaBR": 1019980702119530497,
@@ -16,18 +20,55 @@ LEAKERS = {
 }
 
 
-# Use the Railway persistent volume when available.
-# Otherwise, use accounts.db beside this script for local development.
-if os.path.exists("/data"):
-    TWSCRAPE_DB = "/data/accounts.db"
-else:
-    TWSCRAPE_DB = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "accounts.db"
-    )
+# ==========================================
+# TWSCRAPE DATABASE
+# ==========================================
+#
+# Railway:
+#   /data/accounts.db
+#
+# Local:
+#   accounts.db beside leak_bridge.py
+#
+# We never print the contents of this database.
+# ==========================================
 
+LOCAL_DB = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "accounts.db"
+)
+
+RAILWAY_DB = "/data/accounts.db"
+
+
+if os.path.isfile(RAILWAY_DB):
+    TWSCRAPE_DB = RAILWAY_DB
+
+elif os.path.isfile(LOCAL_DB):
+    TWSCRAPE_DB = LOCAL_DB
+
+else:
+    print(
+        "ERROR: twscrape database not found.",
+        file=sys.stderr
+    )
+    print(
+        "Expected Railway database at /data/accounts.db",
+        file=sys.stderr
+    )
+    print(
+        "Expected local database beside leak_bridge.py",
+        file=sys.stderr
+    )
+    sys.exit(1)
+
+
+# ==========================================
+# CLEAN URL
+# ==========================================
 
 def clean_url(url):
+
     if not url:
         return None
 
@@ -42,7 +83,12 @@ def clean_url(url):
     return url
 
 
+# ==========================================
+# GET MEDIA
+# ==========================================
+
 def get_media(tweet):
+
     images = []
     videos = []
 
@@ -51,18 +97,40 @@ def get_media(tweet):
     if not media:
         return images, videos
 
-    photos = getattr(media, "photos", []) or []
+    photos = getattr(
+        media,
+        "photos",
+        []
+    ) or []
 
     for photo in photos:
-        url = clean_url(getattr(photo, "url", None))
+
+        url = clean_url(
+            getattr(
+                photo,
+                "url",
+                None
+            )
+        )
 
         if url:
             images.append(url)
 
-    video_list = getattr(media, "videos", []) or []
+    video_list = getattr(
+        media,
+        "videos",
+        []
+    ) or []
 
     for video in video_list:
-        url = clean_url(getattr(video, "url", None))
+
+        url = clean_url(
+            getattr(
+                video,
+                "url",
+                None
+            )
+        )
 
         if url:
             videos.append(url)
@@ -70,90 +138,137 @@ def get_media(tweet):
     return images, videos
 
 
+# ==========================================
+# MAIN
+# ==========================================
+
 async def main():
 
-    if not os.path.exists(TWSCRAPE_DB):
+    try:
+
+        api = API(TWSCRAPE_DB)
+
+        results = []
+
+        for username, user_id in LEAKERS.items():
+
+            try:
+
+                async for tweet in api.user_tweets(
+                    user_id,
+                    limit=5
+                ):
+
+                    author = getattr(
+                        tweet,
+                        "user",
+                        None
+                    )
+
+                    display_name = username
+
+                    if author:
+
+                        display_name = (
+                            getattr(
+                                author,
+                                "displayname",
+                                None
+                            )
+                            or username
+                        )
+
+                    images, videos = get_media(
+                        tweet
+                    )
+
+                    results.append({
+
+                        "id": str(
+                            tweet.id
+                        ),
+
+                        "username": username,
+
+                        "displayName": display_name,
+
+                        "text": getattr(
+                            tweet,
+                            "rawContent",
+                            ""
+                        ),
+
+                        "date": tweet.date.isoformat(),
+
+                        "url": (
+                            f"https://x.com/"
+                            f"{username}/status/"
+                            f"{tweet.id}"
+                        ),
+
+                        "images": images,
+
+                        "videos": videos
+
+                    })
+
+            except Exception as error:
+
+                # Only log the leaker name and error.
+                # Never expose database contents.
+                print(
+                    f"ERROR @{username}: {error}",
+                    file=sys.stderr
+                )
+
+        # ==================================
+        # SORT NEWEST FIRST
+        # ==================================
+
+        results.sort(
+            key=lambda tweet: tweet["date"],
+            reverse=True
+        )
+
+        # ==================================
+        # OUTPUT JSON
+        # ==================================
+
         print(
-            f"ERROR: twscrape database not found: {TWSCRAPE_DB}",
+            json.dumps(
+                results,
+                ensure_ascii=False
+            )
+        )
+
+    except Exception as error:
+
+        print(
+            f"ERROR: Leak bridge failed: {error}",
             file=sys.stderr
         )
 
         sys.exit(1)
 
-    api = API(TWSCRAPE_DB)
 
-    results = []
-
-    for username, user_id in LEAKERS.items():
-
-        try:
-
-            async for tweet in api.user_tweets(
-                user_id,
-                limit=5
-            ):
-
-                author = getattr(tweet, "user", None)
-
-                display_name = username
-
-                if author:
-                    display_name = (
-                        getattr(
-                            author,
-                            "displayname",
-                            None
-                        )
-                        or username
-                    )
-
-                images, videos = get_media(tweet)
-
-                results.append({
-                    "id": str(tweet.id),
-
-                    "username": username,
-
-                    "displayName": display_name,
-
-                    "text": getattr(
-                        tweet,
-                        "rawContent",
-                        ""
-                    ),
-
-                    "date": tweet.date.isoformat(),
-
-                    "url": (
-                        f"https://x.com/"
-                        f"{username}/status/"
-                        f"{tweet.id}"
-                    ),
-
-                    "images": images,
-
-                    "videos": videos
-                })
-
-        except Exception as error:
-
-            print(
-                f"ERROR @{username}: {error}",
-                file=sys.stderr
-            )
-
-    results.sort(
-        key=lambda tweet: tweet["date"],
-        reverse=True
-    )
-
-    print(
-        json.dumps(
-            results,
-            ensure_ascii=False
-        )
-    )
-
+# ==========================================
+# ENTRY POINT
+# ==========================================
 
 if __name__ == "__main__":
-    asyncio.run(main())
+
+    try:
+        asyncio.run(main())
+
+    except KeyboardInterrupt:
+
+        sys.exit(0)
+
+    except Exception as error:
+
+        print(
+            f"ERROR: Unexpected leak bridge failure: {error}",
+            file=sys.stderr
+        )
+
+        sys.exit(1)
