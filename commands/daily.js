@@ -31,11 +31,10 @@ module.exports = {
 
             if (!result) {
                 const embed = createEmbed({
-                    title: '🛒 Daily Shop Reset',
+                    title: 'FORTNITE SHOP RESET',
                     description:
-                        '⏳ **No shop reset has been detected yet.**\n\n' +
-                        'The automatic tracker is watching the Fortnite Item Shop.\n\n' +
-                        'Once the shop resets, I\'ll detect the changes automatically.',
+                        'No shop reset has been detected yet.\n\n' +
+                        'The automatic tracker is watching the Fortnite Item Shop.',
                     timestamp: true
                 });
 
@@ -51,36 +50,32 @@ module.exports = {
                 removedToday = []
             } = result;
 
-            let description = '';
-
             // ==========================================
-            // RELEASED TODAY
+            // RELEASED ITEMS
             // ==========================================
 
-            description += '🆕 **RELEASED TODAY**\n\n';
+            let releasedText;
 
             if (releasedToday.length > 0) {
-                description += releasedToday
-                    .map(item => `• **${item.name}**`)
+                releasedText = releasedToday
+                    .map(item => item.name)
                     .join('\n');
             } else {
-                description += 'Nothing new released.';
+                releasedText = 'Nothing new released.';
             }
 
-            description += '\n\n';
-
             // ==========================================
-            // REMOVED
+            // REMOVED ITEMS
             // ==========================================
 
-            description += '❌ **REMOVED**\n\n';
+            let removedText;
 
             if (removedToday.length > 0) {
-                description += removedToday
-                    .map(item => `• **${item.name}**`)
+                removedText = removedToday
+                    .map(item => item.name)
                     .join('\n');
             } else {
-                description += 'Nothing removed.';
+                removedText = 'Nothing removed.';
             }
 
             // ==========================================
@@ -88,29 +83,35 @@ module.exports = {
             // ==========================================
 
             const embed = createEmbed({
-                title: '🛒 Daily Shop Reset',
-                description: description,
-                timestamp: result.detectedAt
-                    ? false
-                    : true
+                title: 'FORTNITE SHOP RESET',
+                description:
+                    'The latest Fortnite Item Shop rotation has been detected.',
+                timestamp: false
             });
 
-            // Use the actual detection time
+            // Use actual detection time
             if (result.detectedAt) {
                 embed.setTimestamp(
                     new Date(result.detectedAt)
                 );
             }
 
-            // Keep the counts without replacing
-            // the global Amyfn footer
-            embed.addFields({
-                name: '📊 SHOP CHANGES',
-                value:
-                    `🆕 **${releasedToday.length}** released\n` +
-                    `❌ **${removedToday.length}** removed`,
-                inline: true
-            });
+            // ==========================================
+            // SHOP CHANGES
+            // ==========================================
+
+            embed.addFields(
+                {
+                    name: `NEW IN THE SHOP  •  ${releasedToday.length}`,
+                    value: releasedText,
+                    inline: true
+                },
+                {
+                    name: `REMOVED FROM SHOP  •  ${removedToday.length}`,
+                    value: removedText,
+                    inline: true
+                }
+            );
 
             await interaction.editReply({
                 embeds: [embed]
