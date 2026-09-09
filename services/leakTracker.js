@@ -115,9 +115,14 @@ function runPythonBridge() {
     return new Promise(
         (resolve, reject) => {
 
+            const pythonCommand =
+                process.platform === 'win32'
+                    ? 'python'
+                    : 'python3';
+
             const python =
                 spawn(
-                    'python',
+                    pythonCommand,
                     [BRIDGE_PATH],
                     {
                         windowsHide: true
