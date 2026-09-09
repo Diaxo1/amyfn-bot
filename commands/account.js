@@ -1,12 +1,16 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder
+    AttachmentBuilder
 } = require('discord.js');
 
 const {
     getPlayerSeasonStats,
     getPlayerLifetimeStats
 } = require('../services/fortniteStats');
+
+const {
+    createAccountCard
+} = require('../services/accountCard');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -20,12 +24,21 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const username = interaction.options.getString('username');
+        const username =
+            interaction.options.getString('username');
 
         await interaction.deferReply();
 
         try {
-            const [seasonData, lifetimeData] = await Promise.all([
+
+            // ==========================================
+            // GET PLAYER DATA
+            // ==========================================
+
+            const [
+                seasonData,
+                lifetimeData
+            ] = await Promise.all([
                 getPlayerSeasonStats(username),
                 getPlayerLifetimeStats(username)
             ]);
@@ -36,10 +49,18 @@ module.exports = {
                 );
             }
 
+            // ==========================================
+            // ACCOUNT
+            // ==========================================
+
             const account =
                 seasonData.account ||
                 lifetimeData.account ||
                 {};
+
+            // ==========================================
+            // STATS
+            // ==========================================
 
             const seasonStats =
                 seasonData.stats?.all?.overall || {};
@@ -65,172 +86,57 @@ module.exports = {
                 'N/A';
 
             // ==========================================
-            // FORMATTING
-            // ==========================================
-
-            const formatNumber = value => {
-                const number = Number(value || 0);
-                return number.toLocaleString();
-            };
-
-            const formatStat = value => {
-                return value === undefined ||
-                    value === null ||
-                    value === ''
-                    ? 'N/A'
-                    : value;
-            };
-
-            const getWinRate = stats => {
-                if (
-                    stats.winRate !== undefined &&
-                    stats.winRate !== null
-                ) {
-                    return `${stats.winRate}%`;
-                }
-
-                const matches = Number(stats.matches || 0);
-                const wins = Number(stats.wins || 0);
-
-                if (!matches) {
-                    return '0.00%';
-                }
-
-                return `${((wins / matches) * 100).toFixed(2)}%`;
-            };
-
-            // ==========================================
-            // EMBED
-            // ==========================================
-
-            const embed = new EmbedBuilder()
-                .setColor(0x1493ff)
-                .setTitle('👤 Fortnite Account')
-                .setDescription(
-                    `### ${account.name || username}\n` +
-                    `Fortnite Battle Royale account overview`
-                )
-
-                // ==========================================
-                // THIS SEASON
-                // ==========================================
-
-                .addFields(
-                    {
-                        name: '🔥 THIS SEASON',
-                        value:
-                            `🏆 **Wins:** ${formatNumber(seasonStats.wins)}\n` +
-                            `🎮 **Matches:** ${formatNumber(seasonStats.matches)}\n` +
-                            `💀 **Kills:** ${formatNumber(seasonStats.kills)}\n` +
-                            `🎯 **K/D:** ${formatStat(seasonStats['k/d'])}\n` +
-                            `📈 **Win Rate:** ${getWinRate(seasonStats)}`,
-                        inline: true
-                    },
-
-                    // ==========================================
-                    // BATTLE PASS
-                    // ==========================================
-
-                    {
-                        name: '🎟️ BATTLE PASS',
-                        value:
-                            `⭐ **Level:** ${battlePassLevel}`,
-                        inline: true
-                    },
-
-                    // ==========================================
-                    // OVERALL
-                    // ==========================================
-
-                    {
-                        name: '📊 OVERALL',
-                        value:
-                            `🏆 **Wins:** ${formatNumber(lifetimeStats.wins)}\n` +
-                            `🎮 **Matches:** ${formatNumber(lifetimeStats.matches)}\n` +
-                            `💀 **Kills:** ${formatNumber(lifetimeStats.kills)}\n` +
-                            `🎯 **K/D:** ${formatStat(lifetimeStats['k/d'])}\n` +
-                            `📈 **Win Rate:** ${getWinRate(lifetimeStats)}`,
-                        inline: true
-                    }
-                );
-
-            // ==========================================
             // PROFILE IMAGE
             // ==========================================
 
-            if (seasonData.image) {
-                embed.setThumbnail(seasonData.image);
-            } else if (lifetimeData.image) {
-                embed.setThumbnail(lifetimeData.image);
-            }
+            const profileImage =
+                seasonData.image ||
+                lifetimeData.image ||
+                null;
 
             // ==========================================
-            // GAME MODES
+            // GENERATE ACCOUNT CARD
             // ==========================================
 
-            embed.addFields(
-                {
-                    name: '🥇 SOLO',
-                    value:
-                        `Wins: **${formatNumber(
-                            seasonData.stats?.all?.solo?.wins
-                        )}**\n` +
-                        `Matches: **${formatNumber(
-                            seasonData.stats?.all?.solo?.matches
-                        )}**\n` +
-                        `K/D: **${formatStat(
-                            seasonData.stats?.all?.solo?.['k/d']
-                        )}**`,
-                    inline: true
-                },
+            console.log(
+                `🎨 Generating account card for ${account.name || username}`
+            );
 
-                {
-                    name: '🥈 DUOS',
-                    value:
-                        `Wins: **${formatNumber(
-                            seasonData.stats?.all?.duo?.wins
-                        )}**\n` +
-                        `Matches: **${formatNumber(
-                            seasonData.stats?.all?.duo?.matches
-                        )}**\n` +
-                        `K/D: **${formatStat(
-                            seasonData.stats?.all?.duo?.['k/d']
-                        )}**`,
-                    inline: true
-                },
+            const card =
+                await createAccountCard({
+                    account,
+                    seasonStats,
+                    lifetimeStats,
+                    battlePassLevel,
+                    profileImage
+                });
 
-                {
-                    name: '🏆 SQUADS',
-                    value:
-                        `Wins: **${formatNumber(
-                            seasonData.stats?.all?.squad?.wins
-                        )}**\n` +
-                        `Matches: **${formatNumber(
-                            seasonData.stats?.all?.squad?.matches
-                        )}**\n` +
-                        `K/D: **${formatStat(
-                            seasonData.stats?.all?.squad?.['k/d']
-                        )}**`,
-                    inline: true
-                }
+            const attachment =
+                new AttachmentBuilder(card)
+                    .setName('amyfn-account.png');
+
+            // ==========================================
+            // SEND
+            // ==========================================
+
+            await interaction.editReply({
+                files: [attachment]
+            });
+
+            console.log(
+                `✅ Account card generated for ${account.name || username}`
+            );
+
+        } catch (error) {
+
+            console.error(
+                '❌ Account lookup error:',
+                error
             );
 
             // ==========================================
-            // FOOTER
+            // ERROR HANDLING
             // ==========================================
-
-            embed
-                .setFooter({
-                    text: 'Amyfn • Fortnite Account'
-                })
-                .setTimestamp();
-
-            await interaction.editReply({
-                embeds: [embed]
-            });
-
-        } catch (error) {
-            console.error('❌ Account lookup error:', error);
 
             if (error.status === 404) {
                 return await interaction.editReply(
@@ -254,7 +160,7 @@ module.exports = {
             }
 
             await interaction.editReply(
-                '❌ Something went wrong while looking up that Fortnite account.'
+                '❌ Something went wrong while creating that Fortnite account card.'
             );
         }
     }
