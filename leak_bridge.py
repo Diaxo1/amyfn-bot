@@ -148,7 +148,49 @@ async def main():
 
         api = API(TWSCRAPE_DB)
 
+        # ==================================
+        # TWSCRAPE ACCOUNT DIAGNOSTICS
+        # ==================================
+
+        print(
+            f"🗄️ TWSCRAPE DB: {TWSCRAPE_DB}",
+            file=sys.stderr
+        )
+
+        try:
+
+            accounts = await api.accounts_info()
+
+            if not accounts:
+
+                print(
+                    "⚠️ No twscrape accounts found in database.",
+                    file=sys.stderr
+                )
+
+            else:
+
+                for account in accounts:
+
+                    print(
+                        f"👤 twscrape account: "
+                        f"{account.username} | "
+                        f"active={account.active}",
+                        file=sys.stderr
+                    )
+
+        except Exception as error:
+
+            print(
+                f"❌ Failed to read twscrape accounts: {error}",
+                file=sys.stderr
+            )
+
         results = []
+
+        # ==================================
+        # CHECK LEAK SOURCES
+        # ==================================
 
         for username, user_id in LEAKERS.items():
 
@@ -216,6 +258,7 @@ async def main():
 
                 # Only log the leaker name and error.
                 # Never expose database contents.
+
                 print(
                     f"ERROR @{username}: {error}",
                     file=sys.stderr
@@ -258,6 +301,7 @@ async def main():
 if __name__ == "__main__":
 
     try:
+
         asyncio.run(main())
 
     except KeyboardInterrupt:
