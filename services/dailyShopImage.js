@@ -174,6 +174,7 @@ function getGalleryPageCount(images) {
 // ==========================================
 
 module.exports = {
+    downloadImage,
     createDailyShopGallery,
     getGalleryPageCount
 };
