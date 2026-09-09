@@ -226,23 +226,29 @@ function runPythonBridge() {
             );
 
             python.on(
-                'close',
-                code => {
+    'close',
+    code => {
 
-                    if (code !== 0) {
+        if (stderr.trim()) {
+            console.log(
+                '🐍 Leak bridge stderr:',
+                stderr.trim()
+            );
+        }
 
-                        reject(
-                            new Error(
-                                stderr ||
-                                `Python exited with code ${code}`
-                            )
-                        );
+        if (code !== 0) {
 
-                        return;
+            reject(
+                new Error(
+                    stderr ||
+                    `Python exited with code ${code}`
+                )
+            );
 
-                    }
+            return;
+        }
 
-                    try {
+        try {
 
                         const tweets =
                             JSON.parse(
