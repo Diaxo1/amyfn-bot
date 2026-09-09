@@ -1,17 +1,47 @@
 const fs = require('fs');
 const path = require('path');
 
-const { getShop } = require('./fortniteApi');
+const {
+    AttachmentBuilder
+} = require('discord.js');
+
+const {
+    getShop
+} = require('./fortniteApi');
 
 const {
     getAllServerConfigs
 } = require('./serverConfig');
 
-const dataFolder = path.join(
+const {
+    createEmbed
+} = require('./embedStyle');
+
+const {
+    downloadImage
+} = require('./dailyShopImage');
+
+
+/*
+==================================================
+DATA STORAGE
+==================================================
+*/
+
+// Railway persistent volume is mounted here.
+// Local development falls back to ./data.
+const persistentDataFolder = '/data';
+
+const localDataFolder = path.join(
     __dirname,
     '..',
     'data'
 );
+
+const dataFolder =
+    fs.existsSync(persistentDataFolder)
+        ? persistentDataFolder
+        : localDataFolder;
 
 const snapshotFile = path.join(
     dataFolder,
@@ -20,6 +50,16 @@ const snapshotFile = path.join(
 
 const dailyResultFile = path.join(
     dataFolder,
+    'dailyResult.json'
+);
+
+const oldSnapshotFile = path.join(
+    localDataFolder,
+    'shopSnapshot.json'
+);
+
+const oldDailyResultFile = path.join(
+    localDataFolder,
     'dailyResult.json'
 );
 
@@ -33,9 +73,7 @@ DATA FOLDER
 */
 
 function ensureDataFolder() {
-
     if (!fs.existsSync(dataFolder)) {
-
         fs.mkdirSync(
             dataFolder,
             {
@@ -48,32 +86,84 @@ function ensureDataFolder() {
 
 /*
 ==================================================
+MIGRATE OLD LOCAL DATA
+==================================================
+*/
+
+function migrateFile(
+    source,
+    destination,
+    label
+) {
+    if (
+        source === destination ||
+        fs.existsSync(destination) ||
+        !fs.existsSync(source)
+    ) {
+        return;
+    }
+
+    try {
+        fs.copyFileSync(
+            source,
+            destination
+        );
+
+        console.log(
+            `📦 Migrated ${label} to persistent storage.`
+        );
+
+    } catch (error) {
+        console.error(
+            `❌ Failed to migrate ${label}:`,
+            error
+        );
+    }
+}
+
+
+function migratePersistentData() {
+    ensureDataFolder();
+
+    if (
+        dataFolder === persistentDataFolder
+    ) {
+        migrateFile(
+            oldSnapshotFile,
+            snapshotFile,
+            'shop snapshot'
+        );
+
+        migrateFile(
+            oldDailyResultFile,
+            dailyResultFile,
+            'daily result'
+        );
+    }
+}
+
+
+/*
+==================================================
 SHOP ITEM EXTRACTION
 ==================================================
 */
 
 function getShopItems(shop) {
-
     const items = [];
-
     const seen = new Set();
 
     for (
         const entry of shop.entries || []
     ) {
-
         const shopItems = [
-
             ...(entry.brItems || []),
-
             ...(entry.items || [])
-
         ];
 
         for (
             const item of shopItems
         ) {
-
             if (!item) {
                 continue;
             }
@@ -86,14 +176,12 @@ function getShopItems(shop) {
                 !id ||
                 seen.has(id)
             ) {
-
                 continue;
             }
 
             seen.add(id);
 
             items.push({
-
                 id,
 
                 name:
@@ -104,7 +192,6 @@ function getShopItems(shop) {
                     item.images?.featured ||
                     item.images?.icon ||
                     null
-
             });
         }
     }
@@ -115,23 +202,36 @@ function getShopItems(shop) {
 
 /*
 ==================================================
+ITEM SIGNATURE
+==================================================
+*/
+
+function createItemSignature(items) {
+    return items
+        .map(item => item.id)
+        .filter(Boolean)
+        .sort()
+        .join('|');
+}
+
+
+/*
+==================================================
 LOAD SHOP SNAPSHOT
 ==================================================
 */
 
 function loadSnapshot() {
-
     ensureDataFolder();
+    migratePersistentData();
 
     if (
         !fs.existsSync(snapshotFile)
     ) {
-
         return null;
     }
 
     try {
-
         const data =
             JSON.parse(
                 fs.readFileSync(
@@ -140,29 +240,12 @@ function loadSnapshot() {
                 )
             );
 
-        /*
-        Old/broken snapshot protection.
-
-        A valid shop snapshot MUST contain
-        currentItems.
-
-        If the file contains something like:
-
-        {
-            "ids": [...],
-            "updatedAt": "..."
-        }
-
-        that's a news snapshot, not a shop snapshot.
-        */
-
         if (
             !data ||
             !Array.isArray(
                 data.currentItems
             )
         ) {
-
             console.log(
                 '⚠️ Existing shopSnapshot.json is invalid. Ignoring it.'
             );
@@ -173,7 +256,6 @@ function loadSnapshot() {
         return data;
 
     } catch (error) {
-
         console.error(
             '❌ Failed to load shop snapshot:',
             error
@@ -194,11 +276,9 @@ function saveSnapshot(
     shop,
     currentItems
 ) {
-
     ensureDataFolder();
 
     const snapshot = {
-
         shopHash:
             shop.hash ||
             null,
@@ -207,23 +287,24 @@ function saveSnapshot(
             shop.date ||
             null,
 
+        itemSignature:
+            createItemSignature(
+                currentItems
+            ),
+
         currentItems,
 
         updatedAt:
             new Date().toISOString()
-
     };
 
     fs.writeFileSync(
-
         snapshotFile,
-
         JSON.stringify(
             snapshot,
             null,
             2
         )
-
     );
 }
 
@@ -237,38 +318,32 @@ DAILY RESULT
 function saveDailyResult(
     result
 ) {
-
     ensureDataFolder();
 
     fs.writeFileSync(
-
         dailyResultFile,
-
         JSON.stringify(
             result,
             null,
             2
         )
-
     );
 }
 
 
 function loadDailyResult() {
-
     ensureDataFolder();
+    migratePersistentData();
 
     if (
         !fs.existsSync(
             dailyResultFile
         )
     ) {
-
         return null;
     }
 
     try {
-
         return JSON.parse(
             fs.readFileSync(
                 dailyResultFile,
@@ -277,7 +352,6 @@ function loadDailyResult() {
         );
 
     } catch (error) {
-
         console.error(
             '❌ Failed to load daily result:',
             error
@@ -290,29 +364,21 @@ function loadDailyResult() {
 
 /*
 ==================================================
-POST TO SERVER
+POST DAILY SHOP
 ==================================================
 */
 
 async function postToServer(
-
     client,
-
     guildId,
-
     config,
-
     result
-
 ) {
-
     try {
-
         if (
             !config ||
             !config.channelId
         ) {
-
             console.log(
                 `ℹ️ No shop channel configured for server ${guildId}`
             );
@@ -326,7 +392,6 @@ async function postToServer(
             );
 
         if (!channel) {
-
             console.log(
                 `❌ Shop channel not found for server ${guildId}`
             );
@@ -335,81 +400,89 @@ async function postToServer(
         }
 
         const {
-
             releasedToday = [],
-
             removedToday = []
-
         } = result;
 
 
-        let description = '';
-
-
         /*
-        RELEASED
+        ==========================================
+        NEW ITEMS
+        ==========================================
         */
 
-        description +=
-            '🆕 **NEW IN THE SHOP**\n\n';
-
-        if (
+        const releasedText =
             releasedToday.length > 0
-        ) {
-
-            description +=
-
-                releasedToday
-                    .map(
-                        item =>
-                            `• **${item.name}**`
-                    )
-                    .join('\n');
-
-        } else {
-
-            description +=
-                'No new cosmetics detected.';
-        }
+                ? releasedToday
+                    .map(item => item.name)
+                    .join('\n')
+                : 'Nothing new released.';
 
 
         /*
-        REMOVED
+        ==========================================
+        REMOVED ITEMS
+        ==========================================
         */
 
-        description +=
-            '\n\n❌ **REMOVED FROM SHOP**\n\n';
+        const removedText =
+            removedToday.length > 0
+                ? removedToday
+                    .map(item => item.name)
+                    .join('\n')
+                : 'Nothing removed.';
+
+
+        /*
+        ==========================================
+        CLEAN DAILY EMBED
+        ==========================================
+        */
+
+        const embed =
+            createEmbed({
+                title:
+                    'FORTNITE SHOP RESET',
+
+                description:
+                    'The latest Fortnite Item Shop rotation has been detected.',
+
+                timestamp: false
+            });
+
 
         if (
-            removedToday.length > 0
+            result.detectedAt
         ) {
-
-            description +=
-
-                removedToday
-                    .map(
-                        item =>
-                            `• **${item.name}**`
-                    )
-                    .join('\n');
-
-        } else {
-
-            description +=
-                'Nothing removed.';
+            embed.setTimestamp(
+                new Date(
+                    result.detectedAt
+                )
+            );
         }
 
 
-        /*
-        SUMMARY
-        */
+        embed.addFields(
+            {
+                name:
+                    `NEW IN THE SHOP  •  ${releasedToday.length}`,
 
-        description +=
-            '\n\n' +
+                value:
+                    releasedText,
 
-            `*${releasedToday.length} new • ` +
+                inline: true
+            },
 
-            `${removedToday.length} removed*`;
+            {
+                name:
+                    `REMOVED FROM SHOP  •  ${removedToday.length}`,
+
+                value:
+                    removedText,
+
+                inline: true
+            }
+        );
 
 
         const roleId =
@@ -422,54 +495,28 @@ async function postToServer(
 
 
         /*
-        SEND MAIN MESSAGE
+        ==========================================
+        SEND MAIN DAILY MESSAGE
+        ==========================================
         */
 
         await channel.send({
-
             content,
 
             embeds: [
-
-                {
-
-                    title:
-                        '🛒 Fortnite Shop Reset',
-
-                    description,
-
-                    timestamp:
-                        new Date().toISOString(),
-
-                    footer: {
-
-                        text:
-                            'Amyfn • Fortnite Shop'
-
-                    }
-
-                }
-
+                embed
             ],
 
             allowedMentions:
-
                 roleId
-
                     ? {
-
                         roles: [
                             roleId
                         ]
-
                     }
-
                     : {
-
                         parse: []
-
                     }
-
         });
 
 
@@ -479,25 +526,23 @@ async function postToServer(
 
 
         /*
-        SEND NEW COSMETIC IMAGES
+        ==========================================
+        NEW COSMETIC IMAGES
+        ==========================================
         */
 
-        const images =
-
+        const imageItems =
             releasedToday
-
-                .map(
+                .filter(
                     item =>
+                        item &&
                         item.image
-                )
-
-                .filter(Boolean);
+                );
 
 
         if (
-            images.length === 0
+            imageItems.length === 0
         ) {
-
             console.log(
                 `ℹ️ No new cosmetic images for server ${guildId}`
             );
@@ -507,45 +552,102 @@ async function postToServer(
 
 
         console.log(
-            `🖼️ Sending ${images.length} new cosmetic images to server ${guildId}...`
+            `🖼️ Downloading ${imageItems.length} new cosmetic images for server ${guildId}...`
         );
 
 
         /*
-        Discord allows max 10 embeds per message.
+        ==========================================
+        DOWNLOAD IMAGES
+        ==========================================
+        */
+
+        const attachments = [];
+
+        for (
+            let i = 0;
+            i < imageItems.length;
+            i++
+        ) {
+            const item =
+                imageItems[i];
+
+            try {
+                const buffer =
+                    await downloadImage(
+                        item.image
+                    );
+
+                const attachment =
+                    new AttachmentBuilder(
+                        buffer
+                    ).setName(
+                        `daily-shop-${i + 1}.png`
+                    );
+
+                attachments.push(
+                    attachment
+                );
+
+            } catch (error) {
+                console.error(
+                    `⚠️ Failed to download image for ${item.name}:`,
+                    error.message
+                );
+            }
+        }
+
+
+        if (
+            attachments.length === 0
+        ) {
+            console.log(
+                `⚠️ No daily images could be downloaded for server ${guildId}`
+            );
+
+            return;
+        }
+
+
+        /*
+        ==========================================
+        SEND IMAGE GALLERY
+        ==========================================
         */
 
         for (
             let i = 0;
-
-            i < images.length;
-
+            i < attachments.length;
             i += 10
         ) {
-
             const batch =
-                images.slice(
+                attachments.slice(
                     i,
                     i + 10
                 );
 
 
+            const imageEmbed =
+                createEmbed({
+                    title:
+                        'FORTNITE SHOP IMAGES',
+
+                    description:
+                        i === 0
+                            ? `Images for ${imageItems.length} newly released cosmetic${imageItems.length === 1 ? '' : 's'}.`
+                            : 'More newly released cosmetics from this shop rotation.',
+
+                    timestamp: false
+                });
+
+
             await channel.send({
+                embeds: [
+                    imageEmbed
+                ],
 
-                embeds:
-
-                    batch.map(
-                        image => ({
-
-                            image: {
-                                url: image
-                            }
-
-                        })
-                    )
-
+                files: batch
             });
-
         }
 
 
@@ -553,17 +655,11 @@ async function postToServer(
             `✅ New cosmetic image gallery sent to server ${guildId}`
         );
 
-
     } catch (error) {
-
         console.error(
-
             `❌ Failed posting shop update to server ${guildId}:`,
-
             error
-
         );
-
     }
 }
 
@@ -575,16 +671,11 @@ ANNOUNCE TO ALL SERVERS
 */
 
 async function announceToAllServers(
-
     client,
-
     result
-
 ) {
-
     const configs =
         getAllServerConfigs();
-
 
     const guildIds =
         Object.keys(configs);
@@ -593,7 +684,6 @@ async function announceToAllServers(
     if (
         guildIds.length === 0
     ) {
-
         console.log(
             'ℹ️ No servers have configured /setup yet.'
         );
@@ -603,28 +693,19 @@ async function announceToAllServers(
 
 
     console.log(
-
         `📢 Sending shop reset to ${guildIds.length} configured server(s)...`
-
     );
 
 
     for (
         const guildId of guildIds
     ) {
-
         await postToServer(
-
             client,
-
             guildId,
-
             configs[guildId],
-
             result
-
         );
-
     }
 }
 
@@ -638,18 +719,14 @@ CHECK SHOP
 async function checkShop(
     client
 ) {
-
     if (checking) {
-
         return;
     }
-
 
     checking = true;
 
 
     try {
-
         const shop =
             await getShop();
 
@@ -660,7 +737,6 @@ async function checkShop(
                 shop.entries
             )
         ) {
-
             console.log(
                 '⚠️ Shop unavailable.'
             );
@@ -676,7 +752,6 @@ async function checkShop(
         if (
             currentItems.length === 0
         ) {
-
             console.log(
                 '⚠️ No shop items found.'
             );
@@ -686,14 +761,14 @@ async function checkShop(
 
 
         console.log(
-
             `🛒 Current shop: ${currentItems.length} unique items`
-
         );
 
 
         /*
+        ==========================================
         LOAD PREVIOUS SHOP
+        ==========================================
         */
 
         const previousSnapshot =
@@ -701,13 +776,14 @@ async function checkShop(
 
 
         /*
+        ==========================================
         FIRST VALID SNAPSHOT
+        ==========================================
         */
 
         if (
             !previousSnapshot
         ) {
-
             saveSnapshot(
                 shop,
                 currentItems
@@ -715,21 +791,22 @@ async function checkShop(
 
 
             console.log(
-
                 `📸 Initial SHOP snapshot saved (${currentItems.length} items).`
-
             );
 
-            console.log(
 
+            console.log(
                 `🕒 Shop date: ${shop.date || 'unknown'}`
-
             );
 
+
             console.log(
-
                 `🔑 Shop hash: ${shop.hash || 'unknown'}`
+            );
 
+
+            console.log(
+                '⏳ No announcement sent because this is the initial snapshot.'
             );
 
             return;
@@ -737,7 +814,9 @@ async function checkShop(
 
 
         /*
-        CHECK WHETHER THE SHOP ROTATED
+        ==========================================
+        COMPARE SHOP ROTATION
+        ==========================================
         */
 
         const previousHash =
@@ -754,35 +833,51 @@ async function checkShop(
             shop.date;
 
 
-        const shopChanged =
-
-            (
-
-                currentHash &&
-                previousHash &&
-                currentHash !== previousHash
-
-            )
-
-            ||
-
-            (
-
-                currentDate &&
-                previousDate &&
-                currentDate !== previousDate
-
+        const previousSignature =
+            previousSnapshot.itemSignature ||
+            createItemSignature(
+                previousSnapshot.currentItems || []
             );
 
 
+        const currentSignature =
+            createItemSignature(
+                currentItems
+            );
+
+
+        const hashChanged =
+            Boolean(
+                currentHash &&
+                previousHash &&
+                currentHash !== previousHash
+            );
+
+
+        const dateChanged =
+            Boolean(
+                currentDate &&
+                previousDate &&
+                currentDate !== previousDate
+            );
+
+
+        const itemsChanged =
+            currentSignature !==
+            previousSignature;
+
+
         /*
-        IF THE API HAS NOT GIVEN US A NEW
-        SHOP ROTATION YET, DON'T TOUCH THE
-        SNAPSHOT.
+        ==========================================
+        NO ROTATION CHANGE
+        ==========================================
         */
 
-        if (!shopChanged) {
-
+        if (
+            !hashChanged &&
+            !dateChanged &&
+            !itemsChanged
+        ) {
             console.log(
                 '🛒 Shop unchanged.'
             );
@@ -790,6 +885,12 @@ async function checkShop(
             return;
         }
 
+
+        /*
+        ==========================================
+        NEW ROTATION DETECTED
+        ==========================================
+        */
 
         console.log(
             '🔄 NEW SHOP ROTATION DETECTED!'
@@ -806,17 +907,27 @@ async function checkShop(
         );
 
 
+        console.log(
+            `Previous date: ${previousDate || 'unknown'}`
+        );
+
+
+        console.log(
+            `Current date: ${currentDate || 'unknown'}`
+        );
+
+
         /*
-        BUILD MAPS
+        ==========================================
+        BUILD ITEM MAPS
+        ==========================================
         */
 
         const previousItems =
             Array.isArray(
                 previousSnapshot.currentItems
             )
-
                 ? previousSnapshot.currentItems
-
                 : [];
 
 
@@ -827,17 +938,14 @@ async function checkShop(
         for (
             const item of previousItems
         ) {
-
             if (
                 item &&
                 item.id
             ) {
-
                 previousMap.set(
                     item.id,
                     item
                 );
-
             }
         }
 
@@ -849,96 +957,87 @@ async function checkShop(
         for (
             const item of currentItems
         ) {
-
             if (
                 item &&
                 item.id
             ) {
-
                 currentMap.set(
                     item.id,
                     item
                 );
-
             }
         }
 
 
         /*
+        ==========================================
         NEW ITEMS
+        ==========================================
         */
 
         const releasedToday =
-
             currentItems.filter(
-
                 item =>
-
                     !previousMap.has(
                         item.id
                     )
-
             );
 
 
         /*
+        ==========================================
         REMOVED ITEMS
+        ==========================================
         */
 
         const removedToday =
-
             previousItems.filter(
-
                 item =>
-
                     !currentMap.has(
                         item.id
                     )
-
             );
 
 
         console.log(
-
             `🆕 New: ${releasedToday.length}`
-
         );
 
 
         console.log(
-
             `❌ Removed: ${removedToday.length}`
-
         );
 
 
         /*
-        IMPORTANT:
-        SAVE THE NEW SHOP SNAPSHOT
-        BEFORE ANNOUNCING.
-
-        This prevents the same rotation
-        from being announced again if
-        Discord posting fails halfway.
+        ==========================================
+        CREATE RESULT
+        ==========================================
         */
 
         const result = {
-
             detectedAt:
                 new Date().toISOString(),
 
             shopHash:
-                currentHash || null,
+                currentHash ||
+                null,
 
             shopDate:
-                currentDate || null,
+                currentDate ||
+                null,
 
             releasedToday,
 
             removedToday
-
         };
 
+
+        /*
+        ==========================================
+        SAVE BEFORE ANNOUNCING
+        ==========================================
+        */
 
         saveDailyResult(
             result
@@ -946,41 +1045,36 @@ async function checkShop(
 
 
         saveSnapshot(
-
             shop,
-
             currentItems
+        );
 
+
+        console.log(
+            '💾 New shop snapshot saved before announcement.'
         );
 
 
         /*
-        SEND DISCORD ANNOUNCEMENT
+        ==========================================
+        ANNOUNCE
+        ==========================================
         */
 
         await announceToAllServers(
-
             client,
-
             result
-
         );
 
 
     } catch (error) {
-
         console.error(
-
             '❌ Shop tracker error:',
-
             error
-
         );
 
     } finally {
-
         checking = false;
-
     }
 }
 
@@ -994,9 +1088,13 @@ START TRACKER
 function startShopTracker(
     client
 ) {
-
     console.log(
         '🔎 Starting Fortnite shop tracker...'
+    );
+
+
+    console.log(
+        `💾 Shop tracker storage: ${dataFolder}`
     );
 
 
@@ -1012,17 +1110,11 @@ function startShopTracker(
     */
 
     setInterval(
-
         () => {
-
             checkShop(client);
-
         },
-
         5 * 60 * 1000
-
     );
-
 }
 
 
@@ -1033,9 +1125,7 @@ LATEST DAILY RESULT
 */
 
 function getLatestDailyResult() {
-
     return loadDailyResult();
-
 }
 
 
@@ -1046,9 +1136,6 @@ EXPORTS
 */
 
 module.exports = {
-
     startShopTracker,
-
     getLatestDailyResult
-
 };
