@@ -17,10 +17,31 @@ const BRIDGE_PATH = path.join(
     'leak_bridge.py'
 );
 
-const SNAPSHOT_PATH = path.join(
+// ==========================================
+// PERSISTENT DATA STORAGE
+// ==========================================
+
+const persistentDataFolder = '/data';
+
+const localDataFolder = path.join(
     __dirname,
     '..',
-    'data',
+    'data'
+);
+
+const dataFolder = fs.existsSync(
+    persistentDataFolder
+)
+    ? persistentDataFolder
+    : localDataFolder;
+
+const SNAPSHOT_PATH = path.join(
+    dataFolder,
+    'leakSnapshot.json'
+);
+
+const OLD_SNAPSHOT_PATH = path.join(
+    localDataFolder,
     'leakSnapshot.json'
 );
 
@@ -31,12 +52,6 @@ const CHECK_INTERVAL = 60 * 1000;
 // ==========================================
 
 function ensureDataFolder() {
-
-    const dataFolder = path.join(
-        __dirname,
-        '..',
-        'data'
-    );
 
     if (!fs.existsSync(dataFolder)) {
 
@@ -52,12 +67,50 @@ function ensureDataFolder() {
 }
 
 // ==========================================
+// MIGRATE OLD SNAPSHOT
+// ==========================================
+
+function migrateSnapshot() {
+
+    ensureDataFolder();
+
+    if (
+        dataFolder === persistentDataFolder &&
+        !fs.existsSync(SNAPSHOT_PATH) &&
+        fs.existsSync(OLD_SNAPSHOT_PATH)
+    ) {
+
+        try {
+
+            fs.copyFileSync(
+                OLD_SNAPSHOT_PATH,
+                SNAPSHOT_PATH
+            );
+
+            console.log(
+                '📦 Migrated leak snapshot to persistent storage.'
+            );
+
+        } catch (error) {
+
+            console.error(
+                '❌ Failed to migrate leak snapshot:',
+                error
+            );
+
+        }
+
+    }
+
+}
+
+// ==========================================
 // LOAD SNAPSHOT
 // ==========================================
 
 function loadSnapshot() {
 
-    ensureDataFolder();
+    migrateSnapshot();
 
     if (!fs.existsSync(SNAPSHOT_PATH)) {
 
@@ -95,14 +148,25 @@ function saveSnapshot(snapshot) {
 
     ensureDataFolder();
 
-    fs.writeFileSync(
-        SNAPSHOT_PATH,
-        JSON.stringify(
-            snapshot,
-            null,
-            2
-        )
-    );
+    try {
+
+        fs.writeFileSync(
+            SNAPSHOT_PATH,
+            JSON.stringify(
+                snapshot,
+                null,
+                2
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            '❌ Failed to save leak snapshot:',
+            error
+        );
+
+    }
 
 }
 
