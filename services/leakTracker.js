@@ -386,6 +386,15 @@ async function sendLeakToGuild(
                 )
             ],
 
+            ...(tweet.videos && tweet.videos.length > 0
+                ? {
+                    content: [
+                        content,
+                        tweet.videos[0]
+                    ].filter(Boolean).join('\\n') || undefined
+                }
+                : {}),
+
             allowedMentions:
                 config.updatesRoleId
 
