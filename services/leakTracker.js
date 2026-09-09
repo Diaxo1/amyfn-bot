@@ -482,6 +482,16 @@ async function checkForLeaks(
         const snapshot =
             loadSnapshot();
 
+        console.log(
+    '🧪 Leak debug latest tweets:',
+    tweets.slice(0, 10).map(tweet => ({
+        id: tweet.id,
+        username: tweet.username,
+        date: tweet.date,
+        seen: !!snapshot[tweet.id]
+    }))
+);
+
         // ==================================
         // FIRST RUN
         // ==================================
