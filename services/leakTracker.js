@@ -17,6 +17,7 @@ const BRIDGE_PATH = path.join(
     'leak_bridge.py'
 );
 
+
 // ==========================================
 // PERSISTENT DATA STORAGE
 // ==========================================
@@ -47,6 +48,7 @@ const OLD_SNAPSHOT_PATH = path.join(
 
 const CHECK_INTERVAL = 60 * 1000;
 
+
 // ==========================================
 // DATA FOLDER
 // ==========================================
@@ -65,6 +67,7 @@ function ensureDataFolder() {
     }
 
 }
+
 
 // ==========================================
 // MIGRATE OLD SNAPSHOT
@@ -104,6 +107,7 @@ function migrateSnapshot() {
 
 }
 
+
 // ==========================================
 // LOAD SNAPSHOT
 // ==========================================
@@ -140,6 +144,7 @@ function loadSnapshot() {
 
 }
 
+
 // ==========================================
 // SAVE SNAPSHOT
 // ==========================================
@@ -170,11 +175,12 @@ function saveSnapshot(snapshot) {
 
 }
 
+
 // ==========================================
 // PYTHON BRIDGE
 // ==========================================
 
-function runPythonBridge() {
+function runPythonBridge(manual = false) {
 
     return new Promise(
         (resolve, reject) => {
@@ -187,7 +193,10 @@ function runPythonBridge() {
             const python =
                 spawn(
                     pythonCommand,
-                    [BRIDGE_PATH],
+                    [
+    BRIDGE_PATH,
+    ...(manual ? ['manual'] : [])
+],
                     {
                         windowsHide: true
                     }
@@ -226,29 +235,32 @@ function runPythonBridge() {
             );
 
             python.on(
-    'close',
-    code => {
+                'close',
+                code => {
 
-        if (stderr.trim()) {
-            console.log(
-                '🐍 Leak bridge stderr:',
-                stderr.trim()
-            );
-        }
+                    if (stderr.trim()) {
 
-        if (code !== 0) {
+                        console.log(
+                            '🐍 Leak bridge stderr:',
+                            stderr.trim()
+                        );
 
-            reject(
-                new Error(
-                    stderr ||
-                    `Python exited with code ${code}`
-                )
-            );
+                    }
 
-            return;
-        }
+                    if (code !== 0) {
 
-        try {
+                        reject(
+                            new Error(
+                                stderr ||
+                                `Python exited with code ${code}`
+                            )
+                        );
+
+                        return;
+
+                    }
+
+                    try {
 
                         const tweets =
                             JSON.parse(
@@ -275,6 +287,7 @@ function runPythonBridge() {
     );
 
 }
+
 
 // ==========================================
 // CREATE LEAK EMBED
@@ -329,6 +342,7 @@ function createLeakEmbed(tweet) {
 
 }
 
+
 // ==========================================
 // SEND LEAK TO ONE GUILD
 // ==========================================
@@ -370,30 +384,48 @@ async function sendLeakToGuild(
 
         }
 
-        const content =
+        const roleMention =
             pingRole &&
             config.updatesRoleId
                 ? `<@&${config.updatesRoleId}>`
                 : undefined;
 
+        const videoUrl =
+            tweet.videos &&
+            tweet.videos.length > 0
+                ? tweet.videos[0]
+                : undefined;
+
+        const contentParts = [];
+
+        if (roleMention) {
+
+            contentParts.push(
+                roleMention
+            );
+
+        }
+
+        if (videoUrl) {
+
+            contentParts.push(
+                videoUrl
+            );
+
+        }
+
         await channel.send({
 
-            content,
+            content:
+                contentParts.length > 0
+                    ? contentParts.join('\n')
+                    : undefined,
 
             embeds: [
                 createLeakEmbed(
                     tweet
                 )
             ],
-
-            ...(tweet.videos && tweet.videos.length > 0
-                ? {
-                    content: [
-                        content,
-                        tweet.videos[0]
-                    ].filter(Boolean).join('\\n') || undefined
-                }
-                : {}),
 
             allowedMentions:
                 config.updatesRoleId
@@ -424,6 +456,7 @@ async function sendLeakToGuild(
     }
 
 }
+
 
 // ==========================================
 // ANNOUNCE LEAK TO ALL SERVERS
@@ -465,6 +498,7 @@ async function announceLeak(
 
 }
 
+
 // ==========================================
 // CHECK FOR LEAKS
 // ==========================================
@@ -498,14 +532,14 @@ async function checkForLeaks(
             loadSnapshot();
 
         console.log(
-    '🧪 Leak debug latest tweets:',
-    tweets.slice(0, 10).map(tweet => ({
-        id: tweet.id,
-        username: tweet.username,
-        date: tweet.date,
-        seen: !!snapshot[tweet.id]
-    }))
-);
+            '🧪 Leak debug latest tweets:',
+            tweets.slice(0, 10).map(tweet => ({
+                id: tweet.id,
+                username: tweet.username,
+                date: tweet.date,
+                seen: !!snapshot[tweet.id]
+            }))
+        );
 
         // ==================================
         // FIRST RUN
@@ -640,6 +674,7 @@ async function checkForLeaks(
 
 }
 
+
 // ==========================================
 // START LEAK TRACKER
 // ==========================================
@@ -666,13 +701,14 @@ function startLeakTracker(
 
 }
 
+
 // ==========================================
 // GET LATEST LEAKS
 // ==========================================
 
 async function getLatestLeaks() {
 
-    return await runPythonBridge();
+    return await runPythonBridge(true);
 
 }
 
@@ -689,10 +725,12 @@ function getLeakStatus() {
         Object.keys(
             snapshot
         )
+
             .filter(
                 id =>
                     id !== 'initialized'
             )
+
             .length;
 
     return {
@@ -711,6 +749,7 @@ function getLeakStatus() {
     };
 
 }
+
 
 // ==========================================
 // EXPORTS

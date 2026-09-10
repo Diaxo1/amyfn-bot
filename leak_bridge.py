@@ -21,16 +21,36 @@ LEAKERS = {
 
 
 # ==========================================
-# TWSCRAPE DATABASE
+# SETTINGS
 # ==========================================
-#
-# Railway:
-#   /data/accounts.db
-#
-# Local:
-#   accounts.db beside leak_bridge.py
-#
-# We never print the contents of this database.
+
+# Normal automatic tracker timeout
+REQUEST_TIMEOUT = 20
+
+# Manual /leaks latest timeout
+# Allows twscrape enough time to wait for
+# its account cooldown.
+MANUAL_TIMEOUT = 300
+
+
+# ==========================================
+# DETERMINE MODE
+# ==========================================
+
+MANUAL_MODE = (
+    len(sys.argv) > 1
+    and sys.argv[1].lower() == "manual"
+)
+
+CURRENT_TIMEOUT = (
+    MANUAL_TIMEOUT
+    if MANUAL_MODE
+    else REQUEST_TIMEOUT
+)
+
+
+# ==========================================
+# TWSCRAPE DATABASE
 # ==========================================
 
 LOCAL_DB = os.path.join(
@@ -52,14 +72,17 @@ else:
         "ERROR: twscrape database not found.",
         file=sys.stderr
     )
+
     print(
         "Expected Railway database at /data/accounts.db",
         file=sys.stderr
     )
+
     print(
         "Expected local database beside leak_bridge.py",
         file=sys.stderr
     )
+
     sys.exit(1)
 
 
@@ -92,7 +115,11 @@ def get_media(tweet):
     images = []
     videos = []
 
-    media = getattr(tweet, "media", None)
+    media = getattr(
+        tweet,
+        "media",
+        None
+    )
 
     if not media:
         return images, videos
@@ -139,6 +166,121 @@ def get_media(tweet):
 
 
 # ==========================================
+# FETCH ONE LEAKER
+# ==========================================
+
+async def fetch_leaker(
+    api,
+    username,
+    user_id
+):
+
+    print(
+        f"🔎 Checking @{username}...",
+        file=sys.stderr,
+        flush=True
+    )
+
+    results = []
+
+    try:
+
+        async def collect():
+
+            async for tweet in api.user_tweets(
+                user_id,
+                limit=1
+            ):
+
+                author = getattr(
+                    tweet,
+                    "user",
+                    None
+                )
+
+                display_name = username
+
+                if author:
+
+                    display_name = (
+                        getattr(
+                            author,
+                            "displayname",
+                            None
+                        )
+                        or username
+                    )
+
+                images, videos = get_media(
+                    tweet
+                )
+
+                results.append({
+
+                    "id": str(
+                        tweet.id
+                    ),
+
+                    "username": username,
+
+                    "displayName": display_name,
+
+                    "text": getattr(
+                        tweet,
+                        "rawContent",
+                        ""
+                    ),
+
+                    "date": tweet.date.isoformat(),
+
+                    "url": (
+                        f"https://x.com/"
+                        f"{username}/status/"
+                        f"{tweet.id}"
+                    ),
+
+                    "images": images,
+
+                    "videos": videos
+
+                })
+
+        await asyncio.wait_for(
+            collect(),
+            timeout=CURRENT_TIMEOUT
+        )
+
+        print(
+            f"✅ @{username}: {len(results)} tweets",
+            file=sys.stderr,
+            flush=True
+        )
+
+        return results
+
+    except asyncio.TimeoutError:
+
+        print(
+            f"⏱️ @{username}: request timed out after "
+            f"{CURRENT_TIMEOUT}s",
+            file=sys.stderr,
+            flush=True
+        )
+
+        return []
+
+    except Exception as error:
+
+        print(
+            f"❌ @{username}: {error}",
+            file=sys.stderr,
+            flush=True
+        )
+
+        return []
+
+
+# ==========================================
 # MAIN
 # ==========================================
 
@@ -146,123 +288,38 @@ async def main():
 
     try:
 
-        api = API(TWSCRAPE_DB)
-
-        # ==================================
-        # TWSCRAPE ACCOUNT DIAGNOSTICS
-        # ==================================
-
         print(
-            f"🗄️ TWSCRAPE DB: {TWSCRAPE_DB}",
-            file=sys.stderr
+            "🗄️ TWSCRAPE DB:",
+            TWSCRAPE_DB,
+            file=sys.stderr,
+            flush=True
         )
 
-        try:
+        print(
+            f"⏱️ Bridge mode: "
+            f"{'MANUAL' if MANUAL_MODE else 'AUTOMATIC'} "
+            f"({CURRENT_TIMEOUT}s timeout)",
+            file=sys.stderr,
+            flush=True
+        )
 
-            accounts = await api.accounts_info()
-
-            if not accounts:
-
-                print(
-                    "⚠️ No twscrape accounts found in database.",
-                    file=sys.stderr
-                )
-
-            else:
-
-                for account in accounts:
-
-                    print(
-                        f"👤 twscrape account: "
-                        f"{account.username} | "
-                        f"active={account.active}",
-                        file=sys.stderr
-                    )
-
-        except Exception as error:
-
-            print(
-                f"❌ Failed to read twscrape accounts: {error}",
-                file=sys.stderr
-            )
+        api = API(TWSCRAPE_DB)
 
         results = []
 
         # ==================================
-        # CHECK LEAK SOURCES
+        # CHECK ALL LEAK SOURCES
         # ==================================
 
         for username, user_id in LEAKERS.items():
 
-            try:
+            tweets = await fetch_leaker(
+                api,
+                username,
+                user_id
+            )
 
-                async for tweet in api.user_tweets(
-                    user_id,
-                    limit=5
-                ):
-
-                    author = getattr(
-                        tweet,
-                        "user",
-                        None
-                    )
-
-                    display_name = username
-
-                    if author:
-
-                        display_name = (
-                            getattr(
-                                author,
-                                "displayname",
-                                None
-                            )
-                            or username
-                        )
-
-                    images, videos = get_media(
-                        tweet
-                    )
-
-                    results.append({
-
-                        "id": str(
-                            tweet.id
-                        ),
-
-                        "username": username,
-
-                        "displayName": display_name,
-
-                        "text": getattr(
-                            tweet,
-                            "rawContent",
-                            ""
-                        ),
-
-                        "date": tweet.date.isoformat(),
-
-                        "url": (
-                            f"https://x.com/"
-                            f"{username}/status/"
-                            f"{tweet.id}"
-                        ),
-
-                        "images": images,
-
-                        "videos": videos
-
-                    })
-
-            except Exception as error:
-
-                # Only log the leaker name and error.
-                # Never expose database contents.
-
-                print(
-                    f"ERROR @{username}: {error}",
-                    file=sys.stderr
-                )
+            results.extend(tweets)
 
         # ==================================
         # SORT NEWEST FIRST
@@ -274,6 +331,36 @@ async def main():
         )
 
         # ==================================
+        # REMOVE DUPLICATES
+        # ==================================
+
+        unique_results = []
+        seen_ids = set()
+
+        for tweet in results:
+
+            tweet_id = tweet["id"]
+
+            if tweet_id in seen_ids:
+                continue
+
+            seen_ids.add(tweet_id)
+
+            unique_results.append(tweet)
+
+        results = unique_results
+
+        # ==================================
+        # FINAL DEBUG
+        # ==================================
+
+        print(
+            f"📦 Bridge returning {len(results)} tweets",
+            file=sys.stderr,
+            flush=True
+        )
+
+        # ==================================
         # OUTPUT JSON
         # ==================================
 
@@ -281,14 +368,16 @@ async def main():
             json.dumps(
                 results,
                 ensure_ascii=False
-            )
+            ),
+            flush=True
         )
 
     except Exception as error:
 
         print(
             f"ERROR: Leak bridge failed: {error}",
-            file=sys.stderr
+            file=sys.stderr,
+            flush=True
         )
 
         sys.exit(1)
@@ -312,7 +401,8 @@ if __name__ == "__main__":
 
         print(
             f"ERROR: Unexpected leak bridge failure: {error}",
-            file=sys.stderr
+            file=sys.stderr,
+            flush=True
         )
 
         sys.exit(1)
