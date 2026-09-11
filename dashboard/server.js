@@ -52,6 +52,7 @@ const app = express();
 
 
 const PORT =
+    process.env.PORT ||
     process.env.DASHBOARD_PORT ||
     3000;
 
