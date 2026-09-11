@@ -58,30 +58,54 @@ LOCAL_DB = os.path.join(
     "accounts.db"
 )
 
+# Railway volume locations
 RAILWAY_DB = "/data/accounts.db"
+APP_DATA_DB = "/app/data/accounts.db"
 
+# Check possible database locations
+DB_CANDIDATES = [
+    RAILWAY_DB,
+    APP_DATA_DB,
+    LOCAL_DB
+]
 
-if os.path.isfile(RAILWAY_DB):
-    TWSCRAPE_DB = RAILWAY_DB
+TWSCRAPE_DB = None
 
-elif os.path.isfile(LOCAL_DB):
-    TWSCRAPE_DB = LOCAL_DB
+for db_path in DB_CANDIDATES:
 
-else:
+    if os.path.isfile(db_path):
+
+        TWSCRAPE_DB = db_path
+
+        print(
+            f"✅ Found twscrape database: {db_path}",
+            file=sys.stderr,
+            flush=True
+        )
+
+        break
+
+if not TWSCRAPE_DB:
+
     print(
         "ERROR: twscrape database not found.",
-        file=sys.stderr
+        file=sys.stderr,
+        flush=True
     )
 
     print(
-        "Expected Railway database at /data/accounts.db",
-        file=sys.stderr
+        "Checked:",
+        file=sys.stderr,
+        flush=True
     )
 
-    print(
-        "Expected local database beside leak_bridge.py",
-        file=sys.stderr
-    )
+    for db_path in DB_CANDIDATES:
+
+        print(
+            f"  - {db_path}",
+            file=sys.stderr,
+            flush=True
+        )
 
     sys.exit(1)
 
