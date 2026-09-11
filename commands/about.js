@@ -26,15 +26,11 @@ const ABOUT_BANNER = path.join(
 
 const DASHBOARD_URL =
     process.env.AMYFN_DASHBOARD_URL ||
-    'https://example.com';
-
-const WEBSITE_URL =
-    process.env.AMYFN_WEBSITE_URL ||
-    'https://example.com';
+    'https://amyfn.up.railway.app/';
 
 const SUPPORT_URL =
     process.env.AMYFN_SUPPORT_URL ||
-    'https://discord.com';
+    'https://discord.gg/mwNKev8ZEY';
 
 const INVITE_URL =
     process.env.AMYFN_INVITE_URL ||
@@ -161,6 +157,19 @@ module.exports = {
                             'or a content creator — Amyfn is here to keep you informed, ' +
                             'connected and ahead of the game.',
                         inline: false
+                    },
+
+                    // ==================================
+                    // SHOP CODE
+                    // ==================================
+
+                    {
+                        name: '💙 Support Amyfn',
+                        value:
+                            'Please use Fortnite Shop Code **`XAID`** when ' +
+                            'purchasing items in the Fortnite Item Shop. ' +
+                            'It helps support the creator! ❤️',
+                        inline: false
                     }
 
                 )
@@ -195,18 +204,6 @@ module.exports = {
                         )
                         .setURL(
                             DASHBOARD_URL
-                        ),
-
-                    new ButtonBuilder()
-                        .setLabel(
-                            'Website'
-                        )
-                        .setEmoji('🌐')
-                        .setStyle(
-                            ButtonStyle.Link
-                        )
-                        .setURL(
-                            WEBSITE_URL
                         ),
 
                     new ButtonBuilder()

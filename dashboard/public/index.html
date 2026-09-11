@@ -32,7 +32,7 @@
 
         <div class="brand">
 
-            <<div class="brand-logo">
+            <div class="brand-logo">
     <img id="bot-avatar" src="" alt="Amyfn">
     <span id="bot-avatar-placeholder">A</span>
 </div>
@@ -151,6 +151,8 @@
 
     </aside>
 
+    <div class="mobile-sidebar-overlay" id="mobile-sidebar-overlay"></div>
+
 
 
     <!-- ====================================== -->
@@ -164,6 +166,11 @@
 
         <header class="topbar">
 
+            <button class="mobile-menu-button" id="mobile-menu-button" type="button" aria-label="Open navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
 
             <div>
 
@@ -1718,6 +1725,46 @@
 
 
     <script src="/app.js"></script>
+
+    <script>
+        (function () {
+            const sidebar = document.querySelector('.sidebar');
+            const menuButton = document.getElementById('mobile-menu-button');
+            const overlay = document.getElementById('mobile-sidebar-overlay');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            if (!sidebar || !menuButton || !overlay) return;
+
+            function setMobileMenu(open) {
+                sidebar.classList.toggle('mobile-open', open);
+                overlay.classList.toggle('visible', open);
+                menuButton.classList.toggle('is-open', open);
+                menuButton.setAttribute('aria-expanded', String(open));
+                menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+                document.body.classList.toggle('sidebar-open', open);
+            }
+
+            menuButton.addEventListener('click', function () {
+                setMobileMenu(!sidebar.classList.contains('mobile-open'));
+            });
+
+            overlay.addEventListener('click', function () {
+                setMobileMenu(false);
+            });
+
+            navItems.forEach(function (item) {
+                item.addEventListener('click', function () {
+                    setMobileMenu(false);
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 700) {
+                    setMobileMenu(false);
+                }
+            });
+        })();
+    </script>
 
 
 </body>
