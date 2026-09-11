@@ -1976,6 +1976,21 @@ async function saveServerConfig(
         const data =
             await response.json();
 
+        const botAvatar =
+    document.getElementById('bot-avatar');
+
+const botAvatarPlaceholder =
+    document.getElementById('bot-avatar-placeholder');
+
+if (botAvatar && data.avatar) {
+    botAvatar.src = data.avatar;
+    botAvatar.style.display = 'block';
+
+    if (botAvatarPlaceholder) {
+        botAvatarPlaceholder.style.display = 'none';
+    }
+}    
+
 
         if (!data.success) {
 

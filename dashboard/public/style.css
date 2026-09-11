@@ -4287,6 +4287,21 @@ body {
         grid-template-columns: 1fr;
     }
 }
+.brand-logo {
+    overflow: hidden;
+}
+
+.brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: none;
+}
+
+.brand-logo span {
+    display: block;
+}
 
 
 /* AUTHENTICATED USER */

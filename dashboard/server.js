@@ -439,6 +439,8 @@ app.get('/auth/discord/callback', async (req, res) => {
                     ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
                     : null
             },
+            
+            
             guildIds: authorizedGuilds.map(
                 guild => guild.id
             ),
@@ -582,16 +584,20 @@ app.get(
 
 
             res.json({
+    bot:
+        discordClient.user?.username ||
+        'Amyfn',
 
-                bot:
-                    discordClient.user?.username ||
-                    'Amyfn',
+    avatar:
+        discordClient.user?.displayAvatarURL({
+            extension: 'png',
+            size: 128
+        }) || null,
 
-
-                status:
-                    discordClient.isReady()
-                        ? 'online'
-                        : 'offline',
+    status:
+        discordClient.isReady()
+            ? 'online'
+            : 'offline',
 
 
                 environment:
