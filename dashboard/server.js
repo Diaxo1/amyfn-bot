@@ -183,6 +183,7 @@ const oauthStates =
 function getRedirectUri() {
     return `${dashboardUrl}/auth/discord/callback`;
 }
+console.log('OAuth redirect URI:', getRedirectUri());
 
 function getSession(req) {
     const cookieHeader =
