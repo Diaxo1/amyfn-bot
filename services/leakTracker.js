@@ -41,6 +41,11 @@ const SNAPSHOT_PATH = path.join(
     'leakSnapshot.json'
 );
 
+const LEAK_CACHE_PATH = path.join(
+    dataFolder,
+    'leakCache.json'
+);
+
 const OLD_SNAPSHOT_PATH = path.join(
     localDataFolder,
     'leakSnapshot.json'
@@ -175,6 +180,72 @@ function saveSnapshot(snapshot) {
 
 }
 
+// ==========================================
+// SAVE LEAK CACHE
+// ==========================================
+
+function saveLeakCache(tweets) {
+
+    ensureDataFolder();
+
+    try {
+
+        fs.writeFileSync(
+            LEAK_CACHE_PATH,
+            JSON.stringify(
+                tweets,
+                null,
+                2
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            '❌ Failed to save leak cache:',
+            error
+        );
+
+    }
+
+}
+
+// ==========================================
+// GET CACHED LEAKS
+// ==========================================
+
+function getCachedLeaks() {
+
+    if (!fs.existsSync(LEAK_CACHE_PATH)) {
+        return [];
+    }
+
+    try {
+
+        const leaks =
+            JSON.parse(
+                fs.readFileSync(
+                    LEAK_CACHE_PATH,
+                    'utf8'
+                )
+            );
+
+        return Array.isArray(leaks)
+            ? leaks
+            : [];
+
+    } catch (error) {
+
+        console.error(
+            '❌ Failed to load leak cache:',
+            error
+        );
+
+        return [];
+
+    }
+
+}
 
 // ==========================================
 // PYTHON BRIDGE
@@ -530,6 +601,8 @@ async function checkForLeaks(
 
         const snapshot =
             loadSnapshot();
+        
+        saveLeakCache(tweets);    
 
         console.log(
             '🧪 Leak debug latest tweets:',
@@ -760,6 +833,8 @@ module.exports = {
     startLeakTracker,
 
     getLatestLeaks,
+
+    getCachedLeaks,
 
     getLeakStatus,
 

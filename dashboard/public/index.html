@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Amyfn Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ====================================== -->
+    <!-- SIDEBAR -->
+    <!-- ====================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                A
+            </div>
+
+            <div>
+
+                <h1>
+                    Amyfn
+                </h1>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+
+            <button
+                class="nav-item active"
+                data-page="overview"
+            >
+                Overview
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="settings"
+            >
+                Server Settings
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="shop"
+            >
+                Shop
+            </button>
+
+
+
+
+            <button
+                class="nav-item"
+                data-page="cosmetics"
+            >
+                Cosmetics
+            </button>
+
+            <button
+                class="nav-item"
+                data-page="leaks"
+            >
+                Leaks
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="news"
+            >
+                News
+            </button>
+
+            
+
+            <button
+                class="nav-item"
+                data-page="giveaways"
+            >
+                Giveaways
+            </button>
+
+
+            <button
+                class="nav-item"
+                data-page="moderation"
+            >
+                Moderation
+            </button>
+
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+
+            <div class="bot-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+
+                    <strong>
+                        Amyfn
+                    </strong>
+
+                    <small id="bot-status">
+                        Checking...
+                    </small>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- ====================================== -->
+    <!-- MAIN -->
+    <!-- ====================================== -->
+
+    <main class="main">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+
+            <div>
+
+                <p class="eyebrow">
+                    AMYFN CONTROL CENTER
+                </p>
+
+                <h2 id="page-title">
+                    Overview
+                </h2>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="environment">
+                    <span class="status-dot"></span>
+                    Development
+                </div>
+
+                <div class="dashboard-user" id="dashboard-user">
+                    <div class="dashboard-user-avatar-wrap">
+                        <img id="dashboard-user-avatar" class="dashboard-user-avatar" src="" alt="Discord user">
+                        <span class="dashboard-user-avatar-placeholder" id="dashboard-user-avatar-placeholder">D</span>
+                    </div>
+                    <div class="dashboard-user-info">
+                        <strong id="dashboard-user-name">Discord User</strong>
+                        <small id="dashboard-user-tag">Authenticated</small>
+                    </div>
+                    <button class="dashboard-logout" type="button" id="dashboard-logout">Log out</button>
+                </div>
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- CONTENT -->
+
+        <section
+            class="content"
+            id="dashboard-content"
+        >
+
+
+
+            <!-- ====================================== -->
+            <!-- OVERVIEW -->
+            <!-- ====================================== -->
+
+            <div
+                class="page active"
+                id="page-overview"
+            >
+
+                <section class="overview-hero">
+
+                    <div class="hero-grid"></div>
+                    <div class="hero-glow hero-glow-one"></div>
+                    <div class="hero-glow hero-glow-two"></div>
+
+                    <div class="overview-hero-content">
+
+                        <div class="hero-kicker">
+                            <span class="hero-kicker-dot"></span>
+                            AMYFN COMMAND CENTER
+                        </div>
+
+                        <h3>
+                            Your Fortnite community,
+                            <span>under control.</span>
+                        </h3>
+
+                        <p>
+                            Monitor your bot, manage trackers, giveaways
+                            and moderation from one place.
+                        </p>
+
+                        <div class="hero-actions">
+
+                            <button
+                                class="hero-action-primary"
+                                type="button"
+                                onclick="showPage('shop')"
+                            >
+                                <span>Open Shop</span>
+                                <span class="hero-arrow">→</span>
+                            </button>
+
+                            <button
+                                class="hero-action-secondary"
+                                type="button"
+                                onclick="showPage('moderation')"
+                            >
+                                Moderation
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="hero-status-card">
+
+                        <div class="hero-status-top">
+
+                            <span class="hero-status-icon">
+                                A
+                            </span>
+
+                            <span class="hero-live-pill">
+                                <span class="status-dot"></span>
+                                ONLINE
+                            </span>
+
+                        </div>
+
+                        <strong>Amyfn</strong>
+                        <small>Discord community bot</small>
+
+                        <div class="hero-status-line">
+                            <span>System status</span>
+                            <b id="hero-system-status">Checking...</b>
+                        </div>
+
+                        <div class="hero-status-bar">
+                            <span></span>
+                        </div>
+
+                        <div class="hero-status-footer">
+                            <span>All services</span>
+                            <span>Operational</span>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <div class="overview-section-heading">
+
+                    <div>
+                        <p class="eyebrow">
+                            AT A GLANCE
+                        </p>
+
+                        <h3>
+                            System overview
+                        </h3>
+                    </div>
+
+                    <span class="overview-updated">
+                        <span class="status-dot"></span>
+                        Live data
+                    </span>
+
+                </div>
+
+
+                <div class="stats-grid overview-stats">
+
+                    <div class="stat-card stat-card-blue">
+
+                        <div class="stat-card-top">
+                            <span>BOT STATUS</span>
+                            <div class="stat-icon">●</div>
+                        </div>
+
+                        <strong id="status-card">
+                            Checking...
+                        </strong>
+
+                        <small>
+                            Development bot
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat-card stat-card-purple">
+
+                        <div class="stat-card-top">
+                            <span>SERVERS</span>
+                            <div class="stat-icon">◆</div>
+                        </div>
+
+                        <strong id="server-count">
+                            --
+                        </strong>
+
+                        <small>
+                            Discord servers
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat-card stat-card-green">
+
+                        <div class="stat-card-top">
+                            <span>SHOP TRACKER</span>
+                            <div class="stat-icon">↻</div>
+                        </div>
+
+                        <strong id="shop-status">
+                            Checking...
+                        </strong>
+
+                        <small id="shop-last-reset">
+                            Checking last reset
+                        </small>
+
+                    </div>
+
+
+                    <div class="stat-card stat-card-orange">
+
+                        <div class="stat-card-top">
+                            <span>LEAK TRACKER</span>
+                            <div class="stat-icon">!</div>
+                        </div>
+
+                        <strong id="leak-status">
+                            Checking...
+                        </strong>
+
+                        <small id="leak-last-check">
+                            Checking last check
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="overview-section-heading trackers-heading">
+
+                    <div>
+                        <p class="eyebrow">
+                            AUTOMATION
+                        </p>
+
+                        <h3>
+                            Active trackers
+                        </h3>
+                    </div>
+
+                    <span class="tracker-summary">
+                        <span class="status-dot"></span>
+                        All systems running
+                    </span>
+
+                </div>
+
+
+                <div class="tracker-grid overview-trackers">
+
+                    <div class="tracker-card">
+
+                        <div class="tracker-icon tracker-icon-shop">
+                            S
+                        </div>
+
+                        <div class="tracker-copy">
+
+                            <div class="tracker-title-row">
+
+                                <h4>
+                                    Daily Shop
+                                </h4>
+
+                                <span
+                                    class="active-badge"
+                                    id="shop-tracker-badge"
+                                >
+                                    Active
+                                </span>
+
+                            </div>
+
+                            <p>
+                                Automatic Fortnite Item Shop
+                                monitoring.
+                            </p>
+
+                            <div class="tracker-meta">
+                                <span>FORTNITE</span>
+                                <span>•</span>
+                                <span>Automatic</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tracker-card">
+
+                        <div class="tracker-icon tracker-icon-leaks">
+                            L
+                        </div>
+
+                        <div class="tracker-copy">
+
+                            <div class="tracker-title-row">
+
+                                <h4>
+                                    Leak Tracker
+                                </h4>
+
+                                <span
+                                    class="active-badge"
+                                    id="leak-tracker-badge"
+                                >
+                                    Active
+                                </span>
+
+                            </div>
+
+                            <p>
+                                Monitor Fortnite leakers and recently
+                                detected posts.
+                            </p>
+
+                            <div class="tracker-meta">
+                                <span id="tracked-posts">0</span>
+                                <span>tracked posts</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tracker-card">
+
+                        <div class="tracker-icon tracker-icon-news">
+                            N
+                        </div>
+
+                        <div class="tracker-copy">
+
+                            <div class="tracker-title-row">
+
+                                <h4>
+                                    News Tracker
+                                </h4>
+
+                                <span
+                                    class="active-badge"
+                                    id="news-tracker-badge"
+                                >
+                                    Active
+                                </span>
+
+                            </div>
+
+                            <p>
+                                Automatic Fortnite news
+                                monitoring.
+                            </p>
+
+                            <div class="tracker-meta">
+                                <span>FORTNITE</span>
+                                <span>•</span>
+                                <span>Automatic</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="overview-quick-grid">
+
+                    <button
+                        class="overview-quick-card"
+                        type="button"
+                        onclick="showPage('cosmetics')"
+                    >
+                        <div class="quick-icon">✦</div>
+
+                        <div>
+                            <strong>Cosmetics</strong>
+                            <span>Search Fortnite cosmetics</span>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+
+                    <button
+                        class="overview-quick-card"
+                        type="button"
+                        onclick="showPage('giveaways')"
+                    >
+                        <div class="quick-icon">G</div>
+
+                        <div>
+                            <strong>Giveaways</strong>
+                            <span>Manage community giveaways</span>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+
+                    <button
+                        class="overview-quick-card"
+                        type="button"
+                        onclick="showPage('moderation')"
+                    >
+                        <div class="quick-icon">M</div>
+
+                        <div>
+                            <strong>Moderation</strong>
+                            <span>Protect and manage your server</span>
+                        </div>
+
+                        <b>→</b>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- SERVER SETTINGS -->
+            <!-- ====================================== -->
+
+            <div
+                class="page"
+                id="page-settings"
+            >
+
+
+                <div class="welcome">
+
+                    <p class="eyebrow">
+                        SERVER CONFIGURATION
+                    </p>
+
+                    <h3>
+                        Server Settings
+                    </h3>
+
+                    <p>
+                        Configure how Amyfn works inside
+                        your Discord server.
+                    </p>
+
+                </div>
+
+
+
+                <div class="settings-panel">
+
+
+                    <div class="setting-group">
+
+                        <label for="server-select">
+                            Discord Server
+                        </label>
+
+                        <select id="server-select">
+
+                            <option value="">
+                                Loading servers...
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div id="server-settings-content">
+
+                        <div class="settings-empty">
+
+                            Select a server to view its
+                            configuration.
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ====================================== -->
+            <!-- SHOP -->
+            <!-- ====================================== -->
+
+            <div
+                class="page"
+                id="page-shop"
+            >
+
+
+                <div class="welcome">
+
+
+                    <p class="eyebrow">
+                        FORTNITE ITEM SHOP
+                    </p>
+
+
+                    <h3>
+                        Daily Shop
+                    </h3>
+
+
+                    <p>
+                        View the current Fortnite Item Shop
+                        and the latest shop changes detected
+                        by Amyfn.
+                    </p>
+
+
+                </div>
+
+
+
+                <div
+                    id="shop-loading"
+                    class="settings-empty"
+                >
+                    Loading Daily Shop...
+                </div>
+
+
+
+                <div
+                    id="shop-content"
+                    style="display:none;"
+                >
+
+
+                    <!-- SHOP HEADER -->
+
+                    <div class="shop-dashboard-header">
+
+
+                        <div>
+
+                            <p class="eyebrow">
+                                SHOP RESET
+                            </p>
+
+
+                            <h3 id="shop-date">
+                                --
+                            </h3>
+
+
+                            <p id="shop-detected">
+                                --
+                            </p>
+
+                        </div>
+
+
+
+                        <div class="shop-count-card">
+
+                            <span>
+                                TOTAL ITEMS
+                            </span>
+
+
+                            <strong id="shop-total">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- CURRENT SHOP -->
+                    <!-- ================================= -->
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <p class="eyebrow">
+                                CURRENT SHOP
+                            </p>
+
+                            <h3>
+                                Items In The Shop
+                            </h3>
+
+                        </div>
+
+
+                        <span
+                            class="shop-section-count"
+                            id="current-items-count"
+                        >
+                            0 items
+                        </span>
+
+
+                    </div>
+
+
+
+                    <div
+                        class="shop-items-grid"
+                        id="current-items"
+                    ></div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- NEW ITEMS -->
+                    <!-- ================================= -->
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <p class="eyebrow">
+                                CHANGES
+                            </p>
+
+                            <h3>
+                                New In The Shop
+                            </h3>
+
+                        </div>
+
+
+                        <span
+                            class="shop-section-count"
+                            id="new-items-count"
+                        >
+                            0 items
+                        </span>
+
+
+                    </div>
+
+
+
+                    <div
+                        class="shop-items-grid"
+                        id="new-items"
+                    ></div>
+
+
+
+                    <!-- ================================= -->
+                    <!-- REMOVED ITEMS -->
+                    <!-- ================================= -->
+
+                    <div class="section-header">
+
+
+                        <div>
+
+                            <p class="eyebrow">
+                                REMOVED
+                            </p>
+
+                            <h3>
+                                Removed From Shop
+                            </h3>
+
+                        </div>
+
+
+                        <span
+                            class="shop-section-count"
+                            id="removed-items-count"
+                        >
+                            0 items
+                        </span>
+
+
+                    </div>
+
+
+
+                    <div
+                        class="shop-items-grid"
+                        id="removed-items"
+                    ></div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+            <!-- ====================================== -->
+<!-- COSMETICS -->
+<!-- ====================================== -->
+
+<div
+    class="page"
+    id="page-cosmetics"
+>
+
+    <!-- HERO -->
+
+    <div class="cosmetics-hero">
+
+        <div class="cosmetics-hero-content">
+
+            <p class="eyebrow">
+                AMYFN COSMETICS
+            </p>
+
+            <h3>
+                Fortnite Cosmetics
+            </h3>
+
+            <p class="cosmetics-hero-description">
+                Explore outfits, emotes, pickaxes, wraps and more.
+            </p>
+
+
+            <div class="cosmetics-search-box">
+
+                <div class="cosmetics-search-input">
+
+                    <span class="cosmetics-search-icon">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        id="cosmetic-search"
+                        placeholder="Search cosmetics..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <button
+                    id="cosmetic-search-button"
+                    type="button"
+                >
+                    Search
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH STATUS -->
+
+    <div
+        id="cosmetics-search-status"
+        class="cosmetics-search-status"
+        style="display:none;"
+    ></div>
+
+
+    <!-- LOADING -->
+
+    <div
+        id="cosmetics-loading"
+        class="cosmetics-empty-state"
+        style="display:none;"
+    >
+
+        <div class="cosmetics-loading-spinner"></div>
+
+        <span>
+            Searching cosmetics...
+        </span>
+
+    </div>
+
+
+    <!-- EMPTY -->
+
+    <div
+        id="cosmetics-empty"
+        class="cosmetics-empty-state"
+    >
+
+        <div class="cosmetics-empty-icon">
+            ✦
+        </div>
+
+        <h4>
+            Find a cosmetic
+        </h4>
+
+        <p>
+            Search for an outfit, emote, pickaxe, wrap or other Fortnite cosmetic.
+        </p>
+
+    </div>
+
+
+    <!-- RESULTS -->
+
+    <div
+        id="cosmetics-results"
+        class="cosmetics-grid"
+    ></div>
+
+</div>
+
+            <!-- ====================================== -->
+            <!-- LEAKS -->
+            <!-- ====================================== -->
+<div
+    class="page"
+    id="page-leaks"
+>
+
+    <div class="welcome">
+        <p class="eyebrow">
+            X / TWITTER
+        </p>
+
+        <h3>
+            Leak Tracker
+        </h3>
+
+        <p>
+            Monitor Fortnite leakers and
+            recently detected posts.
+        </p>
+    </div>
+
+    <div
+        class="leaks-header"
+    >
+        <div>
+            <span class="section-label">
+                RECENT POSTS
+            </span>
+
+            <h2>
+                Latest Leaks
+            </h2>
+        </div>
+
+        <button
+            class="refresh-button"
+            id="refresh-leaks"
+        >
+            Refresh
+        </button>
+    </div>
+
+    <div
+        id="leaks-container"
+        class="leaks-container"
+    >
+        <div class="loading">
+            Loading leaks...
+        </div>
+    </div>
+
+</div>
+
+
+
+            <!-- ====================================== -->
+            <!-- NEWS -->
+            <!-- ====================================== -->
+
+            <div
+                class="page"
+                id="page-news"
+            >
+
+
+                <div class="welcome">
+
+                    <p class="eyebrow">
+                        FORTNITE
+                    </p>
+
+                    <h3>
+                        News Tracker
+                    </h3>
+
+                    <p>
+                        View the latest Fortnite news
+                        detected by Amyfn.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ====================================== -->
+<!-- GIVEAWAYS -->
+<!-- ====================================== -->
+
+<div
+    class="page"
+    id="page-giveaways"
+>
+
+    <div class="welcome giveaway-welcome">
+        <div>
+            <p class="eyebrow">
+                COMMUNITY
+            </p>
+
+            <h3>
+                Giveaways
+            </h3>
+
+            <p>
+                Manage active and completed Fortnite
+                giveaways across your Discord servers.
+            </p>
+        </div>
+
+        <div class="giveaway-welcome-icon">
+            🎁
+        </div>
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- ACTIVE HEADER -->
+    <!-- ====================================== -->
+
+    <div class="giveaway-section-header">
+
+        <div>
+            <span class="section-label">
+                GIVEAWAY MANAGER
+            </span>
+
+            <h2>
+                Active Giveaways
+            </h2>
+        </div>
+
+        <button
+            class="refresh-button"
+            id="refresh-giveaways"
+        >
+            ↻ Refresh
+        </button>
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- ACTIVE GIVEAWAYS -->
+    <!-- ====================================== -->
+
+    <div
+        id="active-giveaways"
+        class="active-giveaways"
+    >
+
+        <div class="giveaway-loading">
+            <div class="loading-spinner"></div>
+            Loading giveaways...
+        </div>
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- HISTORY -->
+    <!-- ====================================== -->
+
+    <div class="giveaway-section-header history-header">
+
+        <div>
+            <span class="section-label">
+                HISTORY
+            </span>
+
+            <h2>
+                Recent Giveaways
+            </h2>
+        </div>
+
+    </div>
+
+
+    <div
+        id="giveaway-history"
+        class="giveaway-history"
+    >
+
+        <div class="giveaway-loading">
+            Loading history...
+        </div>
+
+    </div>
+
+</div>
+
+
+
+           <!-- ====================================== -->
+<!-- MODERATION -->
+<!-- ====================================== -->
+
+<div
+    class="page"
+    id="page-moderation"
+>
+
+    <!-- MODERATION HERO -->
+    <div class="moderation-welcome">
+
+        <div class="moderation-hero-icon">
+            🛡️
+        </div>
+
+        <div class="moderation-hero-content">
+
+            <p class="eyebrow">
+                SERVER PROTECTION
+            </p>
+
+            <h3>
+                Moderation
+            </h3>
+
+            <p>
+                Keep your server clean, safe and under control
+                with Amyfn's moderation tools.
+            </p>
+
+        </div>
+
+        <div class="moderation-status">
+            <span class="moderation-status-dot"></span>
+
+            <div>
+                <strong>
+                    Protection Active
+                </strong>
+
+                <small>
+                    Amyfn is monitoring this server
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- MODERATION TOOLS -->
+    <div class="moderation-section">
+
+        <div class="moderation-section-header">
+
+            <div>
+                <p class="eyebrow">
+                    ACTIONS
+                </p>
+
+                <h3>
+                    Moderation Tools
+                </h3>
+            </div>
+
+        </div>
+
+
+        <div class="moderation-tools-grid">
+
+            <!-- WARN -->
+            <button
+                class="mod-tool-card mod-warn"
+                data-mod-action="warn"
+            >
+
+                <div class="mod-tool-icon">
+                    ⚠️
+                </div>
+
+                <div class="mod-tool-info">
+                    <strong>
+                        Warn
+                    </strong>
+
+                    <span>
+                        Issue a warning to a member
+                    </span>
+                </div>
+
+                <span class="mod-tool-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <!-- KICK -->
+            <button
+                class="mod-tool-card mod-kick"
+                data-mod-action="kick"
+            >
+
+                <div class="mod-tool-icon">
+                    👢
+                </div>
+
+                <div class="mod-tool-info">
+                    <strong>
+                        Kick
+                    </strong>
+
+                    <span>
+                        Remove a member from the server
+                    </span>
+                </div>
+
+                <span class="mod-tool-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <!-- BAN -->
+            <button
+                class="mod-tool-card mod-ban"
+                data-mod-action="ban"
+            >
+
+                <div class="mod-tool-icon">
+                    🔨
+                </div>
+
+                <div class="mod-tool-info">
+                    <strong>
+                        Ban
+                    </strong>
+
+                    <span>
+                        Permanently ban a member
+                    </span>
+                </div>
+
+                <span class="mod-tool-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <!-- TIMEOUT -->
+            <button
+                class="mod-tool-card mod-timeout"
+                data-mod-action="timeout"
+            >
+
+                <div class="mod-tool-icon">
+                    🔇
+                </div>
+
+                <div class="mod-tool-info">
+                    <strong>
+                        Timeout
+                    </strong>
+
+                    <span>
+                        Temporarily silence a member
+                    </span>
+                </div>
+
+                <span class="mod-tool-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <!-- CLEAR -->
+            <button
+                class="mod-tool-card mod-clear"
+                data-mod-action="clear"
+            >
+
+                <div class="mod-tool-icon">
+                    🧹
+                </div>
+
+                <div class="mod-tool-info">
+                    <strong>
+                        Clear Messages
+                    </strong>
+
+                    <span>
+                        Delete recent messages
+                    </span>
+                </div>
+
+                <span class="mod-tool-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <!-- LOCK -->
+            <button
+                class="mod-tool-card mod-lock"
+                data-mod-action="lock"
+            >
+
+                <div class="mod-tool-icon">
+                    🔒
+                </div>
+
+                <div class="mod-tool-info">
+                    <strong>
+                        Lock Channel
+                    </strong>
+
+                    <span>
+                        Prevent members from chatting
+                    </span>
+                </div>
+
+                <span class="mod-tool-arrow">
+                    →
+                </span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- WARNING OVERVIEW -->
+    <div class="moderation-section">
+
+        <div class="moderation-section-header">
+
+            <div>
+                <p class="eyebrow">
+                    WARNING SYSTEM
+                </p>
+
+                <h3>
+                    Warning Overview
+                </h3>
+            </div>
+
+        </div>
+
+
+        <div class="moderation-stats-grid">
+
+            <div class="moderation-stat-card">
+
+                <span>
+                    WARNINGS TODAY
+                </span>
+
+                <strong id="warnings-today">
+                    0
+                </strong>
+
+                <small>
+                    Issued today
+                </small>
+
+            </div>
+
+
+            <div class="moderation-stat-card">
+
+                <span>
+                    ACTIVE WARNINGS
+                </span>
+
+                <strong id="active-warnings">
+                    0
+                </strong>
+
+                <small>
+                    Across the server
+                </small>
+
+            </div>
+
+
+            <div class="moderation-stat-card">
+
+                <span>
+                    MOD ACTIONS
+                </span>
+
+                <strong id="mod-actions-today">
+                    0
+                </strong>
+
+                <small>
+                    Today
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WARNINGS -->
+    <div class="moderation-section">
+
+        <div class="moderation-section-header">
+
+            <div>
+                <p class="eyebrow">
+                    MEMBER WARNINGS
+                </p>
+
+                <h3>
+                    Recent Warnings
+                </h3>
+            </div>
+
+            <button
+                class="refresh-button"
+                id="refresh-moderation"
+            >
+                Refresh
+            </button>
+
+        </div>
+
+
+        <div class="moderation-search">
+
+            <span>
+                🔍
+            </span>
+
+            <input
+                type="text"
+                id="moderation-member-search"
+                placeholder="Search member..."
+            >
+
+        </div>
+
+
+        <div
+            class="warnings-table"
+            id="warnings-list"
+        >
+
+            <div class="moderation-empty">
+
+                <div class="moderation-empty-icon">
+                    🛡️
+                </div>
+
+                <h4>
+                    No warnings
+                </h4>
+
+                <p>
+                    There are currently no active warnings
+                    on this server.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHANNEL CONTROLS -->
+    <div class="moderation-section">
+
+        <div class="moderation-section-header">
+
+            <div>
+                <p class="eyebrow">
+                    CHANNEL CONTROLS
+                </p>
+
+                <h3>
+                    Channel Protection
+                </h3>
+            </div>
+
+        </div>
+
+
+        <div
+            class="channel-controls"
+            id="channel-controls"
+        >
+
+            <div class="channel-control-row">
+
+                <div class="channel-control-name">
+
+                    <span class="channel-hash">
+                        #
+                    </span>
+
+                    <strong>
+                        general
+                    </strong>
+
+                </div>
+
+                <span class="channel-unlocked">
+                    🔓 Unlocked
+                </span>
+
+            </div>
+
+
+            <div class="channel-control-row">
+
+                <div class="channel-control-name">
+
+                    <span class="channel-hash">
+                        #
+                    </span>
+
+                    <strong>
+                        chat
+                    </strong>
+
+                </div>
+
+                <span class="channel-unlocked">
+                    🔓 Unlocked
+                </span>
+
+            </div>
+
+
+            <div class="channel-control-row">
+
+                <div class="channel-control-name">
+
+                    <span class="channel-hash">
+                        #
+                    </span>
+
+                    <strong>
+                        announcements
+                    </strong>
+
+                </div>
+
+                <span class="channel-locked">
+                    🔒 Locked
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MODERATION LOG -->
+    <div class="moderation-section">
+
+        <div class="moderation-section-header">
+
+            <div>
+                <p class="eyebrow">
+                    AUDIT TRAIL
+                </p>
+
+                <h3>
+                    Moderation Log
+                </h3>
+            </div>
+
+        </div>
+
+
+        <div
+            class="moderation-log"
+            id="moderation-log"
+        >
+
+            <div class="moderation-log-empty">
+
+                <span>
+                    📋
+                </span>
+
+                <div>
+                    <strong>
+                        No recent activity
+                    </strong>
+
+                    <small>
+                        Moderation actions will appear here.
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <script src="/app.js"></script>
+
+
+</body>
+
+</html>

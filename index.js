@@ -50,6 +50,10 @@ const {
     execute: executeLeaks
 } = require('./commands/leaks');
 
+const {
+    execute: executeAbout
+} = require('./commands/about');
+
 // ==========================================
 // FORTNITE QUIZ
 // ==========================================
@@ -857,6 +861,25 @@ client.on(
             return;
 
         }
+
+        // ==========================================
+// ABOUT
+// ==========================================
+
+if (
+    interaction.commandName === 'about'
+) {
+
+    console.log(
+        'ℹ️ Calling ABOUT handler...'
+    );
+
+    await executeAbout(
+        interaction
+    );
+
+    return;
+}
 
         // ==========================================
         // IGNORE NON-SLASH COMMAND INTERACTIONS
