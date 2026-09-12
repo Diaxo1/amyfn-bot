@@ -1,21 +1,23 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
+    ContainerBuilder,
+    TextDisplayBuilder,
+    SeparatorBuilder,
+    SectionBuilder,
+    ThumbnailBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     PermissionFlagsBits,
     AttachmentBuilder,
-    MessageFlags
-} = require('discord.js');
-
+    MessageFlags,
+    SeparatorSpacingSize
+} = require('discord.js')
 const path = require('path');
 
 const {
     createGiveaway,
-    getGiveaway,
     updateGiveaway,
-    addEntry,
     getActiveGiveawayForGuild,
     getLatestEndedGiveawayForGuild
 } = require('../services/giveawayService');
@@ -123,59 +125,193 @@ function formatRemaining(endTime) {
 // GIVEAWAY EMBED
 // ==========================================
 
-function createGiveawayEmbed(giveaway) {
+function createGiveawayContainer(giveaway, state = 'active', rerolled = false) {
 
     const endTimestamp =
-        Math.floor(
-            giveaway.endsAt / 1000
+        Math.floor(giveaway.endsAt / 1000);
+
+    const container =
+        new ContainerBuilder()
+            .setAccentColor(
+                state === 'active'
+                    ? 0x1493ff
+                    : state === 'cancelled'
+                        ? 0x555555
+                        : 0x00e5ff
+            );
+
+    // ==========================================
+    // ACTIVE GIVEAWAY
+    // ==========================================
+
+    if (state === 'active') {
+
+        container
+            // Help Center-style header with the banner as a thumbnail.
+            // SectionBuilder MUST have an accessory, so the ThumbnailBuilder
+            // is intentionally attached here.
+            .addSectionComponents(
+                new SectionBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '# 💙 __Amyfn Giveaway__\n' +
+                                '**FORTNITE COMMUNITY GIVEAWAY**\n\n' +
+                                `▌ **${giveaway.prize}**\n` +
+                                '▌ Enter below for your chance to win. '
+                            )
+                    )
+                    .setThumbnailAccessory(
+                        new ThumbnailBuilder()
+                            .setURL(
+                                'attachment://giveaway-banner.png'
+                            )
+                            .setDescription('Amyfn Fortnite Giveaway')
+                    )
+            )
+
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        '🎁 **Giveaway Details**\n\n' +
+                        `▌ **Winners**\n` +
+                        `▌ ${giveaway.winners}\n\n` +
+                        `▌ **Entries**\n` +
+                        `▌ ${giveaway.entries.length}\n\n` +
+                        `▌ **Ends**\n` +
+                        `▌ <t:${endTimestamp}:R>`
+                    )
+            )
+
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        '🎟️ **How To Enter**\n\n' +
+                        '▌ Click **ENTER GIVEAWAY** below to join.\n\n' +
+                        '-# AMYFN • FORTNITE COMMUNITY'
+                    )
+            );
+
+        return container;
+    }
+
+    // ==========================================
+    // ENDED / CANCELLED
+    // ==========================================
+
+    const winnerText =
+        giveaway.winnerIds?.length
+            ? giveaway.winnerIds
+                .map(id => `<@${id}>`)
+                .join(', ')
+            : 'Nobody — not enough entries.';
+
+    if (state === 'cancelled') {
+
+        container
+            .addSectionComponents(
+                new SectionBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '# 🛑 __Giveaway Cancelled__\n' +
+                                '**FORTNITE COMMUNITY GIVEAWAY**\n\n' +
+                                `▌ **${giveaway.prize}**\n` +
+                                '▌ This giveaway has been cancelled by the server staff.'
+                            )
+                    )
+                    .setThumbnailAccessory(
+                        new ThumbnailBuilder()
+                            .setURL(
+                                'attachment://giveaway-banner.png'
+                            )
+                            .setDescription('Amyfn Fortnite Giveaway')
+                    )
+            )
+
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        '-# AMYFN • FORTNITE COMMUNITY'
+                    )
+            );
+
+        return container;
+    }
+
+    container
+        .addSectionComponents(
+            new SectionBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            '# 🏆 __Fortnite Giveaway Ended__\n' +
+                            '**FORTNITE COMMUNITY GIVEAWAY**\n\n' +
+                            `▌ **${giveaway.prize}**\n` +
+                            '▌ The giveaway has ended.'
+                        )
+                )
+                .setThumbnailAccessory(
+                    new ThumbnailBuilder()
+                        .setURL(
+                            'attachment://giveaway-banner.png'
+                        )
+                        .setDescription('Amyfn Fortnite Giveaway')
+                )
+        )
+
+        .addSeparatorComponents(
+            new SeparatorBuilder()
+                .setSpacing(
+                    SeparatorSpacingSize.Small
+                )
+        )
+
+        .addTextDisplayComponents(
+            new TextDisplayBuilder()
+                .setContent(
+                    '🏆 **Winners**\n\n' +
+                    `▌ ${winnerText}\n\n` +
+                    '👥 **Total Entries**\n\n' +
+                    `▌ ${giveaway.entries.length}\n\n` +
+                    (
+                        rerolled
+                            ? '🔄 **Winner Rerolled**\n\n' +
+                              '▌ The winner has been rerolled.'
+                            : '🎉 **Giveaway Complete**\n\n' +
+                              '▌ Thanks everyone for participating in the AMYFN community.'
+                    ) +
+                    '\n\n-# AMYFN • FORTNITE COMMUNITY'
+                )
         );
 
-    return new EmbedBuilder()
+    return container;
+}
 
-        // Fortnite blue
-        .setColor(0x1493ff)
-
-        .setTitle(
-            '🎁 FORTNITE GIVEAWAY'
-        )
-
-        .setDescription(
-
-            `# 🎮 ${giveaway.prize}\n\n` +
-
-            `**DROP IN. ENTER. WIN.**\n\n` +
-
-            `━━━━━━━━━━━━━━━━━━━━\n\n` +
-
-            `🏆 **WINNERS**\n` +
-            `${giveaway.winners}\n\n` +
-
-            `👥 **ENTRIES**\n` +
-            `${giveaway.entries.length}\n\n` +
-
-            `⏳ **ENDS**\n` +
-            `<t:${endTimestamp}:R>\n\n` +
-
-            `━━━━━━━━━━━━━━━━━━━━\n\n` +
-
-            `### 🔵 HOW TO ENTER\n` +
-
-            `Click the button below to enter this giveaway.\n\n` +
-
-            `**Good luck, Fortnite legends!** 💙`
-
-        )
-
-        .setImage(
-            'attachment://giveaway-banner.png'
-        )
-
-        .setFooter({
-            text:
-                'AMYFN • Fortnite Community'
-        })
-
-        .setTimestamp();
+// Backwards-compatible name for anything importing createGiveawayEmbed.
+function createGiveawayEmbed(giveaway) {
+    return createGiveawayContainer(giveaway, 'active');
 }
 
 // ==========================================
@@ -475,12 +611,13 @@ module.exports = {
             );
 
             // ==========================================
-            // CREATE EMBED
+            // CREATE GIVEAWAY MESSAGE
             // ==========================================
 
-            const embed =
-                createGiveawayEmbed(
-                    giveaway
+            const container =
+                createGiveawayContainer(
+                    giveaway,
+                    'active'
                 );
 
             const row =
@@ -491,24 +628,20 @@ module.exports = {
             const attachment =
                 createGiveawayAttachment();
 
-            // ==========================================
-            // SEND GIVEAWAY MESSAGE
-            // ==========================================
-
             const message =
                 await interaction.channel.send({
 
-                    embeds: [
-                        embed
-                    ],
-
                     components: [
+                        container,
                         row
                     ],
 
                     files: [
                         attachment
-                    ]
+                    ],
+
+                    flags:
+                        MessageFlags.IsComponentsV2
 
                 });
 
@@ -638,39 +771,24 @@ if (subcommand === 'reroll') {
                         giveaway.messageId
                     );
 
-                const embed =
-                    new EmbedBuilder()
-
-                        .setColor(
-                            0x555555
-                        )
-
-                        .setTitle(
-                            '🎁 GIVEAWAY CANCELLED'
-                        )
-
-                        .setDescription(
-
-                            `# ${giveaway.prize}\n\n` +
-
-                            `This giveaway has been cancelled by the server staff.`
-
-                        )
-
-                        .setFooter({
-
-                            text:
-                                'AMYFN • Fortnite Community'
-
-                        });
+                const container =
+                    createGiveawayContainer(
+                        giveaway,
+                        'cancelled'
+                    );
 
                 await message.edit({
 
-                    embeds: [
-                        embed
+                    components: [
+                        container
                     ],
 
-                    components: []
+                    files: [
+                        createGiveawayAttachment()
+                    ],
+
+                    flags:
+                        MessageFlags.IsComponentsV2
 
                 });
 
@@ -779,65 +897,28 @@ if (subcommand === 'reroll') {
                         giveaway.messageId
                     );
 
-                const winnerText =
-                    newWinnerIds
-                        .map(
-                            id =>
-                                `<@${id}>`
-                        )
-                        .join(', ');
+                giveaway.winnerIds =
+                    newWinnerIds;
 
-                const embed =
-                    new EmbedBuilder()
-
-                        .setColor(
-                            0x00e5ff
-                        )
-
-                        .setTitle(
-                            '🏆 FORTNITE GIVEAWAY ENDED'
-                        )
-
-                        .setDescription(
-
-                            `# 🎁 ${giveaway.prize}\n\n` +
-
-                            `🏆 **WINNERS**\n` +
-                            `${winnerText}\n\n` +
-
-                            `👥 **TOTAL ENTRIES**\n` +
-                            `${giveaway.entries.length}\n\n` +
-
-                            `━━━━━━━━━━━━━━━━━━━━\n\n` +
-
-                            `**A winner has been rerolled!** 🔄\n\n` +
-
-                            `Congratulations to the new winner! 🎉\n\n` +
-
-                            `Thanks everyone for participating in the AMYFN community. 💙`
-
-                        )
-
-                        .setImage(
-                            'attachment://giveaway-banner.png'
-                        )
-
-                        .setFooter({
-
-                            text:
-                                'AMYFN • Fortnite Community'
-
-                        })
-
-                        .setTimestamp();
+                const container =
+                    createGiveawayContainer(
+                        giveaway,
+                        'ended',
+                        true
+                    );
 
                 await message.edit({
 
-                    embeds: [
-                        embed
+                    components: [
+                        container
                     ],
 
-                    components: []
+                    files: [
+                        createGiveawayAttachment()
+                    ],
+
+                    flags:
+                        MessageFlags.IsComponentsV2
 
                 });
 
@@ -881,7 +962,11 @@ if (subcommand === 'reroll') {
 
     createGiveawayEmbed,
 
+    createGiveawayContainer,
+
     createGiveawayButtons,
+
+    createGiveawayAttachment,
 
     finishGiveaway
 
@@ -988,67 +1073,34 @@ async function finishGiveaway(
                 giveaway.messageId
             );
 
+        giveaway.winnerIds =
+            winners;
+
         const winnerText =
             winners.length
-
                 ? winners
-                    .map(
-                        id =>
-                            `<@${id}>`
-                    )
+                    .map(id => `<@${id}>`)
                     .join(', ')
-
                 : 'Nobody — not enough entries.';
 
-        const embed =
-            new EmbedBuilder()
-
-                .setColor(
-                    0x00e5ff
-                )
-
-                .setTitle(
-                    '🏆 FORTNITE GIVEAWAY ENDED'
-                )
-
-                .setDescription(
-
-                    `# 🎁 ${giveaway.prize}\n\n` +
-
-                    `🏆 **WINNERS**\n` +
-                    `${winnerText}\n\n` +
-
-                    `👥 **TOTAL ENTRIES**\n` +
-                    `${giveaway.entries.length}\n\n` +
-
-                    `━━━━━━━━━━━━━━━━━━━━\n\n` +
-
-                    `**Congratulations!** 🎉\n\n` +
-
-                    `Thanks everyone for participating in the AMYFN community. 💙`
-
-                )
-
-                .setImage(
-                    'attachment://giveaway-banner.png'
-                )
-
-                .setFooter({
-
-                    text:
-                        'AMYFN • Fortnite Community'
-
-                })
-
-                .setTimestamp();
+        const container =
+            createGiveawayContainer(
+                giveaway,
+                'ended'
+            );
 
         await message.edit({
 
-            embeds: [
-                embed
+            components: [
+                container
             ],
 
-            components: []
+            files: [
+                createGiveawayAttachment()
+            ],
+
+            flags:
+                MessageFlags.IsComponentsV2
 
         });
 

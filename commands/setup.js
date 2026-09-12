@@ -2,19 +2,23 @@ const {
     SlashCommandBuilder,
     ChannelType,
     PermissionFlagsBits,
-    AttachmentBuilder
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
-
-const path = require('path');
 
 const {
     setServerConfig,
     getServerConfig
 } = require('../services/serverConfig');
 
-const {
-    createEmbed
-} = require('../services/embedStyle');
+
+// ==========================================
+// COMMAND
+// ==========================================
 
 module.exports = {
 
@@ -29,6 +33,7 @@ module.exports = {
         .setDefaultMemberPermissions(
             PermissionFlagsBits.ManageGuild
         )
+
 
         // ==========================================
         // DAILY SHOP
@@ -55,6 +60,7 @@ module.exports = {
                 .setRequired(false)
         )
 
+
         // ==========================================
         // NEWS + LEAKS
         // ==========================================
@@ -80,6 +86,7 @@ module.exports = {
                 .setRequired(false)
         )
 
+
         // ==========================================
         // LOGGING
         // ==========================================
@@ -96,11 +103,19 @@ module.exports = {
                 .setRequired(false)
         ),
 
+
+    // ==========================================
+    // EXECUTE
+    // ==========================================
+
     async execute(interaction) {
 
         try {
 
-            await interaction.deferReply();
+            await interaction.deferReply({
+                flags: MessageFlags.IsComponentsV2
+            });
+
 
             // ==========================================
             // SERVER CHECK
@@ -108,16 +123,29 @@ module.exports = {
 
             if (!interaction.guild) {
 
-                await interaction.editReply(
-                    '❌ This command can only be used inside a server.'
-                );
+                await interaction.editReply({
+
+                    components: [
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '## ❌ Server Only\n\n' +
+                                '> This command can only be used inside a server.'
+                            )
+                    ],
+
+                    flags:
+                        MessageFlags.IsComponentsV2
+
+                });
 
                 return;
             }
 
+
             console.log(
                 `⚙️ Processing setup for ${interaction.guild.name}`
             );
+
 
             // ==========================================
             // EXISTING CONFIG
@@ -127,6 +155,7 @@ module.exports = {
                 getServerConfig(
                     interaction.guild.id
                 ) || {};
+
 
             // ==========================================
             // OPTIONS
@@ -157,6 +186,7 @@ module.exports = {
                     'logs_channel'
                 );
 
+
             // ==========================================
             // PRESERVE EXISTING SETTINGS
             // ==========================================
@@ -186,6 +216,7 @@ module.exports = {
                 existingConfig.logsChannelId ??
                 null;
 
+
             // ==========================================
             // SAVE CONFIG
             // ==========================================
@@ -193,6 +224,7 @@ module.exports = {
             setServerConfig(
                 interaction.guild.id,
                 {
+
                     channelId:
                         finalDailyChannelId,
 
@@ -207,8 +239,10 @@ module.exports = {
 
                     logsChannelId:
                         finalLogsChannelId
+
                 }
             );
+
 
             // ==========================================
             // FETCH SAVED OBJECTS
@@ -229,6 +263,7 @@ module.exports = {
             let savedLogsChannel =
                 logsChannel || null;
 
+
             try {
 
                 if (
@@ -240,7 +275,9 @@ module.exports = {
                         await interaction.guild.channels.fetch(
                             finalDailyChannelId
                         );
+
                 }
+
 
                 if (
                     !savedDailyRole &&
@@ -251,7 +288,9 @@ module.exports = {
                         await interaction.guild.roles.fetch(
                             finalDailyRoleId
                         );
+
                 }
+
 
                 if (
                     !savedUpdatesChannel &&
@@ -262,7 +301,9 @@ module.exports = {
                         await interaction.guild.channels.fetch(
                             finalUpdatesChannelId
                         );
+
                 }
+
 
                 if (
                     !savedUpdatesRole &&
@@ -273,7 +314,9 @@ module.exports = {
                         await interaction.guild.roles.fetch(
                             finalUpdatesRoleId
                         );
+
                 }
+
 
                 if (
                     !savedLogsChannel &&
@@ -284,6 +327,7 @@ module.exports = {
                         await interaction.guild.channels.fetch(
                             finalLogsChannelId
                         );
+
                 }
 
             } catch (fetchError) {
@@ -294,6 +338,7 @@ module.exports = {
                 );
 
             }
+
 
             // ==========================================
             // STATUS
@@ -312,6 +357,7 @@ module.exports = {
                     : `⚪ **Not configured**\n` +
                       `> Use \`daily_channel\` to choose a channel.`;
 
+
             const updatesStatus =
                 savedUpdatesChannel
 
@@ -325,6 +371,7 @@ module.exports = {
                     : `⚪ **Not configured**\n` +
                       `> Use \`updates_channel\` to choose a channel.`;
 
+
             const logsStatus =
                 savedLogsChannel
 
@@ -334,108 +381,234 @@ module.exports = {
                     : `⚪ **Not configured**\n` +
                       `> Use \`logs_channel\` to choose a channel.`;
 
-            // ==========================================
-            // SETUP BANNER
-            // ==========================================
-
-            const bannerPath =
-                path.join(
-                    __dirname,
-                    '..',
-                    'assets',
-                    'setup-banner.png'
-                );
-
-            const banner =
-                new AttachmentBuilder(
-                    bannerPath,
-                    {
-                        name: 'setup-banner.png'
-                    }
-                );
 
             // ==========================================
-            // EMBED
+            // AMYFN LOGO
             // ==========================================
 
-            const embed =
-                createEmbed({
-
-                    title:
-                        '⚙️ Amyfn Server Setup',
-
-                    description:
-                        'Configure where Amyfn sends automatic Fortnite updates and server logs.\n\n' +
-                        'Your current configuration is shown below.',
-
-                    image:
-                        'attachment://setup-banner.png',
-
-                    fields: [
-
-                        {
-                            name:
-                                '🛒 DAILY SHOP',
-
-                            value:
-                                dailyStatus,
-
-                            inline:
-                                false
-                        },
-
-                        {
-                            name:
-                                '📡 NEWS & LEAKS',
-
-                            value:
-                                updatesStatus,
-
-                            inline:
-                                false
-                        },
-
-                        {
-                            name:
-                                '📋 SERVER LOGGING',
-
-                            value:
-                                logsStatus,
-
-                            inline:
-                                false
-                        },
-
-                        {
-                            name:
-                                '💡 AUTOMATIC UPDATES',
-
-                            value:
-                                '🛒 **Daily Shop** → Shop changes and daily announcements\n' +
-                                '📰 **News** → Fortnite news posted to News & Leaks\n' +
-                                '🕵️ **Leaks** → Fortnite leaks posted to News & Leaks\n' +
-                                '📋 **Logs** → Important server events posted to Logs',
-
-                            inline:
-                                false
-                        },
-
-                        {
-                            name:
-                                '🔧 SETUP OPTIONS',
-
-                            value:
-                                '`daily_channel` • `daily_role`\n' +
-                                '`updates_channel` • `updates_role`\n' +
-                                '`logs_channel`',
-
-                            inline:
-                                false
-                        }
-
-                    ]
-
+            const amyfnLogo =
+                interaction.client.user.displayAvatarURL({
+                    extension: 'png',
+                    size: 256
                 });
+
+
+            // ==========================================
+            // HEADER
+            // ==========================================
+
+            const header =
+                new SectionBuilder()
+
+                    .addTextDisplayComponents(
+
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '# __⚙️ Amyfn Server Setup__'
+                            ),
+
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '**CONFIGURE AMYFN FOR YOUR FORTNITE SERVER.**\n\n' +
+
+                                '> Choose where Amyfn sends automatic Fortnite updates, ' +
+                                'leaks, news and server logs.\n\n' +
+
+                                '> Your current configuration is shown below.'
+                            )
+
+                    )
+
+                    .setThumbnailAccessory(
+                        thumbnail =>
+                            thumbnail
+                                .setURL(amyfnLogo)
+                                .setDescription(
+                                    'Amyfn logo'
+                                )
+                    );
+
+
+            // ==========================================
+            // REAL SEPARATOR
+            // ==========================================
+
+            const separator =
+                () =>
+                    new SeparatorBuilder()
+                        .setDivider(true)
+                        .setSpacing(
+                            SeparatorSpacingSize.Small
+                        );
+
+
+            // ==========================================
+            // DAILY SHOP
+            // ==========================================
+
+            const dailySection =
+                new TextDisplayBuilder()
+                    .setContent(
+
+                        '## 🛒 Daily Shop\n\n' +
+                        dailyStatus
+
+                    );
+
+
+            // ==========================================
+            // NEWS & LEAKS
+            // ==========================================
+
+            const updatesSection =
+                new TextDisplayBuilder()
+                    .setContent(
+
+                        '## 📡 News & Leaks\n\n' +
+                        updatesStatus
+
+                    );
+
+
+            // ==========================================
+            // LOGGING
+            // ==========================================
+
+            const logsSection =
+                new TextDisplayBuilder()
+                    .setContent(
+
+                        '## 📋 Server Logging\n\n' +
+                        logsStatus
+
+                    );
+
+
+            // ==========================================
+            // AUTOMATIC UPDATES
+            // ==========================================
+
+            const automaticSection =
+                new TextDisplayBuilder()
+                    .setContent(
+
+                        '## 💡 Automatic Updates\n\n' +
+
+                        '🛒 **Daily Shop**\n' +
+                        '> Shop changes and daily announcements.\n\n' +
+
+                        '📰 **News**\n' +
+                        '> Fortnite news posted to your News & Leaks channel.\n\n' +
+
+                        '🕵️ **Leaks**\n' +
+                        '> Fortnite leaks posted to your News & Leaks channel.\n\n' +
+
+                        '📋 **Logs**\n' +
+                        '> Important server events posted to your Logs channel.'
+
+                    );
+
+
+            // ==========================================
+            // SETUP OPTIONS
+            // ==========================================
+
+            const optionsSection =
+                new TextDisplayBuilder()
+                    .setContent(
+
+                        '## 🔧 Setup Options\n\n' +
+
+                        '`daily_channel` • `daily_role`\n' +
+                        '`updates_channel` • `updates_role`\n' +
+                        '`logs_channel`\n\n' +
+
+                        '🔒 **Manage Server permission required.**'
+
+                    );
+
+
+            // ==========================================
+            // FOOTER
+            // ==========================================
+
+            const footer =
+                new TextDisplayBuilder()
+                    .setContent(
+                        '-# AMYFN • SERVER CONFIGURATION'
+                    );
+
+
+            // ==========================================
+            // MAIN CONTAINER
+            // ==========================================
+
+            const container =
+                new ContainerBuilder()
+
+                    .setAccentColor(
+                        0x1493ff
+                    )
+
+                    // HEADER
+                    .addSectionComponents(
+                        header
+                    )
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    // DAILY SHOP
+                    .addTextDisplayComponents(
+                        dailySection
+                    )
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    // NEWS & LEAKS
+                    .addTextDisplayComponents(
+                        updatesSection
+                    )
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    // LOGGING
+                    .addTextDisplayComponents(
+                        logsSection
+                    )
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    // AUTOMATIC UPDATES
+                    .addTextDisplayComponents(
+                        automaticSection
+                    )
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    // OPTIONS
+                    .addTextDisplayComponents(
+                        optionsSection
+                    )
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    // FOOTER
+                    .addTextDisplayComponents(
+                        footer
+                    );
+
 
             // ==========================================
             // SEND
@@ -443,19 +616,20 @@ module.exports = {
 
             await interaction.editReply({
 
-                embeds: [
-                    embed
+                components: [
+                    container
                 ],
 
-                files: [
-                    banner
-                ]
+                flags:
+                    MessageFlags.IsComponentsV2
 
             });
+
 
             console.log(
                 '✅ Setup completed successfully.'
             );
+
 
         } catch (error) {
 
@@ -463,6 +637,7 @@ module.exports = {
                 '❌ Setup command error:',
                 error
             );
+
 
             try {
 
@@ -473,12 +648,18 @@ module.exports = {
 
                     await interaction.editReply({
 
-                        content:
-                            '❌ Failed to save the server setup.',
+                        components: [
 
-                        embeds: [],
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    '## ❌ Setup Error\n\n' +
+                                    '> Failed to save the server setup.'
+                                )
 
-                        files: []
+                        ],
+
+                        flags:
+                            MessageFlags.IsComponentsV2
 
                     });
 

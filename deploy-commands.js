@@ -21,15 +21,16 @@ const commands = [
     // ==========================================
 
     new (require('discord.js').SlashCommandBuilder)()
-        .setName('cosmetic')
-        .setDescription('Search for a Fortnite cosmetic')
-        .addStringOption(option =>
-            option
-                .setName('name')
-                .setDescription('Name of the cosmetic')
-                .setRequired(true)
-        )
-        .toJSON(),
+    .setName('cosmetic')
+    .setDescription('Search for a Fortnite cosmetic')
+    .addStringOption(option =>
+        option
+            .setName('name')
+            .setDescription('Name of the cosmetic')
+            .setAutocomplete(true)
+            .setRequired(true)
+    )
+    .toJSON(),
 
     // ==========================================
     // SHOP

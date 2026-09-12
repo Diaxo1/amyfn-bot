@@ -1,7 +1,11 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
-    PermissionFlagsBits
+    ContainerBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    PermissionFlagsBits,
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const {
@@ -13,130 +17,191 @@ const {
 
 module.exports = {
 
-    data:
-        new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
+        .setName('leaks')
+        .setDescription('View and test the Fortnite leak system')
 
-            .setName('leaks')
+        .addSubcommand(sub =>
+            sub
+                .setName('latest')
+                .setDescription('Show the newest leaks')
+        )
 
-            .setDescription(
-                'View and test the Fortnite leak system'
-            )
+        .addSubcommand(sub =>
+            sub
+                .setName('status')
+                .setDescription('Check leak tracker status')
+        )
 
-            .addSubcommand(sub =>
-                sub
-                    .setName('latest')
-                    .setDescription(
-                        'Show the newest leaks'
-                    )
-            )
-
-            .addSubcommand(sub =>
-                sub
-                    .setName('status')
-                    .setDescription(
-                        'Check leak tracker status'
-                    )
-            )
-
-            .addSubcommand(sub =>
-                sub
-                    .setName('test')
-                    .setDescription(
-                        'Send a test leak to your configured channel'
-                    )
-            ),
+        .addSubcommand(sub =>
+            sub
+                .setName('test')
+                .setDescription('Send a test leak to your configured channel')
+        ),
 
     async execute(interaction, client) {
 
-        const sub =
-            interaction.options.getSubcommand();
+        const sub = interaction.options.getSubcommand();
+
+        // ==========================================
+        // LATEST
+        // ==========================================
 
         if (sub === 'latest') {
 
             await interaction.deferReply();
 
-            const tweets =
-                await getLatestLeaks();
+            try {
 
-            if (!tweets.length) {
+                const tweets = await getLatestLeaks();
 
-                await interaction.editReply(
-                    '❌ No leaks were returned.'
-                );
+                if (!tweets.length) {
+                    return interaction.editReply({
+                        content: 'No leaks were returned.'
+                    });
+                }
 
-                return;
-            }
+                const latest = tweets.slice(0, 5);
 
-            const latest =
-                tweets.slice(0, 5);
-
-            await interaction.editReply({
-                embeds:
-                    latest.map(tweet =>
+                /*
+                 * The actual tweet embeds are still created by
+                 * createLeakEmbed() from leakTracker.js.
+                 * This keeps tweet content, images and links intact.
+                 */
+                return interaction.editReply({
+                    content:
+                        `## Latest Fortnite Leaks\n` +
+                        `Showing the ${latest.length} newest leak${latest.length === 1 ? '' : 's'}.`,
+                    embeds: latest.map(tweet =>
                         createLeakEmbed(tweet)
                     )
-            });
+                });
 
-            return;
+            } catch (error) {
+
+                console.error(
+                    'Failed to retrieve latest leaks:',
+                    error
+                );
+
+                return interaction.editReply({
+                    content:
+                        'Failed to retrieve the latest leaks.'
+                });
+            }
         }
+
+        // ==========================================
+        // STATUS
+        // ==========================================
 
         if (sub === 'status') {
 
-            const status =
-                getLeakStatus();
+            const status = getLeakStatus();
 
-            const embed =
-                new EmbedBuilder()
+            const lastCheck =
+                status.lastCheck
+                    ? `<t:${Math.floor(
+                        new Date(status.lastCheck).getTime() / 1000
+                    )}:R>`
+                    : 'Waiting for first check...';
 
-                    .setColor(0x57F287)
+            const container =
+                new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
 
-                    .setTitle(
-                        '🕵️ Leak Tracker Status'
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '# Leak Tracker\n' +
+                                'Live status of the Amyfn Fortnite leak monitor.'
+                            )
                     )
 
-                    .addFields(
-                        {
-                            name: 'Status',
-                            value: '🟢 Running',
-                            inline: true
-                        },
-                        {
-                            name: 'Checking',
-                            value:
-                                `Every ${status.interval}s`,
-                            inline: true
-                        },
-                        {
-                            name: 'Tracked Tweets',
-                            value:
-                                `${status.tracked}`,
-                            inline: true
-                        },
-                        {
-                            name: 'Watching',
-                            value:
-                                '• HYPEX\n• ShiinaBR\n• GhostyLeaks4'
-                        },
-                        {
-                            name: 'Last Check',
-                            value:
-                                status.lastCheck
-                                    ? `<t:${Math.floor(new Date(status.lastCheck).getTime() / 1000)}:R>`
-                                    : 'Waiting...'
-                        }
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(
+                                SeparatorSpacingSize.Small
+                            )
                     )
 
-                    .setFooter({
-                        text:
-                            'Amyfn • Leak System'
-                    });
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `## Status\n**${
+                                    status.active
+                                        ? 'Running'
+                                        : 'Offline'
+                                }`
+                            ),
 
-            await interaction.reply({
-                embeds: [embed]
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `## Check Interval\n` +
+                                `Every **${status.interval}s**`
+                            ),
+
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `## Tracked Tweets\n` +
+                                `**${status.tracked}**`
+                            )
+                    )
+
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(
+                                SeparatorSpacingSize.Small
+                            )
+                    )
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '## Watching\n' +
+                                'HYPEX\n' +
+                                'ShiinaBR\n' +
+                                'GhostyLeaks4'
+                            )
+                    )
+
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(
+                                SeparatorSpacingSize.Small
+                            )
+                    )
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `## Last Check\n${lastCheck}`
+                            )
+                    )
+
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(
+                                SeparatorSpacingSize.Small
+                            )
+                    )
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • LEAK TRACKER'
+                            )
+                    );
+
+            return interaction.reply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2
             });
-
-            return;
         }
+
+        // ==========================================
+        // TEST
+        // ==========================================
 
         if (sub === 'test') {
 
@@ -146,13 +211,11 @@ module.exports = {
                 )
             ) {
 
-                await interaction.reply({
+                return interaction.reply({
                     content:
-                        '❌ You need Manage Server permission.',
-                    ephemeral: true
+                        'You need Manage Server permission to run a leak test.',
+                    flags: MessageFlags.Ephemeral
                 });
-
-                return;
             }
 
             const fakeTweet = {
@@ -160,12 +223,12 @@ module.exports = {
                 username: 'Amyfn',
                 displayName: 'Amyfn Test Leak',
                 text:
-                    '🚨 This is a test leak!\n\nYour automatic Fortnite leak channel is working perfectly.',
-                date:
-                    new Date().toISOString(),
-                url:
-                    'https://x.com',
-                images: []
+                    'This is a test leak.\n\n' +
+                    'Your automatic Fortnite leak channel is working correctly.',
+                date: new Date().toISOString(),
+                url: 'https://x.com',
+                images: [],
+                videos: []
             };
 
             const sent =
@@ -178,24 +241,45 @@ module.exports = {
 
             if (!sent) {
 
-                await interaction.reply({
+                return interaction.reply({
                     content:
-                        '❌ No leak channel has been configured yet. Use `/setup` first.',
-                    ephemeral: true
+                        'No leak channel has been configured yet. Use `/setup` first.',
+                    flags: MessageFlags.Ephemeral
                 });
-
-                return;
             }
 
-            await interaction.reply({
-                content:
-                    '✅ Test leak sent successfully!',
-                ephemeral: true
+            const container =
+                new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '# Leak Test Sent\n' +
+                                'The test leak was successfully sent to the configured leak channel.'
+                            )
+                    )
+
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(
+                                SeparatorSpacingSize.Small
+                            )
+                    )
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • LEAK TRACKER'
+                            )
+                    );
+
+            return interaction.reply({
+                components: [container],
+                flags:
+                    MessageFlags.Ephemeral |
+                    MessageFlags.IsComponentsV2
             });
-
-            return;
         }
-
     }
-
 };

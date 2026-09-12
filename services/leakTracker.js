@@ -378,6 +378,10 @@ function createLeakEmbed(tweet) {
                     tweet.url
             })
 
+            .setTitle(
+                'Fortnite Leak'
+            )
+
             .setDescription(
                 tweet.text ||
                 '*No tweet text*'
@@ -389,7 +393,7 @@ function createLeakEmbed(tweet) {
 
             .setFooter({
                 text:
-                    'Amyfn • Fortnite Community'
+                    'AMYFN • FORTNITE LEAK TRACKER'
             })
 
             .setTimestamp(

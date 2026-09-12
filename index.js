@@ -3,7 +3,8 @@ require('dotenv').config();
 const {
     Client,
     GatewayIntentBits,
-    Events
+    Events,
+    MessageFlags
 } = require('discord.js');
 
 // ==========================================
@@ -11,7 +12,8 @@ const {
 // ==========================================
 
 const {
-    execute: executeCosmetic
+    execute: executeCosmetic,
+    autocomplete: autocompleteCosmetic
 } = require('./commands/cosmetic');
 
 const {
@@ -657,6 +659,33 @@ client.on(
     Events.InteractionCreate,
     async (interaction) => {
 
+                // ==========================================
+        // COSMETIC AUTOCOMPLETE
+        // ==========================================
+
+        if (
+            interaction.isAutocomplete() &&
+            interaction.commandName === 'cosmetic'
+        ) {
+
+            try {
+
+                await autocompleteCosmetic(
+                    interaction
+                );
+
+            } catch (error) {
+
+                console.error(
+                    '❌ Cosmetic autocomplete error:',
+                    error
+                );
+
+            }
+
+            return;
+        }
+
         // ==========================================
         // FORTNITE QUIZ BUTTONS
         // ==========================================
@@ -686,6 +715,10 @@ client.on(
                 )
             ) {
 
+                // Acknowledge immediately so the interaction token
+                // does not expire while the giveaway message is edited.
+                await interaction.deferUpdate();
+
                 const giveawayId =
                     interaction.customId.replace(
                         'giveaway_enter_',
@@ -701,13 +734,11 @@ client.on(
 
                 if (!giveaway) {
 
-                    await interaction.reply({
-
+                    await interaction.followUp({
                         content:
                             '❌ This giveaway no longer exists.',
-
-                        ephemeral: true
-
+                        flags:
+                            MessageFlags.Ephemeral
                     });
 
                     return;
@@ -720,13 +751,11 @@ client.on(
                     giveaway.status !== 'active'
                 ) {
 
-                    await interaction.reply({
-
+                    await interaction.followUp({
                         content:
                             '⏰ This giveaway has already ended.',
-
-                        ephemeral: true
-
+                        flags:
+                            MessageFlags.Ephemeral
                     });
 
                     return;
@@ -739,13 +768,11 @@ client.on(
                     Date.now() >= giveaway.endsAt
                 ) {
 
-                    await interaction.reply({
-
+                    await interaction.followUp({
                         content:
                             '⏰ This giveaway has ended.',
-
-                        ephemeral: true
-
+                        flags:
+                            MessageFlags.Ephemeral
                     });
 
                     return;
@@ -760,13 +787,11 @@ client.on(
                     )
                 ) {
 
-                    await interaction.reply({
-
+                    await interaction.followUp({
                         content:
                             '⚠️ You are already entered in this giveaway!',
-
-                        ephemeral: true
-
+                        flags:
+                            MessageFlags.Ephemeral
                     });
 
                     return;
@@ -781,11 +806,12 @@ client.on(
                         interaction.user.id
                     );
 
-                // Rebuild interface
+                // Rebuild the Amyfn Components V2 interface
 
-                const embed =
-                    giveawayCommand.createGiveawayEmbed(
-                        updatedGiveaway
+                const container =
+                    giveawayCommand.createGiveawayContainer(
+                        updatedGiveaway,
+                        'active'
                     );
 
                 const row =
@@ -793,26 +819,34 @@ client.on(
                         updatedGiveaway
                     );
 
+                const attachment =
+                    giveawayCommand.createGiveawayAttachment();
+
                 try {
 
                     await interaction.message.edit({
 
-                        embeds: [
-                            embed
+                        components: [
+                            container,
+                            row
                         ],
 
-                        components: [
-                            row
-                        ]
+                        files: [
+                            attachment
+                        ],
+
+                        flags:
+                            MessageFlags.IsComponentsV2
 
                     });
 
-                    await interaction.reply({
+                    await interaction.followUp({
 
                         content:
                             '🎉 You are officially entered! Good luck! 💙',
 
-                        ephemeral: true
+                        flags:
+                            MessageFlags.Ephemeral
 
                     });
 
@@ -825,21 +859,15 @@ client.on(
 
                     try {
 
-                        if (
-                            !interaction.replied &&
-                            !interaction.deferred
-                        ) {
+                        await interaction.followUp({
 
-                            await interaction.reply({
+                            content:
+                                '❌ Something went wrong while entering the giveaway.',
 
-                                content:
-                                    '❌ Something went wrong while entering the giveaway.',
+                            flags:
+                                MessageFlags.Ephemeral
 
-                                ephemeral: true
-
-                            });
-
-                        }
+                        });
 
                     } catch (replyError) {
 

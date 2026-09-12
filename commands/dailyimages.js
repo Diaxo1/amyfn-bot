@@ -1,7 +1,12 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
-    AttachmentBuilder
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    MessageFlags,
+    AttachmentBuilder,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const {
@@ -19,89 +24,116 @@ module.exports = {
             'Shows images of cosmetics released in the latest Fortnite Shop reset'
         ),
 
-    execute: async function(interaction) {
-
-        console.log('🖼️ DAILYIMAGES STARTED');
+    async execute(interaction) {
+        console.log('DAILYIMAGES STARTED');
 
         try {
-
-            // Acknowledge the slash command immediately
             await interaction.deferReply();
 
             const result = getLatestDailyResult();
 
+            const separator = () =>
+                new SeparatorBuilder()
+                    .setDivider(true)
+                    .setSpacing(SeparatorSpacingSize.Small);
+
             // ==========================================
-            // NO SHOP RESET
+            // NO RESET
             // ==========================================
 
             if (!result) {
+                const container = new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('# __Daily Shop Images__'),
 
-                const embed = new EmbedBuilder()
-                    .setColor(0x1493ff)
-                    .setTitle('🛒 Daily Shop Images')
-                    .setDescription(
-                        '⏳ **No shop reset has been detected yet.**\n\n' +
-                        'The automatic tracker is watching the Fortnite Item Shop.\n\n' +
-                        'Once a reset is detected, the released items will appear here.'
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '**NO SHOP RESET DETECTED**\n\n' +
+                                'Amyfn is watching the Fortnite Item Shop. ' +
+                                'Released cosmetics will appear here after the next reset.'
+                            )
                     )
-                    .setFooter({
-                        text: 'Amyfn • Fortnite Community'
-                    })
-                    .setTimestamp();
+                    .addSeparatorComponents(separator())
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • DAILY SHOP TRACKER'
+                            )
+                    );
 
                 return interaction.editReply({
-                    embeds: [embed]
+                    components: [container],
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
 
-            const releasedToday =
-                result.releasedToday || [];
+            const releasedToday = result.releasedToday || [];
 
             // ==========================================
-            // NOTHING RELEASED
+            // NOTHING NEW
             // ==========================================
 
             if (releasedToday.length === 0) {
+                const container = new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('# __Daily Shop Images__'),
 
-                const embed = new EmbedBuilder()
-                    .setColor(0x1493ff)
-                    .setTitle('🛒 Daily Shop Images')
-                    .setDescription(
-                        '📭 **No new cosmetics were released in the latest shop reset.**'
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '**NO NEW COSMETICS**\n\n' +
+                                'The latest shop reset did not add any new cosmetics.'
+                            )
                     )
-                    .setFooter({
-                        text: 'Amyfn • Fortnite Community'
-                    })
-                    .setTimestamp();
+                    .addSeparatorComponents(separator())
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • DAILY SHOP TRACKER'
+                            )
+                    );
 
                 return interaction.editReply({
-                    embeds: [embed]
+                    components: [container],
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
 
             // ==========================================
-            // GET IMAGE URLS
+            // GET ITEMS WITH IMAGES
             // ==========================================
 
-            const images = releasedToday
-                .map(item => item.image)
-                .filter(Boolean);
+            const itemsWithImages = releasedToday
+                .filter(item => item.image);
 
-            if (images.length === 0) {
+            if (itemsWithImages.length === 0) {
+                const container = new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('# __Daily Shop Images__'),
 
-                const embed = new EmbedBuilder()
-                    .setColor(0x1493ff)
-                    .setTitle('🛒 Daily Shop Images')
-                    .setDescription(
-                        '⚠️ **No images were available for the released items.**'
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '**NO IMAGES AVAILABLE**\n\n' +
+                                'The released cosmetics were detected, ' +
+                                'but no usable images were found.'
+                            )
                     )
-                    .setFooter({
-                        text: 'Amyfn • Fortnite Community'
-                    })
-                    .setTimestamp();
+                    .addSeparatorComponents(separator())
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • DAILY SHOP TRACKER'
+                            )
+                    );
 
                 return interaction.editReply({
-                    embeds: [embed]
+                    components: [container],
+                    flags: MessageFlags.IsComponentsV2
                 });
             }
 
@@ -111,32 +143,47 @@ module.exports = {
 
             const attachments = [];
 
-            for (let i = 0; i < images.length; i++) {
+            for (
+                let i = 0;
+                i < itemsWithImages.length;
+                i++
+            ) {
+                const item = itemsWithImages[i];
 
                 try {
-
                     console.log(
-                        `🖼️ Downloading daily image ${i + 1}/${images.length}`
+                        `Downloading daily image ${i + 1}/${itemsWithImages.length}: ${item.name || 'Unknown'}`
                     );
 
                     const buffer =
-                        await downloadImage(images[i]);
+                        await downloadImage(item.image);
 
-                    const attachment =
+                    const safeName =
+                        String(
+                            item.name ||
+                            `daily-shop-${i + 1}`
+                        )
+                            .replace(
+                                /[<>:"/\\|?*\x00-\x1F]/g,
+                                ''
+                            )
+                            .trim()
+                            .replace(/\s+/g, '-')
+                            .slice(0, 70) ||
+                        `daily-shop-${i + 1}`;
+
+                    attachments.push(
                         new AttachmentBuilder(buffer)
                             .setName(
-                                `daily-shop-${i + 1}.png`
-                            );
-
-                    attachments.push(attachment);
-
-                } catch (error) {
-
-                    console.error(
-                        `⚠️ Failed to download daily image ${i + 1}:`,
-                        error.message
+                                `${safeName}.png`
+                            )
                     );
 
+                } catch (error) {
+                    console.error(
+                        `Failed to download daily image ${i + 1}:`,
+                        error.message
+                    );
                 }
             }
 
@@ -145,35 +192,64 @@ module.exports = {
             // ==========================================
 
             if (attachments.length === 0) {
-
                 return interaction.editReply({
                     content:
-                        '❌ Failed to download the Daily Shop images.'
+                        'Failed to download the Daily Shop images.'
                 });
             }
 
             // ==========================================
-            // GALLERY EMBED
+            // HEADER
             // ==========================================
 
-            const headerEmbed =
-                new EmbedBuilder()
-                    .setColor(0x1493ff)
-                    .setTitle('🛒 Daily Shop Images')
-                    .setDescription(
-                        `🔥 **${attachments.length} new cosmetic image${attachments.length === 1 ? '' : 's'} from the latest Fortnite Shop reset.**`
+            const detectedAt =
+                result.detectedAt
+                    ? new Date(result.detectedAt)
+                    : new Date();
+
+            const dateText =
+                detectedAt.toLocaleString(
+                    'en-GB',
+                    {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }
+                );
+
+            const header =
+                new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '# __Daily Shop Images__'
+                            ),
+
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `**${attachments.length}** new cosmetic image${attachments.length === 1 ? '' : 's'} ` +
+                                `from the latest Fortnite Shop reset.\n\n` +
+                                `Reset detected **${dateText}**.`
+                            )
                     )
-                    .setFooter({
-                        text: 'Amyfn • Fortnite Community'
-                    })
-                    .setTimestamp(
-                        result.detectedAt
-                            ? new Date(result.detectedAt)
-                            : new Date()
+
+                    .addSeparatorComponents(
+                        separator()
+                    )
+
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • DAILY SHOP TRACKER'
+                            )
                     );
 
             // ==========================================
-            // BATCH IMAGES
+            // DISCORD ATTACHMENT LIMIT
             // ==========================================
 
             const BATCH_SIZE = 10;
@@ -185,7 +261,6 @@ module.exports = {
                 i < attachments.length;
                 i += BATCH_SIZE
             ) {
-
                 batches.push(
                     attachments.slice(
                         i,
@@ -195,74 +270,74 @@ module.exports = {
             }
 
             // ==========================================
-            // HEADER MESSAGE
+            // HEADER + FIRST 10 IMAGES
             // ==========================================
+            //
+            // The first batch is attached directly to
+            // the original interaction response.
+            //
+            // This keeps the header and first images
+            // visually connected instead of creating
+            // a separate message immediately below it.
+            //
 
             await interaction.editReply({
-                embeds: [headerEmbed]
-            });
-
-            // ==========================================
-            // FIRST BATCH OF IMAGES
-            // ==========================================
-
-            await interaction.followUp({
-                files: batches[0]
+                components: [header],
+                files: batches[0],
+                flags: MessageFlags.IsComponentsV2
             });
 
             // ==========================================
             // REMAINING BATCHES
             // ==========================================
+            //
+            // Discord allows up to 10 attachments
+            // per message, so anything after the
+            // first batch is sent normally underneath.
+            //
 
-            for (let i = 1; i < batches.length; i++) {
-
+            for (
+                let i = 1;
+                i < batches.length;
+                i++
+            ) {
                 await interaction.followUp({
                     files: batches[i]
                 });
-
             }
 
             console.log(
-                `✅ DAILYIMAGES: Sent ${attachments.length} individual images in ${batches.length} image message(s).`
+                `DAILYIMAGES: Sent ${attachments.length} images in ${batches.length} image message(s).`
             );
 
         } catch (error) {
-
             console.error(
-                '❌ DAILYIMAGES ERROR:',
+                'DAILYIMAGES ERROR:',
                 error
             );
 
             try {
-
                 if (
                     interaction.deferred ||
                     interaction.replied
                 ) {
-
                     await interaction.editReply({
                         content:
-                            '❌ Failed to load the Daily Shop images.',
-                        embeds: [],
-                        files: []
+                            'Failed to load the Daily Shop images.',
+                        components: []
                     });
-
                 } else {
-
                     await interaction.reply({
                         content:
-                            '❌ Failed to load the Daily Shop images.'
+                            'Failed to load the Daily Shop images.'
                     });
-
                 }
 
             } catch (replyError) {
-
                 console.error(
-                    '❌ Could not send Daily Images error:',
+                    'Could not send Daily Images error:',
                     replyError
                 );
-
             }
         }
     }

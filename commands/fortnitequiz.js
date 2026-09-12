@@ -1,11 +1,16 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
+    ContainerBuilder,
+    TextDisplayBuilder,
+    SeparatorBuilder,
+    SectionBuilder,
+    ThumbnailBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     AttachmentBuilder,
-    MessageFlags
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const fs = require('fs');
@@ -65,12 +70,28 @@ function shuffle(array) {
 
 function createAnswerButtons(
     quizId,
-    answers
+    answers,
+    disabled = false,
+    selectedIndex = null,
+    correctIndex = null
 ) {
     const letters = ['A', 'B', 'C', 'D'];
 
     const buttons = answers.map(
         (answer, index) => {
+            let style = ButtonStyle.Primary;
+
+            if (disabled) {
+                if (index === selectedIndex) {
+                    style =
+                        selectedIndex === correctIndex
+                            ? ButtonStyle.Success
+                            : ButtonStyle.Danger;
+                } else {
+                    style = ButtonStyle.Secondary;
+                }
+            }
+
             return new ButtonBuilder()
                 .setCustomId(
                     `quiz_${quizId}_${index}`
@@ -78,9 +99,8 @@ function createAnswerButtons(
                 .setLabel(
                     `${letters[index]} • ${answer}`
                 )
-                .setStyle(
-                    ButtonStyle.Primary
-                );
+                .setStyle(style)
+                .setDisabled(disabled);
         }
     );
 
@@ -97,41 +117,135 @@ function createAnswerButtons(
     ];
 }
 
-function createResultEmbed(
+function createQuizContainer(
     question,
-    selectedAnswer,
-    correct
+    imageName = 'quiz-current.png',
+    result = null
 ) {
-    const embed = new EmbedBuilder()
-        .setColor(
-            correct
-                ? 0x2ecc71
-                : 0xe74c3c
-        )
-        .setTitle(
-            correct
-                ? '✅ Correct!'
-                : '❌ Not quite!'
-        )
-        .setDescription(
-            correct
-                ? `**${selectedAnswer}** was the correct answer!`
-                : `You chose **${selectedAnswer}**.\n\nThe correct answer was **${question.correctAnswer}**.`
-        )
-        .setFooter({
-            text: 'AMYFN • Fortnite Quiz'
-        })
-        .setTimestamp();
+    const container =
+        new ContainerBuilder();
 
-    return embed;
+    if (!result) {
+        container.addSectionComponents(
+            new SectionBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        '# 💙 __Fortnite Quiz__\n' +
+                        '**TEST YOUR FORTNITE KNOWLEDGE**\n\n' +
+                        '▌ Choose the answer you think is correct below.'
+                    )
+                )
+                .setThumbnailAccessory(
+                    new ThumbnailBuilder()
+                        .setURL(
+                            `attachment://${imageName}`
+                        )
+                        .setDescription(
+                            'Fortnite Quiz Question'
+                        )
+                )
+        );
+
+        container
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    '🧠 **Question**\n\n' +
+                    `▌ ${question.question}`
+                )
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    '🎯 **Your Answer**\n\n' +
+                    '▌ Pick one of the four choices below.\n\n' +
+                    '-# AMYFN • FORTNITE QUIZ'
+                )
+            );
+    } else {
+        const correct =
+            result.selectedAnswer ===
+            question.correctAnswer;
+
+        container.addSectionComponents(
+            new SectionBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        correct
+                            ? '# 💙 __Correct!__\n**NICE ONE, YOU KNOW YOUR FORTNITE.**'
+                            : '# 💙 __Not Quite!__\n**BETTER LUCK ON THE NEXT ONE.**'
+                    )
+                )
+                .setThumbnailAccessory(
+                    new ThumbnailBuilder()
+                        .setURL(
+                            `attachment://${imageName}`
+                        )
+                        .setDescription(
+                            'Fortnite Quiz Result'
+                        )
+                )
+        );
+
+        container
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    '🧠 **Question**\n\n' +
+                    `▌ ${question.question}`
+                )
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    correct
+                        ? `✅ **Your Answer**\n\n▌ ${result.selectedAnswer}\n\n` +
+                          '🎉 **Correct answer!**'
+                        : `❌ **Your Answer**\n\n▌ ${result.selectedAnswer}\n\n` +
+                          `💡 **Correct Answer**\n\n▌ ${question.correctAnswer}`
+                )
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(
+                        SeparatorSpacingSize.Small
+                    )
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    '🔄 **Want another?**\n\n' +
+                    '▌ Run `/fortnitequiz` to start a new question.\n\n' +
+                    '-# AMYFN • FORTNITE QUIZ'
+                )
+            );
+    }
+
+    return container;
 }
 
 async function createQuizMessage(
     interaction
 ) {
-    // Tell Discord immediately that we're processing the quiz.
-    // This prevents the interaction from expiring while Sharp
-    // generates the quiz image.
     await interaction.deferReply();
 
     const questions = loadQuestions();
@@ -184,27 +298,23 @@ async function createQuizMessage(
             'quiz-current.png'
         );
 
-    const embed =
-        new EmbedBuilder()
-            .setColor(0x1493ff)
-            .setImage(
-                'attachment://quiz-current.png'
-            )
-            .setFooter({
-                text:
-                    'AMYFN • Fortnite Quiz • Medium'
-            });
-
-    const components =
-        createAnswerButtons(
-            quizId,
-            answers
+    const container =
+        createQuizContainer(
+            question
         );
 
+    const components = [
+        container,
+        ...createAnswerButtons(
+            quizId,
+            answers
+        )
+    ];
+
     return interaction.editReply({
-        embeds: [embed],
+        components,
         files: [attachment],
-        components
+        flags: MessageFlags.IsComponentsV2
     });
 }
 
@@ -214,6 +324,8 @@ module.exports = {
         .setDescription(
             'Test your Fortnite knowledge.'
         ),
+
+    createQuizContainer,
 
     async execute(interaction) {
         try {
@@ -327,50 +439,39 @@ module.exports = {
             quizId
         );
 
-        const resultEmbed =
-            createResultEmbed(
-                quiz.question,
-                selectedAnswer,
-                correct
+        const correctIndex =
+            quiz.answers.findIndex(
+                answer =>
+                    answer ===
+                    quiz.question.correctAnswer
             );
 
-        const disabledRows =
-            interaction.message.components.map(
-                row => {
-                    return new ActionRowBuilder()
-                        .addComponents(
-                            row.components.map(
-                                button => {
-                                    const isSelected =
-                                        button.customId.endsWith(
-                                            `_${answerIndex}`
-                                        );
-
-                                    return ButtonBuilder
-                                        .from(button)
-                                        .setDisabled(true)
-                                        .setStyle(
-                                            isSelected
-                                                ? (
-                                                    correct
-                                                        ? ButtonStyle.Success
-                                                        : ButtonStyle.Danger
-                                                )
-                                                : ButtonStyle.Secondary
-                                        );
-                                }
-                            )
-                        );
+        const resultContainer =
+            createQuizContainer(
+                quiz.question,
+                'quiz-current.png',
+                {
+                    selectedAnswer,
+                    correct
                 }
             );
 
+        const disabledRows =
+            createAnswerButtons(
+                quizId,
+                quiz.answers,
+                true,
+                answerIndex,
+                correctIndex
+            );
+
         await interaction.update({
-            embeds: [
-                interaction.message.embeds[0],
-                resultEmbed
+            components: [
+                resultContainer,
+                ...disabledRows
             ],
-            components:
-                disabledRows
+            flags:
+                MessageFlags.IsComponentsV2
         });
 
         return true;

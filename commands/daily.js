@@ -1,16 +1,16 @@
-console.log('🔥 NEW DAILY.JS LOADED');
-
 const {
-    SlashCommandBuilder
+    SlashCommandBuilder,
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const {
     getLatestDailyResult
 } = require('../services/dailyShopTracker');
-
-const {
-    createEmbed
-} = require('../services/embedStyle');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -21,125 +21,182 @@ module.exports = {
 
     async execute(interaction) {
         try {
-            await interaction.deferReply();
-
             const result = getLatestDailyResult();
 
+            const logo = interaction.client.user.displayAvatarURL({
+                extension: 'png',
+                size: 256
+            });
+
+            const separator = () =>
+                new SeparatorBuilder()
+                    .setDivider(true)
+                    .setSpacing(SeparatorSpacingSize.Small);
+
             // ==========================================
-            // NO RESET DETECTED
+            // NO RESET
             // ==========================================
 
             if (!result) {
-                const embed = createEmbed({
-                    title: 'FORTNITE SHOP RESET',
-                    description:
-                        'No shop reset has been detected yet.\n\n' +
-                        'The automatic tracker is watching the Fortnite Item Shop.',
-                    timestamp: true
+                const container = new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+                    .addSectionComponents(
+                        new SectionBuilder()
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent('# __Fortnite Shop Reset__'),
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        '**NO SHOP RESET DETECTED**\n\n' +
+                                        'Amyfn is currently watching the Fortnite Item Shop. ' +
+                                        'The latest reset will appear here once detected.'
+                                    )
+                            )
+                            .setThumbnailAccessory(
+                                thumbnail =>
+                                    thumbnail
+                                        .setURL(logo)
+                                        .setDescription('Amyfn')
+                            )
+                    )
+                    .addSeparatorComponents(separator())
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('-# AMYFN • DAILY SHOP TRACKER')
+                    );
+
+                return interaction.reply({
+                    components: [container],
+                    flags: MessageFlags.IsComponentsV2
                 });
-
-                await interaction.editReply({
-                    embeds: [embed]
-                });
-
-                return;
             }
 
-            const {
-                releasedToday = [],
-                removedToday = []
-            } = result;
+            const releasedToday = result.releasedToday || [];
+            const removedToday = result.removedToday || [];
 
-            // ==========================================
-            // RELEASED ITEMS
-            // ==========================================
+            const releasedNames = releasedToday
+                .map(item => item.name)
+                .filter(Boolean);
 
-            let releasedText;
+            const removedNames = removedToday
+                .map(item => item.name)
+                .filter(Boolean);
 
-            if (releasedToday.length > 0) {
-                releasedText = releasedToday
-                    .map(item => item.name)
-                    .join('\n');
-            } else {
-                releasedText = 'Nothing new released.';
-            }
+            const formatList = (names, emptyText) => {
+                if (!names.length) return emptyText;
 
-            // ==========================================
-            // REMOVED ITEMS
-            // ==========================================
+                // Keep the component compact and readable on large shop resets.
+                const MAX_VISIBLE = 24;
+                const visible = names.slice(0, MAX_VISIBLE);
+                const remaining = names.length - visible.length;
 
-            let removedText;
+                let text = visible.map(name => `• ${name}`).join('\n');
 
-            if (removedToday.length > 0) {
-                removedText = removedToday
-                    .map(item => item.name)
-                    .join('\n');
-            } else {
-                removedText = 'Nothing removed.';
-            }
+                if (remaining > 0) {
+                    text += `\n\n*+ ${remaining} more*`;
+                }
 
-            // ==========================================
-            // EMBED
-            // ==========================================
+                return text;
+            };
 
-            const embed = createEmbed({
-                title: 'FORTNITE SHOP RESET',
-                description:
-                    'The latest Fortnite Item Shop rotation has been detected.',
-                timestamp: false
+            const detectedAt = result.detectedAt
+                ? new Date(result.detectedAt)
+                : new Date();
+
+            const dateText = detectedAt.toLocaleString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
 
-            // Use actual detection time
-            if (result.detectedAt) {
-                embed.setTimestamp(
-                    new Date(result.detectedAt)
+            // ==========================================
+            // MAIN CONTAINER
+            // ==========================================
+
+            const container = new ContainerBuilder()
+                .setAccentColor(0x1493ff)
+
+                // HEADER
+                .addSectionComponents(
+                    new SectionBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder()
+                                .setContent('# __Fortnite Shop Reset__'),
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `**${releasedToday.length}** new cosmetic${releasedToday.length === 1 ? '' : 's'} ` +
+                                    `and **${removedToday.length}** removed.\n\n` +
+                                    `Reset detected **${dateText}**.`
+                                )
+                        )
+                        .setThumbnailAccessory(
+                            thumbnail =>
+                                thumbnail
+                                    .setURL(logo)
+                                    .setDescription('Amyfn')
+                        )
+                )
+
+                .addSeparatorComponents(separator())
+
+                // NEW
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## New In The Shop  •  ${releasedToday.length}\n\n` +
+                            formatList(
+                                releasedNames,
+                                'No new cosmetics were released.'
+                            )
+                        )
+                )
+
+                .addSeparatorComponents(separator())
+
+                // REMOVED
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            `## Removed From Shop  •  ${removedToday.length}\n\n` +
+                            formatList(
+                                removedNames,
+                                'No cosmetics were removed.'
+                            )
+                        )
+                )
+
+                .addSeparatorComponents(separator())
+
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent(
+                            '-# AMYFN • DAILY SHOP TRACKER'
+                        )
                 );
-            }
 
-            // ==========================================
-            // SHOP CHANGES
-            // ==========================================
-
-            embed.addFields(
-                {
-                    name: `NEW IN THE SHOP  •  ${releasedToday.length}`,
-                    value: releasedText,
-                    inline: true
-                },
-                {
-                    name: `REMOVED FROM SHOP  •  ${removedToday.length}`,
-                    value: removedText,
-                    inline: true
-                }
-            );
-
-            await interaction.editReply({
-                embeds: [embed]
+            return interaction.reply({
+                components: [container],
+                flags: MessageFlags.IsComponentsV2
             });
 
         } catch (error) {
-            console.error(
-                '❌ Daily command error:',
-                error
-            );
+            console.error('Daily command error:', error);
 
-            // Only try to reply if the interaction is still usable
             try {
-                if (
-                    interaction.deferred ||
-                    interaction.replied
-                ) {
+                if (interaction.deferred || interaction.replied) {
                     await interaction.editReply(
-                        '❌ Failed to load the Daily Shop results.'
+                        'Failed to load the Daily Shop results.'
                     );
                 } else {
                     await interaction.reply(
-                        '❌ Failed to load the Daily Shop results.'
+                        'Failed to load the Daily Shop results.'
                     );
                 }
             } catch (replyError) {
                 console.error(
-                    '❌ Could not send error response:',
+                    'Could not send Daily command error response:',
                     replyError
                 );
             }

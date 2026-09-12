@@ -1,262 +1,293 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
+    AttachmentBuilder,
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    AttachmentBuilder
+    StringSelectMenuBuilder
 } = require('discord.js');
+const crypto = require('crypto');
 
-const path = require('path');
+const {
+    getPlayerSeasonStats,
+    getPlayerLifetimeStats
+} = require('../services/fortniteStats');
 
-// ==========================================
-// BANNER
-// ==========================================
+const {
+    createAccountCard
+} = require('../services/accountCard');
 
-const ABOUT_BANNER = path.join(
-    __dirname,
-    '..',
-    'assets',
-    'about-banner.png'
-);
+const {
+    getAccountSkinImage
+} = require('../services/fortniteCosmetics');
 
-// ==========================================
-// LINKS
-// ==========================================
+// Account card sessions live in memory. This keeps select-menu clicks fast
+// without making another Fortnite API request for Season <-> Overall.
+const accountSessions = new Map();
+const SESSION_TTL = 15 * 60 * 1000;
 
-const DASHBOARD_URL =
-    process.env.AMYFN_DASHBOARD_URL ||
-    'https://amyfn.up.railway.app/';
+function createSession(data) {
+    const id = crypto.randomBytes(6).toString('hex');
 
-const SUPPORT_URL =
-    process.env.AMYFN_SUPPORT_URL ||
-    'https://discord.gg/mwNKev8ZEY';
+    accountSessions.set(id, {
+        ...data,
+        expiresAt: Date.now() + SESSION_TTL
+    });
 
-const INVITE_URL =
-    process.env.AMYFN_INVITE_URL ||
-    'https://discord.com/oauth2/authorize?client_id=1545634405412905090&permissions=8&scope=bot%20applications.commands';
+    return id;
+}
 
+function getSession(id) {
+    const session = accountSessions.get(id);
 
-// ==========================================
-// COMMAND
-// ==========================================
+    if (!session) return null;
+
+    if (Date.now() > session.expiresAt) {
+        accountSessions.delete(id);
+        return null;
+    }
+
+    session.expiresAt = Date.now() + SESSION_TTL;
+    return session;
+}
+
+function buildAccountComponents(sessionId, time = 'season') {
+    const timeMenu = new StringSelectMenuBuilder()
+        .setCustomId(`account_time_${sessionId}`)
+        .setPlaceholder('Select time period')
+        .addOptions([
+            {
+                label: 'This Season',
+                description: 'Stats from the current season',
+                value: 'season',
+                default: time === 'season'
+            },
+            {
+                label: 'Overall',
+                description: 'Lifetime Battle Royale stats',
+                value: 'overall',
+                default: time === 'overall'
+            }
+        ]);
+
+    return [
+        new ActionRowBuilder().addComponents(timeMenu)
+    ];
+}
+
+async function renderAccount(interaction, session, time) {
+    const stats = time === 'season'
+        ? session.seasonStats
+        : session.lifetimeStats;
+
+    const card = await createAccountCard({
+        account: session.account,
+        stats,
+        battlePassLevel: session.battlePassLevel,
+        skinImage: session.skinImage,
+        time
+    });
+
+    const attachment = new AttachmentBuilder(card)
+        .setName('amyfn-account.png');
+
+    return interaction.editReply({
+        content: '',
+        files: [attachment],
+        components: buildAccountComponents(session.id, time)
+    });
+}
+
+async function handleAccountComponent(interaction) {
+    if (!interaction.isStringSelectMenu()) return false;
+
+    const isTimeMenu = interaction.customId.startsWith('account_time_');
+
+    if (!isTimeMenu) return false;
+
+    const sessionId = interaction.customId.replace(/^account_time_/, '');
+    const session = getSession(sessionId);
+
+    if (!session) {
+        await interaction.reply({
+            content: 'This account card has expired. Run `/account` again.',
+            ephemeral: true
+        });
+        return true;
+    }
+
+    // Only the person who created the card can control its dropdown.
+    if (interaction.user.id !== session.userId) {
+        await interaction.reply({
+            content: 'Only the person who used `/account` can change these stats.',
+            ephemeral: true
+        });
+        return true;
+    }
+
+    const time = interaction.values[0];
+    session.time = time;
+
+    try {
+        await interaction.deferUpdate();
+        await renderAccount(interaction, session, time);
+    } catch (error) {
+        console.error('Account card select-menu error:', error);
+
+        try {
+            await interaction.editReply({
+                content: 'Something went wrong while updating the account card.'
+            });
+        } catch (_) {
+            // Interaction may already have expired.
+        }
+    }
+
+    return true;
+}
 
 module.exports = {
-
     data: new SlashCommandBuilder()
-        .setName('about')
-        .setDescription(
-            'Learn more about Amyfn and its features'
+        .setName('account')
+        .setDescription('View a Fortnite player account overview')
+        .addStringOption(option =>
+            option
+                .setName('username')
+                .setDescription("The player's Epic Games display name")
+                .setRequired(true)
         ),
 
     async execute(interaction) {
+        const username = interaction.options.getString('username');
 
-        console.log(
-            'ℹ️ Calling ABOUT handler...'
-        );
+        await interaction.deferReply();
 
-        const embed =
-            new EmbedBuilder()
+        try {
+            // ==========================================
+            // GET PLAYER DATA
+            // ==========================================
 
-                // ==================================
-                // COLOR
-                // ==================================
+            const [seasonData, lifetimeData] = await Promise.all([
+                getPlayerSeasonStats(username),
+                getPlayerLifetimeStats(username)
+            ]);
 
-                .setColor(0x1493ff)
-
-                // ==================================
-                // TITLE
-                // ==================================
-
-                .setTitle(
-                    '👑 About Amyfn'
-                )
-
-                // ==================================
-                // DESCRIPTION
-                // ==================================
-
-                .setDescription(
-                    '**Your all-in-one Fortnite Discord companion.**\n\n' +
-
-                    'Amyfn brings Fortnite updates, Item Shop tracking, ' +
-                    'cosmetics, leaks, news, giveaways and more directly ' +
-                    'to your Discord server.\n\n' +
-
-                    'Built for players, creators and communities ' +
-                    'who live and breathe Fortnite.'
-                )
-
-                // ==================================
-                // BANNER
-                // ==================================
-
-                .setImage(
-                    'attachment://about-banner.png'
-                )
-
-                // ==================================
-                // FEATURES
-                // ==================================
-
-                .addFields(
-
-                    {
-                        name: '✨ What Amyfn can do',
-                        value:
-                            'ㅤ',
-                        inline: false
-                    },
-
-                    {
-                        name: '🛒 Daily Shop',
-                        value:
-                            'Track the Fortnite Item Shop with fresh updates.',
-                        inline: true
-                    },
-
-                    {
-                        name: '👕 Cosmetics',
-                        value:
-                            'Search and view Fortnite cosmetics with ease.',
-                        inline: true
-                    },
-
-                    {
-                        name: '🔭 Leaks',
-                        value:
-                            'Get the latest Fortnite leaks from trusted sources.',
-                        inline: true
-                    },
-
-                    {
-                        name: '📰 News',
-                        value:
-                            'Stay updated with the latest Fortnite news.',
-                        inline: true
-                    },
-
-                    {
-                        name: '🎁 Giveaways',
-                        value:
-                            'Run and manage giveaways for your community.',
-                        inline: true
-                    },
-
-                    {
-                        name: '🛡️ Moderation',
-                        value:
-                            'Keep your Discord server clean and safe.',
-                        inline: true
-                    },
-
-                    {
-                        name: '🎯 Built for Fortnite communities.',
-                        value:
-                            'Whether you are a casual player, a competitive grinder, ' +
-                            'or a content creator — Amyfn is here to keep you informed, ' +
-                            'connected and ahead of the game.',
-                        inline: false
-                    },
-
-                    // ==================================
-                    // SHOP CODE
-                    // ==================================
-
-                    {
-                        name: '💙 Support Amyfn',
-                        value:
-                            'Please use Fortnite Shop Code **`XAID`** when ' +
-                            'purchasing items in the Fortnite Item Shop. ' +
-                            'It helps support the creator! ❤️',
-                        inline: false
-                    }
-
-                )
-
-                // ==================================
-                // FOOTER
-                // ==================================
-
-                .setFooter({
-                    text:
-                        'AMYFN • Your Fortnite Companion • Track • Discover • Stay Updated • Together'
-                })
-
-                .setTimestamp();
-
-
-        // ==========================================
-        // BUTTONS
-        // ==========================================
-
-        const buttons =
-            new ActionRowBuilder()
-                .addComponents(
-
-                    new ButtonBuilder()
-                        .setLabel(
-                            'Configure Amyfn'
-                        )
-                        .setEmoji('⚙️')
-                        .setStyle(
-                            ButtonStyle.Link
-                        )
-                        .setURL(
-                            DASHBOARD_URL
-                        ),
-
-                    new ButtonBuilder()
-                        .setLabel(
-                            'Support Server'
-                        )
-                        .setEmoji('💬')
-                        .setStyle(
-                            ButtonStyle.Link
-                        )
-                        .setURL(
-                            SUPPORT_URL
-                        ),
-
-                    new ButtonBuilder()
-                        .setLabel(
-                            'Invite Amyfn'
-                        )
-                        .setEmoji('➕')
-                        .setStyle(
-                            ButtonStyle.Link
-                        )
-                        .setURL(
-                            INVITE_URL
-                        )
-
+            if (!seasonData || !lifetimeData) {
+                return await interaction.editReply(
+                    `I couldn't find Fortnite stats for **${username}**.`
                 );
+            }
 
+            // ==========================================
+            // ACCOUNT
+            // ==========================================
 
-        // ==========================================
-        // SEND
-        // ==========================================
+            const account =
+                seasonData.account ||
+                lifetimeData.account ||
+                {};
 
-        await interaction.reply({
+            // Keep the complete mode collections. The renderer needs Solo,
+            // Duo, Squad and LTM instead of only the overall stats object.
+            const seasonStats = seasonData.stats?.all || {};
+            const lifetimeStats = lifetimeData.stats?.all || {};
 
-            embeds: [
-                embed
-            ],
+            // ==========================================
+            // BATTLE PASS
+            // ==========================================
 
-            files: [
-                new AttachmentBuilder(
-                    ABOUT_BANNER
-                ).setName(
-                    'about-banner.png'
-                )
-            ],
+            const battlePass =
+                seasonData.battlePass ||
+                lifetimeData.battlePass ||
+                {};
 
-            components: [
-                buttons
-            ]
+            const battlePassLevel =
+                battlePass.level ??
+                battlePass.currentLevel ??
+                battlePass.current_level ??
+                battlePass.progress?.level ??
+                battlePass.tier ??
+                'N/A';
 
-        });
+            // ==========================================
+            // PROFILE IMAGE
+            // ==========================================
 
-    }
+            const skinImage = await getAccountSkinImage(seasonData, lifetimeData);
 
+            // ==========================================
+            // ACCOUNT SESSION
+            // ==========================================
+
+            const sessionId = createSession({
+                id: null,
+                userId: interaction.user.id,
+                account,
+                seasonStats,
+                lifetimeStats,
+                battlePassLevel,
+                skinImage,
+                time: 'season'
+            });
+
+            const session = accountSessions.get(sessionId);
+            session.id = sessionId;
+
+            // ==========================================
+            // GENERATE ACCOUNT CARD
+            // ==========================================
+
+            console.log(
+                `Generating account card for ${account.name || username}`
+            );
+
+            const card = await createAccountCard({
+                account,
+                stats: seasonStats,
+                battlePassLevel,
+                skinImage,
+                time: 'season'
+            });
+
+            const attachment = new AttachmentBuilder(card)
+                .setName('amyfn-account.png');
+
+            // ==========================================
+            // SEND
+            // ==========================================
+
+            await interaction.editReply({
+                files: [attachment],
+                components: buildAccountComponents(sessionId, 'season')
+            });
+
+            console.log(
+                `Account card generated for ${account.name || username}`
+            );
+        } catch (error) {
+            console.error('Account lookup error:', error);
+
+            if (error.status === 404) {
+                return await interaction.editReply(
+                    `I couldn't find Fortnite stats for **${username}**.`
+                );
+            }
+
+            if (error.status === 401 || error.status === 403) {
+                return await interaction.editReply(
+                    'Fortnite API authentication failed. Check your API key.'
+                );
+            }
+
+            if (error.status === 429) {
+                return await interaction.editReply(
+                    'The Fortnite API is being rate limited. Try again shortly.'
+                );
+            }
+
+            await interaction.editReply(
+                'Something went wrong while creating that Fortnite account card.'
+            );
+        }
+    },
+
+    handleAccountComponent
 };
