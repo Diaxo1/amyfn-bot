@@ -2,7 +2,14 @@ const {
     SlashCommandBuilder,
     PermissionFlagsBits,
     EmbedBuilder,
-    ChannelType
+    ChannelType,
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const fs = require('fs');
@@ -197,6 +204,123 @@ function formatDuration(
 
     return parts.join(' ') || '0s';
 
+}
+
+
+// ==========================================
+// AMYFN MODERATION UI
+// ==========================================
+
+const MODERATION_BLUE = 0x1493ff;
+
+const ACTION_UI = {
+    warn:      { icon: '⚠️', title: 'Member Warned', subtitle: 'MODERATION • WARNING' },
+    warnings:  { icon: '📋', title: 'Warning History', subtitle: 'MODERATION • HISTORY' },
+    ban:       { icon: '🔨', title: 'Member Banned', subtitle: 'MODERATION • BAN' },
+    kick:      { icon: '👢', title: 'Member Kicked', subtitle: 'MODERATION • KICK' },
+    timeout:   { icon: '⏱️', title: 'Member Timed Out', subtitle: 'MODERATION • TIMEOUT' },
+    untimeout: { icon: '✅', title: 'Timeout Removed', subtitle: 'MODERATION • TIMEOUT' },
+    clear:     { icon: '🧹', title: 'Messages Cleared', subtitle: 'MODERATION • CLEANUP' },
+    slowmode:  { icon: '🐌', title: 'Slowmode Updated', subtitle: 'MODERATION • CHANNEL' },
+    lock:      { icon: '🔒', title: 'Channel Locked', subtitle: 'MODERATION • CHANNEL' },
+    unlock:    { icon: '🔓', title: 'Channel Unlocked', subtitle: 'MODERATION • CHANNEL' }
+};
+
+function memberAvatar(target) {
+    return target?.displayAvatarURL({
+        extension: 'png',
+        size: 128,
+        forceStatic: true
+    }) || null;
+}
+
+function buildModerationContainer({
+    action,
+    target = null,
+    intro = '',
+    blocks = [],
+    footer = 'AMYFN • MODERATION'
+}) {
+    const meta = ACTION_UI[action] || {
+        icon: '🛡️',
+        title: 'Moderation Action',
+        subtitle: 'MODERATION'
+    };
+
+    const container = new ContainerBuilder()
+        .setAccentColor(MODERATION_BLUE);
+
+    const header = new SectionBuilder()
+        .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+                `# 💙 __${meta.icon} ${meta.title}__\n` +
+                `**${meta.subtitle}**\n\n` +
+                (intro ? `▌ ${intro}` : '')
+            )
+        );
+
+    const avatar = memberAvatar(target);
+
+    if (avatar) {
+        header.setThumbnailAccessory(
+            new ThumbnailBuilder()
+                .setURL(avatar)
+                .setDescription(`${target.user.tag} avatar`)
+        );
+    }
+
+    container.addSectionComponents(header);
+
+    if (blocks.length) {
+        container.addSeparatorComponents(
+            new SeparatorBuilder()
+                .setSpacing(SeparatorSpacingSize.Small)
+        );
+
+        for (let i = 0; i < blocks.length; i++) {
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(blocks[i])
+            );
+
+            if (i < blocks.length - 1) {
+                container.addSeparatorComponents(
+                    new SeparatorBuilder()
+                        .setSpacing(SeparatorSpacingSize.Small)
+                );
+            }
+        }
+    }
+
+    container.addSeparatorComponents(
+        new SeparatorBuilder()
+            .setSpacing(SeparatorSpacingSize.Small)
+    );
+
+    container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`-# ${footer}`)
+    );
+
+    return container;
+}
+
+async function replyModeration(interaction, options) {
+    const container = buildModerationContainer(options);
+
+    return interaction.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2 |
+            (options.ephemeral ? MessageFlags.Ephemeral : 0)
+    });
+}
+
+async function editModeration(interaction, options) {
+    const container = buildModerationContainer(options);
+
+    return interaction.editReply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2 |
+            (options.ephemeral ? MessageFlags.Ephemeral : 0)
+    });
 }
 
 // ==========================================
@@ -573,9 +697,15 @@ async function executeWarn(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'warn',
+        target,
+        intro: `**${target.user.tag}** has received a moderation warning.`,
+        blocks: [
+            `👤 **Member**\n▌ <@${target.id}>`,
+            `🛡️ **Moderator**\n▌ <@${interaction.user.id}>`,
+            `📊 **Total Warnings**\n▌ ${totalWarnings}`,
+            `📝 **Reason**\n▌ ${reason}`
         ]
     });
 
@@ -717,11 +847,15 @@ async function executeWarnings(
             })
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
-        ],
-        ephemeral: true
+    await replyModeration(interaction, {
+        action: 'warnings',
+        target,
+        ephemeral: true,
+        intro: `Showing the latest warnings for **${target.user.tag}**.`,
+        blocks: [
+            `📊 **Total Warnings**\n▌ ${memberWarnings.length}`,
+            description
+        ]
     });
 
 }
@@ -832,9 +966,14 @@ async function executeBan(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'ban',
+        target,
+        intro: `**${target.user.tag}** has been banned from the server.`,
+        blocks: [
+            `👤 **Member**\\n▌ <@${target.id}>`,
+            `🛡️ **Moderator**\\n▌ <@${interaction.user.id}>`,
+            `📝 **Reason**\\n▌ ${reason}`
         ]
     });
 
@@ -951,9 +1090,14 @@ async function executeKick(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'kick',
+        target,
+        intro: `**${target.user.tag}** has been kicked from the server.`,
+        blocks: [
+            `👤 **Member**\\n▌ <@${target.id}>`,
+            `🛡️ **Moderator**\\n▌ <@${interaction.user.id}>`,
+            `📝 **Reason**\\n▌ ${reason}`
         ]
     });
 
@@ -1057,9 +1201,15 @@ async function executeTimeout(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'timeout',
+        target,
+        intro: `**${target.user.tag}** has been timed out.`,
+        blocks: [
+            `👤 **Member**\n▌ <@${target.id}>`,
+            `⏱️ **Duration**\n▌ ${formatDuration(milliseconds)}`,
+            `🛡️ **Moderator**\n▌ <@${interaction.user.id}>`,
+            `📝 **Reason**\n▌ ${reason}`
         ]
     });
 
@@ -1175,9 +1325,14 @@ async function executeUntimeout(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'untimeout',
+        target,
+        intro: `The timeout for **${target.user.tag}** has been removed.`,
+        blocks: [
+            `👤 **Member**\\n▌ <@${target.id}>`,
+            `🛡️ **Moderator**\\n▌ <@${interaction.user.id}>`,
+            `📝 **Reason**\\n▌ ${reason}`
         ]
     });
 
@@ -1250,9 +1405,13 @@ async function executeClear(
                 )
                 .setTimestamp();
 
-        await interaction.editReply({
-            embeds: [
-                embed
+        await editModeration(interaction, {
+            action: 'clear',
+            ephemeral: true,
+            intro: `Cleanup completed in <#${interaction.channel.id}>.`,
+            blocks: [
+                `🧹 **Messages Deleted**\n▌ ${deleted.size}`,
+                `🛡️ **Moderator**\n▌ <@${interaction.user.id}>`
             ]
         });
 
@@ -1355,9 +1514,13 @@ async function executeSlowmode(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'slowmode',
+        intro: `Slowmode settings were updated in <#${channel.id}>.`,
+        blocks: [
+            `📢 **Channel**\n▌ <#${channel.id}>`,
+            `🐌 **Slowmode**\n▌ ${seconds === 0 ? 'Disabled' : `${seconds} seconds`}`,
+            `🛡️ **Moderator**\n▌ <@${interaction.user.id}>`
         ]
     });
 
@@ -1436,9 +1599,13 @@ async function executeLock(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'lock',
+        intro: `This channel has been locked for regular members.`,
+        blocks: [
+            `📢 **Channel**\n▌ <#${channel.id}>`,
+            `🛡️ **Moderator**\n▌ <@${interaction.user.id}>`,
+            `📝 **Reason**\n▌ ${reason}`
         ]
     });
 
@@ -1517,9 +1684,13 @@ async function executeUnlock(
             )
             .setTimestamp();
 
-    await interaction.reply({
-        embeds: [
-            embed
+    await replyModeration(interaction, {
+        action: 'unlock',
+        intro: `This channel has been unlocked for regular members.`,
+        blocks: [
+            `📢 **Channel**\n▌ <#${channel.id}>`,
+            `🛡️ **Moderator**\n▌ <@${interaction.user.id}>`,
+            `📝 **Reason**\n▌ ${reason}`
         ]
     });
 
