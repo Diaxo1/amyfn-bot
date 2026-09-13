@@ -53,6 +53,11 @@ const OLD_SNAPSHOT_PATH = path.join(
 
 const CHECK_INTERVAL = 60 * 1000;
 
+// Only one leak role ping every 10 minutes globally.
+// Leak detection and posting continue normally during the cooldown.
+const LEAK_PING_COOLDOWN = 10 * 60 * 1000;
+let lastLeakPingAt = 0;
+
 
 // ==========================================
 // DATA FOLDER
@@ -545,6 +550,15 @@ async function announceLeak(
     const configs =
         getAllServerConfigs();
 
+    // The scraper still detects and sends every leak.
+    // This only controls whether the configured role gets pinged.
+    const now = Date.now();
+    const shouldPing = now - lastLeakPingAt >= LEAK_PING_COOLDOWN;
+
+    if (shouldPing) {
+        lastLeakPingAt = now;
+    }
+
     for (
         const guildId of Object.keys(
             configs
@@ -557,7 +571,7 @@ async function announceLeak(
                 client,
                 guildId,
                 tweet,
-                true
+                shouldPing
             );
 
         } catch (error) {
