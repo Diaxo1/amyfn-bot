@@ -1,17 +1,12 @@
 {
-  "shopHash": "36fc66b78fcefbd2",
-  "shopDate": "2026-09-12T00:00:00Z",
-  "itemSignature": "BID_003_RedKnight|BID_023_Pinkbear|BID_039_SpaceBlackFemale|BID_154_Feathers|BID_193_TeriyakiFishMale|BID_202_WavyManFemale|BID_228_SciOpsMale|BID_354_StreetFashionRed|BID_387_PunkDevil|BID_421_TeriyakiWarrior|BID_550_JonesyVagabond|BID_566_TeriyakiAtlantis|BID_724_BananaLeader|BID_822_AlienSummer|BID_A_042_FuzzyBearSummerFemale|Backpack_BananaPhilosopher|Backpack_DimeBlanketGrace|Backpack_DimeBlanket_Mic|Backpack_DuneBriefShift|Backpack_DyedDuelist|Backpack_FNCS_S34|Backpack_FacetBlom|Backpack_FumeFleeceClap|Backpack_FumeFleeceFade|Backpack_FumeFleeceJig|Backpack_FumeFleeceShack|Backpack_FumeFleeceWag|Backpack_GarlicWhisk|Backpack_GlintRush|Backpack_HealedScar|Backpack_JadeTowelGloss|Backpack_JadeTowel_Drum|Backpack_JadeTowel_Mic|Backpack_LooseCreep|Backpack_SirWolf|Backpack_SkiffGrind|Backpack_SoapPocket|Backpack_SunbeamQuest|Backpack_TackleShow|Backpack_TotalFlock|Backpack_TrackWaver|CID_027_Athena_Commando_F|CID_034_Athena_Commando_F_Medieval|CID_042_Athena_Commando_M_Cyberpunk|CID_069_Athena_Commando_F_PinkBear|CID_101_Athena_Commando_M_Stealth|CID_105_Athena_Commando_F_SpaceBlack|CID_274_Athena_Commando_M_Feathers|CID_315_Athena_Commando_M_TeriyakiFish|CID_326_Athena_Commando_F_WavyMan|CID_363_Athena_Commando_M_SciOps|CID_397_Athena_Commando_F_TreasureHunterFashion|CID_527_Athena_Commando_F_StreetFashionRed|CID_586_Athena_Commando_F_PunkDevil|CID_624_Athena_Commando_M_TeriyakiWarrior|CID_625_Athena_Commando_F_PinkTrooper|CID_734_Athena_Commando_F_BannerRed|CID_798_Athena_Commando_M_JonesyVagabond|CID_801_Athena_Commando_F_GolfSummer|CID_813_Athena_Commando_M_TeriyakiAtlantis|CID_836_Athena_Commando_M_JonesyFlare|CID_A_045_Athena_Commando_M_BananaLeader|CID_A_149_Athena_Commando_F_Pliant_C|CID_A_171_Athena_Commando_F_Stands_D|CID_A_175_Athena_Commando_M_AlienSummer|CID_A_453_Athena_Commando_F_FuzzyBearSummer|Character_AntiZappo|Character_BadCat|Character_BananaPhilosopher|Character_Billy|Character_BrightDisk|Character_CataclysmTower|Character_DimeBlanketGrace|Character_DuneBriefMerry|Character_DuneBriefShift|Character_DyedDuelist|Character_FacetBlom|Character_FumeFleeceClap|Character_FumeFleeceFade|Character_FumeFleeceJig|Character_FumeFleeceShack|Character_FumeFleeceWag|Character_FuzzyClaw|Character_GarlicWhisk|Character_GlintRush|Character_GoatFish|Character_HealedScar|Character_JadeTowelGloss|Character_LooseCreep|Character_ServeStreet|Character_SirWolf|Character_SkiffGrind|Character_SoapPocket|Character_SunbeamQuest|Character_TackleShow|Character_TikkaTaste|Character_TotalFlock|Character_TrackWaver|Character_VelociTeeth|Character_WaywardRebelFNCS|Companion_CacaoLynx|Companion_EggBawk|Companion_FacetWhisk|Companion_MuzzleSwish|Companion_PouchGnaw|Contrail_DimeBlanket|Contrail_JadeTowel|EID_BeachBreak|EID_BlueApparel|EID_ClayPlug|EID_Destiny|EID_DimeBlanket|EID_DimeBlanketGrace|EID_DuneBrief|EID_FlagPlant|EID_FumeFleeceClap|EID_FumeFleeceFade|EID_FumeFleeceShack|EID_FumeFleeceWag|EID_GarlicWhisk|EID_GarlicWhisk_Clobber|EID_GlintRush|EID_GoldenGlory|EID_HoopDreams|EID_JadeTowel|EID_JadeTowel_Gloss|EID_LooseCreep|EID_NerdStomp|EID_SkiffGrind|EID_SoapPocket|EID_SoapPocket_Punch|EID_Spectacular|EID_StairCrew|EID_TotalFlock|EID_TotalFlock_Slash|EID_TrackWaver|Glider_TrackWaver|LoadingScreen_TrackWaver|Pickaxe_DimeBlanket_Mic|Pickaxe_DuneBriefMerry|Pickaxe_DuneBriefShift|Pickaxe_FacetBlom|Pickaxe_FumeFleeceClap|Pickaxe_FumeFleeceFade|Pickaxe_FumeFleeceJig|Pickaxe_FumeFleeceShack|Pickaxe_FumeFleeceWag|Pickaxe_GarlicWhisk|Pickaxe_GlintRush|Pickaxe_GoatFish|Pickaxe_HealedScar|Pickaxe_JadeTowel_Drum|Pickaxe_JadeTowel_Mic|Pickaxe_LooseCreep|Pickaxe_ServeStreet|Pickaxe_SkiffGrind|Pickaxe_SoapPocket|Pickaxe_TackleShow|Pickaxe_TotalFlock|Pickaxe_TrackWaver|Pickaxe_WayWardRebelFNCS|Shoes_HowlFeast|Shoes_JetPropel|Shoes_LumenDrakePat|Shoes_PacketCrescentMauve|Shoes_TugBlooperMorse|Wrap_379_Pliant|Wrap_BrightDisk|Wrap_FumeFleece|Wrap_GlintRush|Wrap_TrackWaver|Wrap_WaywardRebel",
+  "shopHash": "c7f7afc59ed3743e",
+  "shopDate": "2026-09-14T00:00:00Z",
+  "itemSignature": "BID_003_RedKnight|BID_193_TeriyakiFishMale|BID_315_PizzaPit|BID_460_SharkAttack|BID_822_AlienSummer|BID_942_LimaBean|BID_A_042_FuzzyBearSummerFemale|Backpack_DuneBriefShift|Backpack_DyedDuelist|Backpack_FNCS_S38|Backpack_FacetBlom|Backpack_FumeFleeceClap|Backpack_FumeFleeceFade|Backpack_FumeFleeceJig|Backpack_FumeFleeceShack|Backpack_FumeFleeceWag|Backpack_GrowMallet|Backpack_LooseCreep|Backpack_NoiseClueGust|Backpack_NoiseClueLurch|Backpack_NoiseClue_Guitar|Backpack_QuarterClasp|Backpack_QuarterClaspJoin_How|Backpack_SkiffGrind|Backpack_SteelyKendama|Backpack_SunbeamQuest|Backpack_TackleShow|Backpack_TaxiHeel|Backpack_TrackWaver|CID_034_Athena_Commando_F_Medieval|CID_110_Athena_Commando_F_CircuitBreaker|CID_315_Athena_Commando_M_TeriyakiFish|CID_355_Athena_Commando_M_Farmer|CID_356_Athena_Commando_F_Farmer|CID_432_Athena_Commando_M_BalloonHead|CID_482_Athena_Commando_F_PizzaPit|CID_625_Athena_Commando_F_PinkTrooper|CID_677_Athena_Commando_M_SharkAttack|CID_734_Athena_Commando_F_BannerRed|CID_801_Athena_Commando_F_GolfSummer|CID_A_171_Athena_Commando_F_Stands_D|CID_A_175_Athena_Commando_M_AlienSummer|CID_A_453_Athena_Commando_F_FuzzyBearSummer|Character_DuneBriefMerry|Character_DuneBriefShift|Character_DyedDuelist|Character_FacetBlom|Character_FumeFleeceClap|Character_FumeFleeceFade|Character_FumeFleeceJig|Character_FumeFleeceShack|Character_FumeFleeceWag|Character_FuzzyClaw|Character_GrowMallet|Character_LooseCreep|Character_MoonSatellite|Character_NoiseClueGust|Character_NoiseClueLurch|Character_QuarterClaspJoin|Character_QuarterClaspZoom|Character_SkiffGrind|Character_SkilledSkull|Character_SteelyKendama|Character_SunbeamQuest|Character_TackleShow|Character_TaxiHeel|Character_TrackWaver|Character_WickedMindFNCS|Companion_CacaoLynx|EID_BeachBreak|EID_BlueApparel|EID_DuneBrief|EID_EightUp|EID_FumeFleeceClap|EID_FumeFleeceFade|EID_FumeFleeceShack|EID_FumeFleeceWag|EID_GroceryGroove|EID_HoopDreams|EID_LimaBean|EID_LooseCreep|EID_NoiseClueGust|EID_NoiseClueLurch|EID_PleaseHelp|EID_QuarterClaspJoin|EID_QuarterClaspZoom|EID_RageQuit|EID_RelayStick_Plume|EID_SkiffGrind|EID_SneakingTraversal|EID_StairCrew|EID_TaxiHeel|EID_TrackWaver|EID_VictoryHighway|EID_Warehouse|Glider_ID_059_DurrburgerHero|Glider_ID_126_Farmer|Glider_NoiseClueLurch|Glider_TrackWaver|LoadingScreen_NoiseClue|LoadingScreen_QuarterClasp|LoadingScreen_TrackWaver|Pickaxe_DuneBriefMerry|Pickaxe_DuneBriefShift|Pickaxe_FacetBlom|Pickaxe_FumeFleeceClap|Pickaxe_FumeFleeceFade|Pickaxe_FumeFleeceJig|Pickaxe_FumeFleeceShack|Pickaxe_FumeFleeceWag|Pickaxe_GrowMallet|Pickaxe_HappyFNCS|Pickaxe_ID_084_DurrburgerHero|Pickaxe_ID_220_ForkKnife1H|Pickaxe_LooseCreep|Pickaxe_MoonSatellite|Pickaxe_NoiseClueGust|Pickaxe_NoiseClue_Guitar|Pickaxe_QuarterClaspAbove|Pickaxe_QuarterClaspJoin|Pickaxe_SkiffGrind|Pickaxe_SkilledSkull|Pickaxe_SteelyKendama|Pickaxe_TackleShow|Pickaxe_TaxiHeel|Pickaxe_TrackWaver|Shoes_ChoreNoodleRubble|Shoes_DevilDash|Shoes_LumenDrakeKit|Shoes_TugBlooperMorse|Wrap_FumeFleece|Wrap_NoiseClue|Wrap_QuarterClaspZoom|Wrap_SteelyKendama|Wrap_TrackWaver|Wrap_VioletFare|Wrap_WickedMindFNCS",
   "currentItems": [
     {
       "id": "Backpack_SkiffGrind",
       "name": "Travel Tokki Model",
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_skiffgrind/featured.png"
-    },
-    {
-      "id": "EID_NerdStomp",
-      "name": "GEEK TIMË",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_nerdstomp/icon.png"
     },
     {
       "id": "Backpack_TrackWaver",
@@ -24,9 +19,9 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/glider_trackwaver/featured.png"
     },
     {
-      "id": "EID_GarlicWhisk_Clobber",
-      "name": "FLAWLESS VICTORY",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_garlicwhisk_clobber/icon.png"
+      "id": "Wrap_QuarterClaspZoom",
+      "name": "Energy Burn",
+      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_quarterclaspzoom/featured.png"
     },
     {
       "id": "EID_BlueApparel",
@@ -49,41 +44,6 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/bid_193_teriyakifishmale/featured.png"
     },
     {
-      "id": "Backpack_JadeTowelGloss",
-      "name": "Pack-sune Miku",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_jadetowelgloss/featured.png"
-    },
-    {
-      "id": "Character_AntiZappo",
-      "name": "Agent Webb",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_antizappo/featured.png"
-    },
-    {
-      "id": "Wrap_379_Pliant",
-      "name": "Pixellator",
-      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_379_pliant/featured.png"
-    },
-    {
-      "id": "CID_A_045_Athena_Commando_M_BananaLeader",
-      "name": "Potassius Peels",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_a_045_athena_commando_m_bananaleader/featured.png"
-    },
-    {
-      "id": "BID_724_BananaLeader",
-      "name": "Cape of Potassius",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_724_bananaleader/featured.png"
-    },
-    {
-      "id": "EID_JadeTowel",
-      "name": "Miku Live",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_jadetowel/icon.png"
-    },
-    {
-      "id": "Character_TikkaTaste",
-      "name": "Walter Irons",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_tikkataste/featured.png"
-    },
-    {
       "id": "EID_LooseCreep",
       "name": "Blinkin' Amazing",
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_loosecreep/icon.png"
@@ -94,14 +54,9 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_fumefleecejig/featured.png"
     },
     {
-      "id": "Character_CataclysmTower",
-      "name": "Saff",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_cataclysmtower/featured.png"
-    },
-    {
-      "id": "Character_Billy",
-      "name": "A Goat",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_billy/featured.png"
+      "id": "Backpack_QuarterClasp",
+      "name": "Heist Duffel",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_quarterclasp/featured.png"
     },
     {
       "id": "Character_DuneBriefShift",
@@ -119,16 +74,6 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_dunebriefshift/featured.png"
     },
     {
-      "id": "CID_326_Athena_Commando_F_WavyMan",
-      "name": "Twistie",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_326_athena_commando_f_wavyman/featured.png"
-    },
-    {
-      "id": "BID_202_WavyManFemale",
-      "name": "Twistie Inflator",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_202_wavymanfemale/featured.png"
-    },
-    {
       "id": "Pickaxe_FumeFleeceJig",
       "name": "Power Bow",
       "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_fumefleecejig/featured.png"
@@ -144,99 +89,29 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_dyedduelist/featured.png"
     },
     {
-      "id": "Character_TotalFlock",
-      "name": "Raiden (MK3)",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_totalflock/featured.png"
+      "id": "CID_677_Athena_Commando_M_SharkAttack",
+      "name": "Bull Shark",
+      "image": "https://fortnite-api.com/images/cosmetics/br/cid_677_athena_commando_m_sharkattack/featured.png"
     },
     {
-      "id": "Contrail_DimeBlanket",
-      "name": "Cute Cutout",
-      "image": "https://fortnite-api.com/images/cosmetics/br/contrail_dimeblanket/featured.png"
+      "id": "BID_460_SharkAttack",
+      "name": "Shark's Tank",
+      "image": "https://fortnite-api.com/images/cosmetics/br/bid_460_sharkattack/featured.png"
     },
     {
-      "id": "Contrail_JadeTowel",
-      "name": "Miku Light",
-      "image": "https://fortnite-api.com/images/cosmetics/br/contrail_jadetowel/featured.png"
+      "id": "Backpack_SteelyKendama",
+      "name": "Ceremonial Gong",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_steelykendama/featured.png"
     },
     {
-      "id": "EID_GlintRush",
-      "name": "Continue? Coin",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_glintrush/icon.png"
+      "id": "Character_NoiseClueLurch",
+      "name": "Lil Wayne",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_noisecluelurch/featured.png"
     },
     {
-      "id": "Backpack_JadeTowel_Drum",
-      "name": "Miku's Beat Drums",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_jadetowel_drum/featured.png"
-    },
-    {
-      "id": "Pickaxe_JadeTowel_Drum",
-      "name": "Miku's Beat Drums",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_jadetowel_drum/featured.png"
-    },
-    {
-      "id": "Character_GarlicWhisk",
-      "name": "Kitana (MK3)",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_garlicwhisk/featured.png"
-    },
-    {
-      "id": "CID_586_Athena_Commando_F_PunkDevil",
-      "name": "Haze",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_586_athena_commando_f_punkdevil/featured.png"
-    },
-    {
-      "id": "BID_387_PunkDevil",
-      "name": "Ridgeback",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_387_punkdevil/featured.png"
-    },
-    {
-      "id": "Character_WaywardRebelFNCS",
-      "name": "Champion PJ",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_waywardrebelfncs/featured.png"
-    },
-    {
-      "id": "Pickaxe_WayWardRebelFNCS",
-      "name": "FNCS Tape Decker",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_waywardrebelfncs/featured.png"
-    },
-    {
-      "id": "Wrap_WaywardRebel",
-      "name": "Champion's Hexaglow",
-      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_waywardrebel/featured.png"
-    },
-    {
-      "id": "Backpack_FNCS_S34",
-      "name": "FNCS Raider",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_fncs_s34/featured.png"
-    },
-    {
-      "id": "Character_GlintRush",
-      "name": "Fractal Midas",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_glintrush/featured.png"
-    },
-    {
-      "id": "Backpack_GlintRush",
-      "name": "Fractured SHADOW Pack",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_glintrush/featured.png"
-    },
-    {
-      "id": "EID_DimeBlanket",
-      "name": "Taste",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_dimeblanket/icon.png"
-    },
-    {
-      "id": "Backpack_DimeBlanket_Mic",
-      "name": "Sabrina's Mic",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_dimeblanket_mic/featured.png"
-    },
-    {
-      "id": "Pickaxe_DimeBlanket_Mic",
-      "name": "Sabrina's Mic",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_dimeblanket_mic/featured.png"
-    },
-    {
-      "id": "CID_836_Athena_Commando_M_JonesyFlare",
-      "name": "Castaway Jonesy",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_836_athena_commando_m_jonesyflare/featured.png"
+      "id": "Backpack_NoiseClueLurch",
+      "name": "Milli Bricks",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_noisecluelurch/featured.png"
     },
     {
       "id": "CID_034_Athena_Commando_F_Medieval",
@@ -249,14 +124,9 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/bid_003_redknight/featured.png"
     },
     {
-      "id": "EID_Spectacular",
-      "name": "GOATed",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_spectacular/icon.png"
-    },
-    {
-      "id": "EID_Destiny",
-      "name": "Go With the Flow",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_destiny/icon.png"
+      "id": "Pickaxe_TaxiHeel",
+      "name": "Stan's Foam Finger",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_taxiheel/featured.png"
     },
     {
       "id": "Backpack_SunbeamQuest",
@@ -264,9 +134,9 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_sunbeamquest/featured.png"
     },
     {
-      "id": "EID_GoldenGlory",
-      "name": "Stateside",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_goldenglory/icon.png"
+      "id": "Pickaxe_SkilledSkull",
+      "name": "Phantomglaas Blades",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_skilledskull/featured.png"
     },
     {
       "id": "Wrap_TrackWaver",
@@ -284,9 +154,19 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/character_sunbeamquest/featured.png"
     },
     {
-      "id": "BID_039_SpaceBlackFemale",
-      "name": "Dark Void",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_039_spaceblackfemale/featured.png"
+      "id": "Backpack_NoiseClue_Guitar",
+      "name": "Tha Guitar",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_noiseclue_guitar/featured.png"
+    },
+    {
+      "id": "Pickaxe_NoiseClue_Guitar",
+      "name": "Tha Guitar",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_noiseclue_guitar/featured.png"
+    },
+    {
+      "id": "EID_RageQuit",
+      "name": "Rage Quit",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_ragequit/icon.png"
     },
     {
       "id": "Wrap_FumeFleece",
@@ -299,134 +179,24 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_trackwaver/featured.png"
     },
     {
-      "id": "Backpack_JadeTowel_Mic",
-      "name": "Hatsune's Mic-u",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_jadetowel_mic/featured.png"
+      "id": "Backpack_NoiseClueGust",
+      "name": "Weezy Board",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_noisecluegust/featured.png"
     },
     {
-      "id": "Pickaxe_JadeTowel_Mic",
-      "name": "Hatsune's Mic-u",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_jadetowel_mic/featured.png"
+      "id": "Character_QuarterClaspJoin",
+      "name": "Redway Ruby",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_quarterclaspjoin/featured.png"
     },
     {
-      "id": "CID_527_Athena_Commando_F_StreetFashionRed",
-      "name": "Ruby",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_527_athena_commando_f_streetfashionred/featured.png"
+      "id": "Backpack_QuarterClaspJoin_How",
+      "name": "Gifford Shuffle",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_quarterclaspjoin_how/featured.png"
     },
     {
-      "id": "BID_354_StreetFashionRed",
-      "name": "Red Alert",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_354_streetfashionred/featured.png"
-    },
-    {
-      "id": "Pickaxe_ServeStreet",
-      "name": "Inflatable Hammer",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_servestreet/featured.png"
-    },
-    {
-      "id": "Shoes_LumenDrakePat",
-      "name": "Nike Dunk Low 'Panda'",
-      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_lumendrakepat/featured.png"
-    },
-    {
-      "id": "Character_SoapPocket",
-      "name": "Scorpion (MK3)",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_soappocket/featured.png"
-    },
-    {
-      "id": "Pickaxe_TotalFlock",
-      "name": "Raiden's Staff",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_totalflock/featured.png"
-    },
-    {
-      "id": "Backpack_TotalFlock",
-      "name": "Raiden's Amulet",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_totalflock/featured.png"
-    },
-    {
-      "id": "Backpack_SoapPocket",
-      "name": "Scorpion's Flaming Skull",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_soappocket/featured.png"
-    },
-    {
-      "id": "Pickaxe_SoapPocket",
-      "name": "Scorpion's Twin Katana",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_soappocket/featured.png"
-    },
-    {
-      "id": "Pickaxe_GarlicWhisk",
-      "name": "Kitana's Steel Fans",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_garlicwhisk/featured.png"
-    },
-    {
-      "id": "Backpack_GarlicWhisk",
-      "name": "Kitana's Fan-Bearer",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_garlicwhisk/featured.png"
-    },
-    {
-      "id": "EID_GarlicWhisk",
-      "name": "Kitana's Fan-Nado",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_garlicwhisk/icon.png"
-    },
-    {
-      "id": "EID_SoapPocket",
-      "name": "Toasty!",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_soappocket/icon.png"
-    },
-    {
-      "id": "EID_SoapPocket_Punch",
-      "name": "Test Your Might",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_soappocket_punch/icon.png"
-    },
-    {
-      "id": "EID_TotalFlock",
-      "name": "Conducting Rod Brand",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_totalflock/icon.png"
-    },
-    {
-      "id": "EID_TotalFlock_Slash",
-      "name": "Raiden's Victory",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_totalflock_slash/icon.png"
-    },
-    {
-      "id": "Character_SirWolf",
-      "name": "Wendell",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_sirwolf/featured.png"
-    },
-    {
-      "id": "Backpack_SirWolf",
-      "name": "Nut Hutch",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_sirwolf/featured.png"
-    },
-    {
-      "id": "Character_HealedScar",
-      "name": "Hajime",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_healedscar/featured.png"
-    },
-    {
-      "id": "Backpack_HealedScar",
-      "name": "Hajime's Kasa",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_healedscar/featured.png"
-    },
-    {
-      "id": "EID_ClayPlug",
-      "name": "Rap Monster",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_clayplug/icon.png"
-    },
-    {
-      "id": "Pickaxe_FumeFleeceFade",
-      "name": "Power Sword",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_fumefleecefade/featured.png"
-    },
-    {
-      "id": "CID_363_Athena_Commando_M_SciOps",
-      "name": "Axiom",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_363_athena_commando_m_sciops/featured.png"
-    },
-    {
-      "id": "BID_228_SciOpsMale",
-      "name": "Commission",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_228_sciopsmale/featured.png"
+      "id": "EID_TaxiHeel",
+      "name": "Stan's Jam",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_taxiheel/icon.png"
     },
     {
       "id": "Character_TrackWaver",
@@ -434,14 +204,14 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/character_trackwaver/featured.png"
     },
     {
-      "id": "Character_GoatFish",
-      "name": "Faun",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_goatfish/featured.png"
+      "id": "Pickaxe_FumeFleeceFade",
+      "name": "Power Sword",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_fumefleecefade/featured.png"
     },
     {
-      "id": "Companion_MuzzleSwish",
-      "name": "Kitsune",
-      "image": "https://fortnite-api.com/images/cosmetics/br/companion_muzzleswish/featured.png"
+      "id": "Wrap_NoiseClue",
+      "name": "YM Burner",
+      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_noiseclue/featured.png"
     },
     {
       "id": "EID_HoopDreams",
@@ -474,19 +244,39 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_tackleshow/featured.png"
     },
     {
-      "id": "Character_ServeStreet",
-      "name": "Semibot",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_servestreet/featured.png"
+      "id": "Pickaxe_QuarterClaspJoin",
+      "name": "Stealth Slicer",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_quarterclaspjoin/featured.png"
     },
     {
-      "id": "CID_397_Athena_Commando_F_TreasureHunterFashion",
-      "name": "Aura",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_397_athena_commando_f_treasurehunterfashion/featured.png"
+      "id": "CID_355_Athena_Commando_M_Farmer",
+      "name": "Hayseed",
+      "image": "https://fortnite-api.com/images/cosmetics/br/cid_355_athena_commando_m_farmer/featured.png"
     },
     {
       "id": "Character_FumeFleeceFade",
       "name": "Red Ranger",
       "image": "https://fortnite-api.com/images/cosmetics/br/character_fumefleecefade/featured.png"
+    },
+    {
+      "id": "Wrap_VioletFare",
+      "name": "Ocean's Glow",
+      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_violetfare/featured.png"
+    },
+    {
+      "id": "Pickaxe_ID_084_DurrburgerHero",
+      "name": "Patty Whacker",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_084_durrburgerhero/featured.png"
+    },
+    {
+      "id": "Character_GrowMallet",
+      "name": "Francine Smith",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_growmallet/featured.png"
+    },
+    {
+      "id": "Pickaxe_GrowMallet",
+      "name": "Francine's Purse",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_growmallet/featured.png"
     },
     {
       "id": "Shoes_TugBlooperMorse",
@@ -499,39 +289,29 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/character_fumefleeceshack/featured.png"
     },
     {
-      "id": "Pickaxe_GoatFish",
-      "name": "Goat Fish",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_goatfish/featured.png"
+      "id": "CID_482_Athena_Commando_F_PizzaPit",
+      "name": "PJ Pepperoni",
+      "image": "https://fortnite-api.com/images/cosmetics/br/cid_482_athena_commando_f_pizzapit/featured.png"
+    },
+    {
+      "id": "BID_315_PizzaPit",
+      "name": "Cheesy",
+      "image": "https://fortnite-api.com/images/cosmetics/br/bid_315_pizzapit/featured.png"
+    },
+    {
+      "id": "Character_MoonSatellite",
+      "name": "Takumi of the Tides",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_moonsatellite/featured.png"
+    },
+    {
+      "id": "Pickaxe_MoonSatellite",
+      "name": "Ocean's Edge",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_moonsatellite/featured.png"
     },
     {
       "id": "Character_FuzzyClaw",
       "name": "Raven Team Syd",
       "image": "https://fortnite-api.com/images/cosmetics/br/character_fuzzyclaw/featured.png"
-    },
-    {
-      "id": "CID_798_Athena_Commando_M_JonesyVagabond",
-      "name": "Relaxed Fit Jonesy",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_798_athena_commando_m_jonesyvagabond/featured.png"
-    },
-    {
-      "id": "BID_550_JonesyVagabond",
-      "name": "Beef Pack",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_550_jonesyvagabond/featured.png"
-    },
-    {
-      "id": "Character_DimeBlanketGrace",
-      "name": "Tour-Ready Sabrina Carpenter",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_dimeblanketgrace/featured.png"
-    },
-    {
-      "id": "Backpack_DimeBlanketGrace",
-      "name": "SC Heart Purse",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_dimeblanketgrace/featured.png"
-    },
-    {
-      "id": "EID_DimeBlanketGrace",
-      "name": "Please Please Please",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_dimeblanketgrace/icon.png"
     },
     {
       "id": "BID_A_042_FuzzyBearSummerFemale",
@@ -544,21 +324,6 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/cid_a_453_athena_commando_f_fuzzybearsummer/featured.png"
     },
     {
-      "id": "BID_154_Feathers",
-      "name": "Hatchback",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_154_feathers/featured.png"
-    },
-    {
-      "id": "CID_813_Athena_Commando_M_TeriyakiAtlantis",
-      "name": "Atlantean Fishstick",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_813_athena_commando_m_teriyakiatlantis/featured.png"
-    },
-    {
-      "id": "BID_566_TeriyakiAtlantis",
-      "name": "Titan Scale",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_566_teriyakiatlantis/featured.png"
-    },
-    {
       "id": "CID_A_175_Athena_Commando_M_AlienSummer",
       "name": "Human Bill",
       "image": "https://fortnite-api.com/images/cosmetics/br/cid_a_175_athena_commando_m_aliensummer/featured.png"
@@ -567,6 +332,31 @@
       "id": "BID_822_AlienSummer",
       "name": "A WEATHER BALLOON",
       "image": "https://fortnite-api.com/images/cosmetics/br/bid_822_aliensummer/featured.png"
+    },
+    {
+      "id": "Character_SteelyKendama",
+      "name": "Kozaru",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_steelykendama/featured.png"
+    },
+    {
+      "id": "Pickaxe_SteelyKendama",
+      "name": "Mythical Maulers",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_steelykendama/featured.png"
+    },
+    {
+      "id": "Wrap_SteelyKendama",
+      "name": "Old World",
+      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_steelykendama/featured.png"
+    },
+    {
+      "id": "Shoes_DevilDash",
+      "name": "Crimson Hooves",
+      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_devildash/featured.png"
+    },
+    {
+      "id": "EID_QuarterClaspJoin",
+      "name": "Go Live",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_quarterclaspjoin/icon.png"
     },
     {
       "id": "Character_SkiffGrind",
@@ -584,9 +374,9 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_fumefleeceshack/featured.png"
     },
     {
-      "id": "EID_JadeTowel_Gloss",
-      "name": "Miku Miku Beam",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_jadetowel_gloss/icon.png"
+      "id": "CID_110_Athena_Commando_F_CircuitBreaker",
+      "name": "Cipher",
+      "image": "https://fortnite-api.com/images/cosmetics/br/cid_110_athena_commando_f_circuitbreaker/featured.png"
     },
     {
       "id": "Pickaxe_FumeFleeceClap",
@@ -599,19 +389,14 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_fumefleecefade/featured.png"
     },
     {
+      "id": "Pickaxe_HappyFNCS",
+      "name": "Champion Chopper",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_happyfncs/featured.png"
+    },
+    {
       "id": "EID_FumeFleeceWag",
       "name": "Uncontrollable Dance",
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_fumefleecewag/icon.png"
-    },
-    {
-      "id": "EID_FlagPlant",
-      "name": "Stake Your Claim",
-      "image": "https://fortnite-api.com/images/cosmetics/br/eid_flagplant/icon.png"
-    },
-    {
-      "id": "CID_105_Athena_Commando_F_SpaceBlack",
-      "name": "Dark Vanguard",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_105_athena_commando_f_spaceblack/featured.png"
     },
     {
       "id": "EID_FumeFleeceShack",
@@ -619,34 +404,89 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_fumefleeceshack/icon.png"
     },
     {
-      "id": "BID_023_Pinkbear",
-      "name": "Cuddle Bow",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_023_pinkbear/featured.png"
-    },
-    {
-      "id": "CID_274_Athena_Commando_M_Feathers",
-      "name": "Tender Defender",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_274_athena_commando_m_feathers/featured.png"
-    },
-    {
-      "id": "Shoes_HowlFeast",
-      "name": "Pupper Slippers",
-      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_howlfeast/featured.png"
-    },
-    {
       "id": "Character_FacetBlom",
       "name": "Genji",
       "image": "https://fortnite-api.com/images/cosmetics/br/character_facetblom/featured.png"
     },
     {
-      "id": "Backpack_BananaPhilosopher",
-      "name": "NaNa Scroll",
-      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_bananaphilosopher/featured.png"
+      "id": "Character_WickedMindFNCS",
+      "name": "Chaos Champion",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_wickedmindfncs/featured.png"
+    },
+    {
+      "id": "Backpack_FNCS_S38",
+      "name": "Champion's Emblem",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_fncs_s38/featured.png"
+    },
+    {
+      "id": "Wrap_WickedMindFNCS",
+      "name": "Champion's Chaos",
+      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_wickedmindfncs/featured.png"
+    },
+    {
+      "id": "EID_VictoryHighway",
+      "name": "Champion's Medal",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_victoryhighway/icon.png"
+    },
+    {
+      "id": "EID_LimaBean",
+      "name": "Distraction Dance",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_limabean/icon.png"
+    },
+    {
+      "id": "Backpack_GrowMallet",
+      "name": "Klaus Heisler",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_growmallet/featured.png"
+    },
+    {
+      "id": "EID_NoiseClueLurch",
+      "name": "Lollipop",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_noisecluelurch/icon.png"
+    },
+    {
+      "id": "Glider_NoiseClueLurch",
+      "name": "Young Money Stage",
+      "image": "https://fortnite-api.com/images/cosmetics/br/glider_noisecluelurch/featured.png"
+    },
+    {
+      "id": "Character_NoiseClueGust",
+      "name": "Weezy",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_noisecluegust/featured.png"
+    },
+    {
+      "id": "EID_NoiseClueGust",
+      "name": "6 Foot 7 Foot",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_noisecluegust/icon.png"
+    },
+    {
+      "id": "Pickaxe_NoiseClueGust",
+      "name": "Weezy Boardbreaker",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_noisecluegust/featured.png"
+    },
+    {
+      "id": "LoadingScreen_NoiseClue",
+      "name": "Weezy's Pose",
+      "image": "https://fortnite-api.com/images/cosmetics/br/loadingscreen_noiseclue/featured.png"
+    },
+    {
+      "id": "CID_356_Athena_Commando_F_Farmer",
+      "name": "Sunflower",
+      "image": "https://fortnite-api.com/images/cosmetics/br/cid_356_athena_commando_f_farmer/featured.png"
     },
     {
       "id": "EID_TrackWaver",
       "name": "Mercy's Reach",
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_trackwaver/icon.png"
+    },
+    {
+      "id": "Shoes_ChoreNoodleRubble",
+      "name": "Air Jordan 1 Retro High OG Defiant ‘Couture’",
+      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_chorenoodlerubble/featured.png"
+    },
+    {
+      "id": "Character_QuarterClaspZoom",
+      "name": "Typical Gamer",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_quarterclaspzoom/featured.png"
     },
     {
       "id": "EID_BeachBreak",
@@ -684,9 +524,19 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_staircrew/icon.png"
     },
     {
+      "id": "Shoes_LumenDrakeKit",
+      "name": "Air Jordan 3 Retro 'Varsity Royal'",
+      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_lumendrakekit/featured.png"
+    },
+    {
       "id": "CID_625_Athena_Commando_F_PinkTrooper",
       "name": "Zadie",
       "image": "https://fortnite-api.com/images/cosmetics/br/cid_625_athena_commando_f_pinktrooper/featured.png"
+    },
+    {
+      "id": "EID_PleaseHelp",
+      "name": "Beggin'",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_pleasehelp/icon.png"
     },
     {
       "id": "EID_FumeFleeceClap",
@@ -694,9 +544,14 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_fumefleececlap/icon.png"
     },
     {
-      "id": "CID_069_Athena_Commando_F_PinkBear",
-      "name": "Cuddle Team Leader",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_069_athena_commando_f_pinkbear/featured.png"
+      "id": "EID_Warehouse",
+      "name": "Dance Therapy",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_warehouse/icon.png"
+    },
+    {
+      "id": "Character_SkilledSkull",
+      "name": "Anima",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_skilledskull/featured.png"
     },
     {
       "id": "Character_FumeFleeceClap",
@@ -704,9 +559,19 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/character_fumefleececlap/featured.png"
     },
     {
-      "id": "Shoes_PacketCrescentMauve",
-      "name": "adidas adizero Aruku 'Red'",
-      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_packetcrescentmauve/featured.png"
+      "id": "EID_GroceryGroove",
+      "name": "Supermarket",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_grocerygroove/icon.png"
+    },
+    {
+      "id": "Pickaxe_ID_220_ForkKnife1H",
+      "name": "Fork Knife",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_220_forkknife1h/featured.png"
+    },
+    {
+      "id": "Backpack_TaxiHeel",
+      "name": "Threat Level Fridge Magnet",
+      "image": "https://fortnite-api.com/images/cosmetics/br/backpack_taxiheel/featured.png"
     },
     {
       "id": "Pickaxe_FumeFleeceShack",
@@ -714,24 +579,24 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_fumefleeceshack/featured.png"
     },
     {
-      "id": "Shoes_JetPropel",
-      "name": "Shuttle Stompers",
-      "image": "https://fortnite-api.com/images/cosmetics/br/shoes_jetpropel/featured.png"
+      "id": "EID_RelayStick_Plume",
+      "name": "Sonic Surfer",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_relaystick_plume/icon.png"
     },
     {
-      "id": "Wrap_BrightDisk",
-      "name": "Waters of Change",
-      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_brightdisk/featured.png"
-    },
-    {
-      "id": "CID_027_Athena_Commando_F",
-      "name": "Survival Specialist",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_027_athena_commando_f/featured.png"
+      "id": "EID_EightUp",
+      "name": "I'm So ATL",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_eightup/icon.png"
     },
     {
       "id": "EID_SkiffGrind",
       "name": "Lil' Tokki",
       "image": "https://fortnite-api.com/images/cosmetics/br/eid_skiffgrind/icon.png"
+    },
+    {
+      "id": "Glider_ID_126_Farmer",
+      "name": "Crop Duster",
+      "image": "https://fortnite-api.com/images/cosmetics/br/glider_id_126_farmer/featured.png"
     },
     {
       "id": "Character_FumeFleeceJig",
@@ -759,44 +624,29 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/backpack_fumefleececlap/featured.png"
     },
     {
-      "id": "BID_421_TeriyakiWarrior",
-      "name": "Coral Commandos",
-      "image": "https://fortnite-api.com/images/cosmetics/br/bid_421_teriyakiwarrior/featured.png"
+      "id": "Glider_ID_059_DurrburgerHero",
+      "name": "Flying Saucer",
+      "image": "https://fortnite-api.com/images/cosmetics/br/glider_id_059_durrburgerhero/featured.png"
     },
     {
-      "id": "Pickaxe_GlintRush",
-      "name": "Gilded Splinter",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_glintrush/featured.png"
+      "id": "EID_QuarterClaspZoom",
+      "name": "Random Challenge",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_quarterclaspzoom/icon.png"
     },
     {
-      "id": "Character_VelociTeeth",
-      "name": "Saura",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_velociteeth/featured.png"
+      "id": "Character_TaxiHeel",
+      "name": "Stan Smith",
+      "image": "https://fortnite-api.com/images/cosmetics/br/character_taxiheel/featured.png"
     },
     {
-      "id": "Character_BrightDisk",
-      "name": "Heroic Hope",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_brightdisk/featured.png"
+      "id": "BID_942_LimaBean",
+      "name": "Crewmate",
+      "image": "https://fortnite-api.com/images/cosmetics/br/bid_942_limabean/featured.png"
     },
     {
-      "id": "Pickaxe_HealedScar",
-      "name": "Dark Cloud Katana",
-      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_healedscar/featured.png"
-    },
-    {
-      "id": "Character_BadCat",
-      "name": "Bad Kit",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_badcat/featured.png"
-    },
-    {
-      "id": "Wrap_GlintRush",
-      "name": "Faceted Gold",
-      "image": "https://fortnite-api.com/images/cosmetics/br/wrap_glintrush/featured.png"
-    },
-    {
-      "id": "CID_A_149_Athena_Commando_F_Pliant_C",
-      "name": "The Stylist",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_a_149_athena_commando_f_pliant_c/featured.png"
+      "id": "Pickaxe_QuarterClaspAbove",
+      "name": "Stealth Breaker",
+      "image": "https://fortnite-api.com/images/cosmetics/br/pickaxe_quarterclaspabove/featured.png"
     },
     {
       "id": "CID_801_Athena_Commando_F_GolfSummer",
@@ -819,50 +669,25 @@
       "image": "https://fortnite-api.com/images/cosmetics/br/loadingscreen_trackwaver/featured.png"
     },
     {
+      "id": "LoadingScreen_QuarterClasp",
+      "name": "The Ultimate Heist",
+      "image": "https://fortnite-api.com/images/cosmetics/br/loadingscreen_quarterclasp/featured.png"
+    },
+    {
       "id": "CID_315_Athena_Commando_M_TeriyakiFish",
       "name": "Fishstick",
       "image": "https://fortnite-api.com/images/cosmetics/br/cid_315_athena_commando_m_teriyakifish/featured.png"
     },
     {
-      "id": "Character_BananaPhilosopher",
-      "name": "Peelosopher Bananocrates",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_bananaphilosopher/featured.png"
+      "id": "EID_SneakingTraversal",
+      "name": "Very Sneaky",
+      "image": "https://fortnite-api.com/images/cosmetics/br/eid_sneakingtraversal/icon.png"
     },
     {
-      "id": "CID_624_Athena_Commando_M_TeriyakiWarrior",
-      "name": "Triggerfish",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_624_athena_commando_m_teriyakiwarrior/featured.png"
-    },
-    {
-      "id": "Character_JadeTowelGloss",
-      "name": "Hatsune Miku",
-      "image": "https://fortnite-api.com/images/cosmetics/br/character_jadetowelgloss/featured.png"
-    },
-    {
-      "id": "CID_101_Athena_Commando_M_Stealth",
-      "name": "Midnight Ops",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_101_athena_commando_m_stealth/featured.png"
-    },
-    {
-      "id": "CID_042_Athena_Commando_M_Cyberpunk",
-      "name": "Circuit Breaker",
-      "image": "https://fortnite-api.com/images/cosmetics/br/cid_042_athena_commando_m_cyberpunk/featured.png"
-    },
-    {
-      "id": "Companion_EggBawk",
-      "name": "Doodle-Doo",
-      "image": "https://fortnite-api.com/images/cosmetics/br/companion_eggbawk/featured.png"
-    },
-    {
-      "id": "Companion_PouchGnaw",
-      "name": "Hammy",
-      "image": "https://fortnite-api.com/images/cosmetics/br/companion_pouchgnaw/featured.png"
-    },
-    {
-      "id": "Companion_FacetWhisk",
-      "name": "Fractal Cat",
-      "image": "https://fortnite-api.com/images/cosmetics/br/companion_facetwhisk/featured.png"
+      "id": "CID_432_Athena_Commando_M_BalloonHead",
+      "name": "Airhead",
+      "image": "https://fortnite-api.com/images/cosmetics/br/cid_432_athena_commando_m_balloonhead/featured.png"
     }
   ],
-  "updatedAt": "2026-09-12T00:02:12.287Z"
+  "updatedAt": "2026-09-14T00:25:15.103Z"
 }

@@ -1,14 +1,14 @@
 {
-  "hash": "a6bd5a464af65f87b2aa612be28f97ac227109c7",
-  "date": "2026-09-11T13:00:11Z",
+  "hash": "a7e714bcdefccee4de32161d34dae125e67da52b",
+  "date": "2026-09-13T07:21:51Z",
   "ids": [
     "ee936649beddd642b2b4e60915ba64c7",
     "85b298129f7411142d89296b0cd05b9b",
     "23bb0202e8d281816bd1601b1b92949f",
     "788192ca830b5b3cd85498f610befa24",
-    "c456c860de6f0084a1dfb5df6f1a3e96"
+    "ecc6586bad2a0fd6bf6a1267f30d87db"
   ],
-  "fingerprint": "8977884efb65933156a1e1845db15ea091a8ddc0963ecd5f0f154152cf4238b4",
+  "fingerprint": "6b2b6f4d2c535bd03b4f220e9bd8bbed4757b64c0893cd18995d30a61031a208",
   "articles": [
     {
       "id": "ee936649beddd642b2b4e60915ba64c7",
@@ -43,13 +43,13 @@
       "hidden": false
     },
     {
-      "id": "c456c860de6f0084a1dfb5df6f1a3e96",
-      "title": "Power Hours Kick Off on Saturday",
-      "body": "Get ready to power up with Supercharged Overdrive Grenades and more Gold and Cheat Master Sprites! Live September 12 at 2 PM ET and 9 PM ET.",
-      "image": "https://cdn-live.prm.ol.epicgames.com/prod/224b1b5877b644ae821a26cd8e995229.jpeg?width=1920&height=1080&aspect=fill",
+      "id": "ecc6586bad2a0fd6bf6a1267f30d87db",
+      "title": "New Loot Hacks and Fresh Sprites",
+      "body": "More weapons have arrived via Loot Hacks! Spend Sprite Dust on a Loot Hack to customize what drops from Chests, shaking up matches with bonus items that can't be found anywhere else. Plus, try the new Prop Hunt Override and chase X-Ray, Onigiri, and more Sprites.",
+      "image": "https://cdn-live.prm.ol.epicgames.com/prod/b076983b75c64e858255c8bc40aadb13.jpeg?width=1920&height=1080&aspect=fill",
       "sortingPriority": 60,
       "hidden": false
     }
   ],
-  "updatedAt": "2026-09-11T21:28:43.418Z"
+  "updatedAt": "2026-09-14T00:25:14.658Z"
 }

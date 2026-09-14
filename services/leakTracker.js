@@ -3,7 +3,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const {
-    EmbedBuilder
+    EmbedBuilder,
+    AttachmentBuilder
 } = require('discord.js');
 
 const {
@@ -424,6 +425,220 @@ function createLeakEmbed(tweet) {
 
 
 // ==========================================
+// DOWNLOAD VIDEO FOR DISCORD
+// ==========================================
+//
+// X's video.twimg.com URLs are valid MP4 files, but Discord
+// does not reliably render them as an inline video when they
+// are posted as a plain URL.
+//
+// We download the MP4 and upload it as a Discord attachment.
+// This gives Discord a real video attachment to render.
+//
+// Keep the limit below the common 10 MB upload limit.
+// If a video is too large, we fall back to the direct X URL
+// instead of crashing the leak tracker.
+// ==========================================
+
+const MAX_DISCORD_VIDEO_SIZE = 9.5 * 1024 * 1024;
+const VIDEO_DOWNLOAD_TIMEOUT = 25 * 1000;
+
+async function downloadVideoForDiscord(videoUrl) {
+
+    if (!videoUrl) {
+        return null;
+    }
+
+    if (typeof fetch !== 'function') {
+        console.error(
+            '❌ Global fetch is unavailable. Cannot download leak video.'
+        );
+        return null;
+    }
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+        controller.abort();
+    }, VIDEO_DOWNLOAD_TIMEOUT);
+
+    try {
+
+        console.log(
+            '🎥 Downloading leak video for Discord...'
+        );
+
+        const response = await fetch(
+            videoUrl,
+            {
+                method: 'GET',
+                redirect: 'follow',
+                signal: controller.signal,
+                headers: {
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            console.error(
+                `❌ Video download failed: HTTP ${response.status}`
+            );
+
+            return null;
+        }
+
+        const contentType =
+            String(
+                response.headers.get('content-type') || ''
+            ).toLowerCase();
+
+        const contentLengthHeader =
+            response.headers.get('content-length');
+
+        const contentLength =
+            contentLengthHeader
+                ? Number(contentLengthHeader)
+                : 0;
+
+        if (
+            contentLength &&
+            contentLength > MAX_DISCORD_VIDEO_SIZE
+        ) {
+
+            console.log(
+                `⚠️ Leak video is too large for Discord: ` +
+                `${(contentLength / 1024 / 1024).toFixed(2)} MB`
+            );
+
+            return null;
+        }
+
+        if (!response.body) {
+
+            console.error(
+                '❌ Video response has no readable body.'
+            );
+
+            return null;
+        }
+
+        const chunks = [];
+        let totalSize = 0;
+
+        // Node.js fetch exposes a Web ReadableStream.
+        // Reading it chunk-by-chunk keeps us from blindly
+        // loading an oversized X video into memory.
+        const reader = response.body.getReader();
+
+        try {
+
+            while (true) {
+
+                const {
+                    done,
+                    value
+                } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                if (!value) {
+                    continue;
+                }
+
+                totalSize += value.byteLength;
+
+                if (
+                    totalSize >
+                    MAX_DISCORD_VIDEO_SIZE
+                ) {
+
+                    console.log(
+                        `⚠️ Leak video exceeded Discord size limit ` +
+                        `(${(totalSize / 1024 / 1024).toFixed(2)} MB). ` +
+                        'Falling back to X URL.'
+                    );
+
+                    try {
+                        await reader.cancel();
+                    } catch (_) {}
+
+                    return null;
+                }
+
+                chunks.push(
+                    Buffer.from(value)
+                );
+            }
+
+        } finally {
+
+            try {
+                reader.releaseLock();
+            } catch (_) {}
+
+        }
+
+        if (!chunks.length) {
+
+            console.error(
+                '❌ Downloaded leak video is empty.'
+            );
+
+            return null;
+        }
+
+        const buffer =
+            Buffer.concat(chunks);
+
+        const extension =
+            contentType.includes('webm')
+                ? 'webm'
+                : 'mp4';
+
+        console.log(
+            `✅ Leak video downloaded: ` +
+            `${(buffer.length / 1024 / 1024).toFixed(2)} MB`
+        );
+
+        return {
+            buffer,
+            extension
+        };
+
+    } catch (error) {
+
+        if (error && error.name === 'AbortError') {
+
+            console.error(
+                '⏱️ Leak video download timed out.'
+            );
+
+        } else {
+
+            console.error(
+                '❌ Leak video download error:',
+                error
+            );
+
+        }
+
+        return null;
+
+    } finally {
+
+        clearTimeout(timeout);
+
+    }
+
+}
+
+
+// ==========================================
 // SEND LEAK TO ONE GUILD
 // ==========================================
 
@@ -464,17 +679,67 @@ async function sendLeakToGuild(
 
         }
 
+
+        // ==========================================
+        // ROLE MENTION
+        // ==========================================
+
         const roleMention =
             pingRole &&
             config.updatesRoleId
                 ? `<@&${config.updatesRoleId}>`
                 : undefined;
 
+
+        // ==========================================
+        // VIDEO
+        // ==========================================
+
         const videoUrl =
             tweet.videos &&
             tweet.videos.length > 0
                 ? tweet.videos[0]
                 : undefined;
+
+        let videoAttachment = null;
+
+        if (videoUrl) {
+
+            const downloadedVideo =
+                await downloadVideoForDiscord(
+                    videoUrl
+                );
+
+            if (downloadedVideo) {
+
+                videoAttachment =
+                    new AttachmentBuilder(
+                        downloadedVideo.buffer,
+                        {
+                            name:
+                                `fortnite-leak-${tweet.id}.${downloadedVideo.extension}`
+                        }
+                    );
+
+                console.log(
+                    `🎬 Prepared Discord video attachment ` +
+                    `for tweet ${tweet.id}`
+                );
+
+            } else {
+
+                console.log(
+                    `🔗 Using X video URL fallback for tweet ${tweet.id}`
+                );
+
+            }
+
+        }
+
+
+        // ==========================================
+        // MESSAGE CONTENT
+        // ==========================================
 
         const contentParts = [];
 
@@ -486,7 +751,14 @@ async function sendLeakToGuild(
 
         }
 
-        if (videoUrl) {
+        // Only post the raw video URL when Discord cannot
+        // receive the video as an attachment. This prevents
+        // the ugly raw X URL from appearing when the video
+        // is successfully uploaded.
+        if (
+            videoUrl &&
+            !videoAttachment
+        ) {
 
             contentParts.push(
                 videoUrl
@@ -494,7 +766,12 @@ async function sendLeakToGuild(
 
         }
 
-        await channel.send({
+
+        // ==========================================
+        // SEND LEAK
+        // ==========================================
+
+        const messagePayload = {
 
             content:
                 contentParts.length > 0
@@ -509,18 +786,30 @@ async function sendLeakToGuild(
 
             allowedMentions:
                 config.updatesRoleId
-
                     ? {
                         roles: [
                             config.updatesRoleId
                         ]
                     }
-
                     : {
                         roles: []
                     }
 
-        });
+        };
+
+        if (videoAttachment) {
+
+            messagePayload.files = [
+                videoAttachment
+            ];
+
+        }
+
+
+        await channel.send(
+            messagePayload
+        );
+
 
         return true;
 
