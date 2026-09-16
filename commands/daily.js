@@ -17,7 +17,7 @@ const {
 
 const {
     getAllServerConfigs
-} = require('./serverConfig');
+} = require('../services/serverConfig');
 
 const {
     createEmbed
