@@ -2,7 +2,13 @@ const fs = require('fs');
 const path = require('path');
 
 const {
-    AttachmentBuilder
+    AttachmentBuilder,
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const {
@@ -405,125 +411,125 @@ async function postToServer(
         } = result;
 
 
-        /*
-        ==========================================
-        NEW ITEMS
-        ==========================================
-        */
+        const releasedNames = releasedToday
+            .map(item => item.name)
+            .filter(Boolean);
 
-        const releasedText =
-            releasedToday.length > 0
-                ? releasedToday
-                    .map(item => item.name)
-                    .join('\n')
-                : 'Nothing new released.';
+        const removedNames = removedToday
+            .map(item => item.name)
+            .filter(Boolean);
 
+        const formatList = (names, emptyText) => {
+            if (!names.length) return emptyText;
 
-        /*
-        ==========================================
-        REMOVED ITEMS
-        ==========================================
-        */
+            const MAX_VISIBLE = 24;
+            const visible = names.slice(0, MAX_VISIBLE);
+            const remaining = names.length - visible.length;
 
-        const removedText =
-            removedToday.length > 0
-                ? removedToday
-                    .map(item => item.name)
-                    .join('\n')
-                : 'Nothing removed.';
+            let text = visible
+                .map(name => `• ${name}`)
+                .join('\\n');
 
-
-        /*
-        ==========================================
-        CLEAN DAILY EMBED
-        ==========================================
-        */
-
-        const embed =
-            createEmbed({
-                title:
-                    'FORTNITE SHOP RESET',
-
-                description:
-                    'The latest Fortnite Item Shop rotation has been detected.',
-
-                timestamp: false
-            });
-
-
-        if (
-            result.detectedAt
-        ) {
-            embed.setTimestamp(
-                new Date(
-                    result.detectedAt
-                )
-            );
-        }
-
-
-        embed.addFields(
-            {
-                name:
-                    `NEW IN THE SHOP  •  ${releasedToday.length}`,
-
-                value:
-                    releasedText,
-
-                inline: true
-            },
-
-            {
-                name:
-                    `REMOVED FROM SHOP  •  ${removedToday.length}`,
-
-                value:
-                    removedText,
-
-                inline: true
+            if (remaining > 0) {
+                text += `\\n\\n*+ ${remaining} more*`;
             }
-        );
 
+            return text;
+        };
 
-        const roleId =
-            config.roleId;
+        const detectedAt = result.detectedAt
+            ? new Date(result.detectedAt)
+            : new Date();
 
-        const content =
-            roleId
-                ? `<@&${roleId}>`
-                : undefined;
+        const dateText = detectedAt.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
 
+        const logo = client.user.displayAvatarURL({
+            extension: 'png',
+            size: 256
+        });
 
-        /*
-        ==========================================
-        SEND MAIN DAILY MESSAGE
-        ==========================================
-        */
+        const separator = () =>
+            new SeparatorBuilder()
+                .setDivider(true)
+                .setSpacing(SeparatorSpacingSize.Small);
+
+        const container = new ContainerBuilder()
+            .setAccentColor(0x1493ff)
+            .addSectionComponents(
+                new SectionBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('# __Fortnite Shop Reset__'),
+
+                        new TextDisplayBuilder()
+                            .setContent(
+                                `**${releasedToday.length}** new cosmetic${releasedToday.length === 1 ? '' : 's'} ` +
+                                `and **${removedToday.length}** removed.\\n\\n` +
+                                `Reset detected **${dateText}**.`
+                            )
+                    )
+                    .setThumbnailAccessory(thumbnail =>
+                        thumbnail
+                            .setURL(logo)
+                            .setDescription('Amyfn')
+                    )
+            )
+            .addSeparatorComponents(separator())
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `## New In The Shop  •  ${releasedToday.length}\\n\\n` +
+                        formatList(
+                            releasedNames,
+                            'No new cosmetics were released.'
+                        )
+                    )
+            )
+            .addSeparatorComponents(separator())
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `## Removed From Shop  •  ${removedToday.length}\\n\\n` +
+                        formatList(
+                            removedNames,
+                            'No cosmetics were removed.'
+                        )
+                    )
+            )
+            .addSeparatorComponents(separator())
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent('-# AMYFN • DAILY SHOP TRACKER')
+            );
+
+        const roleId = config.roleId;
+
+        const content = roleId
+            ? `<@&${roleId}>`
+            : undefined;
 
         await channel.send({
             content,
-
-            embeds: [
-                embed
-            ],
-
-            allowedMentions:
-                roleId
-                    ? {
-                        roles: [
-                            roleId
-                        ]
-                    }
-                    : {
-                        parse: []
-                    }
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+            allowedMentions: roleId
+                ? {
+                    roles: [roleId]
+                }
+                : {
+                    parse: []
+                }
         });
-
 
         console.log(
             `✅ Daily shop posted to server ${guildId}`
         );
-
 
         /*
         ==========================================
@@ -620,36 +626,47 @@ async function postToServer(
             i < attachments.length;
             i += 10
         ) {
-            const batch =
-                attachments.slice(
-                    i,
-                    i + 10
-                );
+            const batch = attachments.slice(
+                i,
+                i + 10
+            );
 
+            const firstBatch = i === 0;
 
-            const imageEmbed =
-                createEmbed({
-                    title:
-                        'FORTNITE SHOP IMAGES',
+            if (firstBatch) {
+                const imageContainer = new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+                    .addSectionComponents(
+                        new SectionBuilder()
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent('# __Daily Shop Images__'),
 
-                    description:
-                        i === 0
-                            ? `Images for ${imageItems.length} newly released cosmetic${imageItems.length === 1 ? '' : 's'}.`
-                            : 'More newly released cosmetics from this shop rotation.',
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        `**${attachments.length}** new cosmetic image${attachments.length === 1 ? '' : 's'} ` +
+                                        `from the latest Fortnite Shop reset.\\n\\n` +
+                                        `Reset detected **${dateText}**.`
+                                    )
+                            )
+                    )
+                    .addSeparatorComponents(separator())
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('-# AMYFN • DAILY SHOP TRACKER')
+                    );
 
-                    timestamp: false
+                await channel.send({
+                    components: [imageContainer],
+                    flags: MessageFlags.IsComponentsV2,
+                    files: batch
                 });
-
-
-            await channel.send({
-                embeds: [
-                    imageEmbed
-                ],
-
-                files: batch
-            });
+            } else {
+                await channel.send({
+                    files: batch
+                });
+            }
         }
-
 
         console.log(
             `✅ New cosmetic image gallery sent to server ${guildId}`

@@ -3,8 +3,13 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const {
-    EmbedBuilder,
-    AttachmentBuilder
+    ContainerBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    TextDisplayBuilder,
+    AttachmentBuilder,
+    MessageFlags,
+    SeparatorSpacingSize
 } = require('discord.js');
 
 const {
@@ -367,41 +372,124 @@ function runPythonBridge(manual = false) {
 
 
 // ==========================================
-// CREATE LEAK EMBED
+// CREATE LEAK V2 CONTAINER
 // ==========================================
+
+function createLeakContainer(tweet, client) {
+
+    const logo =
+        client?.user
+            ? client.user.displayAvatarURL({
+                extension: 'png',
+                size: 256
+            })
+            : null;
+
+    const separator = () =>
+        new SeparatorBuilder()
+            .setDivider(true)
+            .setSpacing(
+                SeparatorSpacingSize.Small
+            );
+
+    const author =
+        tweet.displayName ||
+        tweet.username ||
+        'Unknown Leaker';
+
+    const username =
+        tweet.username
+            ? `(@${tweet.username})`
+            : '';
+
+    const tweetText =
+        tweet.text ||
+        '*No tweet text*';
+
+    const tweetLink =
+        tweet.url ||
+        'https://x.com';
+
+    const header =
+        new SectionBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        '# __Fortnite Leak__'
+                    ),
+
+                new TextDisplayBuilder()
+                    .setContent(
+                        `**${author} ${username}**\n\n` +
+                        tweetText
+                    )
+            );
+
+    if (logo) {
+        header.setThumbnailAccessory(
+            thumbnail =>
+                thumbnail
+                    .setURL(logo)
+                    .setDescription('Amyfn logo')
+        );
+    }
+
+    return new ContainerBuilder()
+        .setAccentColor(0x1493ff)
+        .addSectionComponents(header)
+        .addSeparatorComponents(separator())
+        .addTextDisplayComponents(
+            new TextDisplayBuilder()
+                .setContent(
+                    `🔗 **[View Original Post](${tweetLink})**`
+                )
+        )
+        .addSeparatorComponents(separator())
+        .addTextDisplayComponents(
+            new TextDisplayBuilder()
+                .setContent(
+                    '-# AMYFN • FORTNITE LEAK TRACKER'
+                )
+        );
+}
+
+
+// ==========================================
+// LEGACY LEAK EMBED
+// ==========================================
+//
+// Kept so existing code/imports do not break.
+// New automatic leak posts use createLeakContainer().
 
 function createLeakEmbed(tweet) {
 
+    const {
+        EmbedBuilder
+    } = require('discord.js');
+
     const embed =
         new EmbedBuilder()
-
             .setColor(0x1493ff)
-
             .setAuthor({
                 name:
                     `${tweet.displayName} (@${tweet.username})`,
                 url:
                     tweet.url
             })
-
             .setTitle(
                 'Fortnite Leak'
             )
-
             .setDescription(
                 tweet.text ||
                 '*No tweet text*'
             )
-
             .setURL(
                 tweet.url
             )
-
             .setFooter({
                 text:
                     'AMYFN • FORTNITE LEAK TRACKER'
             })
-
             .setTimestamp(
                 new Date(
                     tweet.date
@@ -412,15 +500,12 @@ function createLeakEmbed(tweet) {
         tweet.images &&
         tweet.images.length > 0
     ) {
-
         embed.setImage(
             tweet.images[0]
         );
-
     }
 
     return embed;
-
 }
 
 
@@ -658,9 +743,7 @@ async function sendLeakToGuild(
         !config ||
         !config.updatesChannelId
     ) {
-
         return false;
-
     }
 
     try {
@@ -674,9 +757,7 @@ async function sendLeakToGuild(
             !channel ||
             !channel.isTextBased()
         ) {
-
             return false;
-
         }
 
 
@@ -733,7 +814,6 @@ async function sendLeakToGuild(
                 );
 
             }
-
         }
 
 
@@ -744,27 +824,34 @@ async function sendLeakToGuild(
         const contentParts = [];
 
         if (roleMention) {
-
-            contentParts.push(
-                roleMention
-            );
-
+            contentParts.push(roleMention);
         }
 
-        // Only post the raw video URL when Discord cannot
-        // receive the video as an attachment. This prevents
-        // the ugly raw X URL from appearing when the video
-        // is successfully uploaded.
+        /*
+         * Discord does not currently provide an MP4/video
+         * component inside ContainerBuilder.
+         *
+         * The V2 panel is therefore the leak card, while the
+         * actual video attachment is sent with the same message.
+         * Discord renders the native video directly with the post.
+         */
         if (
             videoUrl &&
             !videoAttachment
         ) {
-
-            contentParts.push(
-                videoUrl
-            );
-
+            contentParts.push(videoUrl);
         }
+
+
+        // ==========================================
+        // CREATE V2 PANEL
+        // ==========================================
+
+        const container =
+            createLeakContainer(
+                tweet,
+                client
+            );
 
 
         // ==========================================
@@ -778,11 +865,12 @@ async function sendLeakToGuild(
                     ? contentParts.join('\n')
                     : undefined,
 
-            embeds: [
-                createLeakEmbed(
-                    tweet
-                )
+            components: [
+                container
             ],
+
+            flags:
+                MessageFlags.IsComponentsV2,
 
             allowedMentions:
                 config.updatesRoleId
@@ -805,11 +893,9 @@ async function sendLeakToGuild(
 
         }
 
-
         await channel.send(
             messagePayload
         );
-
 
         return true;
 
@@ -821,9 +907,7 @@ async function sendLeakToGuild(
         );
 
         return false;
-
     }
-
 }
 
 
@@ -1145,6 +1229,7 @@ module.exports = {
 
     getLeakStatus,
 
+    createLeakContainer,
     createLeakEmbed,
 
     sendLeakToGuild

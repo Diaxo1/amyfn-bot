@@ -1,6 +1,7 @@
 const {
     SlashCommandBuilder,
     ContainerBuilder,
+    SectionBuilder,
     SeparatorBuilder,
     TextDisplayBuilder,
     PermissionFlagsBits,
@@ -11,7 +12,7 @@ const {
 const {
     getLatestLeaks,
     getLeakStatus,
-    createLeakEmbed,
+    createLeakContainer,
     sendLeakToGuild
 } = require('../services/leakTracker');
 
@@ -56,25 +57,173 @@ module.exports = {
                 const tweets = await getLatestLeaks();
 
                 if (!tweets.length) {
+
+                    const container =
+                        new ContainerBuilder()
+                            .setAccentColor(0x1493ff)
+
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        '# __Latest Fortnite Leaks__'
+                                    ),
+
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        '**NO LEAKS FOUND**\n\n' +
+                                        'Amyfn did not receive any recent Fortnite leaks.'
+                                    )
+                            )
+
+                            .addSeparatorComponents(
+                                new SeparatorBuilder()
+                                    .setDivider(true)
+                                    .setSpacing(
+                                        SeparatorSpacingSize.Small
+                                    )
+                            )
+
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        '-# AMYFN • LEAK TRACKER'
+                                    )
+                            );
+
                     return interaction.editReply({
-                        content: 'No leaks were returned.'
+                        components: [container],
+                        flags: MessageFlags.IsComponentsV2
                     });
                 }
 
-                const latest = tweets.slice(0, 5);
+                const latest =
+                    tweets
+                        .slice(0, 5);
+
+                const logo =
+                    interaction.client.user.displayAvatarURL({
+                        extension: 'png',
+                        size: 256
+                    });
+
+                const separator =
+                    () =>
+                        new SeparatorBuilder()
+                            .setDivider(true)
+                            .setSpacing(
+                                SeparatorSpacingSize.Small
+                            );
+
+                const header =
+                    new SectionBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    '# __Latest Fortnite Leaks__'
+                                ),
+
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `**${latest.length}** newest leak${latest.length === 1 ? '' : 's'} detected by Amyfn.`
+                                )
+                        )
+                        .setThumbnailAccessory(
+                            thumbnail =>
+                                thumbnail
+                                    .setURL(logo)
+                                    .setDescription('Amyfn logo')
+                        );
+
+                const container =
+                    new ContainerBuilder()
+                        .setAccentColor(0x1493ff)
+                        .addSectionComponents(
+                            header
+                        )
+                        .addSeparatorComponents(
+                            separator()
+                        );
 
                 /*
-                 * The actual tweet embeds are still created by
-                 * createLeakEmbed() from leakTracker.js.
-                 * This keeps tweet content, images and links intact.
+                 * Keep each leak visually separate inside the same
+                 * Components V2 container.
+                 *
+                 * Videos/images are intentionally handled below as
+                 * attachments where applicable.
+                 */
+                for (
+                    let i = 0;
+                    i < latest.length;
+                    i++
+                ) {
+
+                    const tweet =
+                        latest[i];
+
+                    const author =
+                        tweet.displayName ||
+                        tweet.username ||
+                        'Unknown Leaker';
+
+                    const username =
+                        tweet.username
+                            ? `(@${tweet.username})`
+                            : '';
+
+                    const tweetText =
+                        tweet.text ||
+                        '*No tweet text*';
+
+                    const tweetLink =
+                        tweet.url ||
+                        'https://x.com';
+
+                    container
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `## ${i + 1}. ${author} ${username}\n\n` +
+                                    tweetText
+                                ),
+
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    `🔗 **[View Original Post](${tweetLink})**`
+                                )
+                        );
+
+                    if (
+                        i <
+                        latest.length - 1
+                    ) {
+                        container.addSeparatorComponents(
+                            separator()
+                        );
+                    }
+                }
+
+                container
+                    .addSeparatorComponents(
+                        separator()
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(
+                                '-# AMYFN • FORTNITE LEAK TRACKER'
+                            )
+                    );
+
+                /*
+                 * /leaks latest returns the V2 panel.
+                 *
+                 * We deliberately do not try to embed remote X videos
+                 * inside the container. The automatic tracker already
+                 * handles native Discord video attachments through
+                 * sendLeakToGuild().
                  */
                 return interaction.editReply({
-                    content:
-                        `## Latest Fortnite Leaks\n` +
-                        `Showing the ${latest.length} newest leak${latest.length === 1 ? '' : 's'}.`,
-                    embeds: latest.map(tweet =>
-                        createLeakEmbed(tweet)
-                    )
+                    components: [container],
+                    flags: MessageFlags.IsComponentsV2
                 });
 
             } catch (error) {
@@ -120,6 +269,7 @@ module.exports = {
 
                     .addSeparatorComponents(
                         new SeparatorBuilder()
+                            .setDivider(true)
                             .setSpacing(
                                 SeparatorSpacingSize.Small
                             )
@@ -150,6 +300,7 @@ module.exports = {
 
                     .addSeparatorComponents(
                         new SeparatorBuilder()
+                            .setDivider(true)
                             .setSpacing(
                                 SeparatorSpacingSize.Small
                             )
@@ -167,6 +318,7 @@ module.exports = {
 
                     .addSeparatorComponents(
                         new SeparatorBuilder()
+                            .setDivider(true)
                             .setSpacing(
                                 SeparatorSpacingSize.Small
                             )
@@ -181,6 +333,7 @@ module.exports = {
 
                     .addSeparatorComponents(
                         new SeparatorBuilder()
+                            .setDivider(true)
                             .setSpacing(
                                 SeparatorSpacingSize.Small
                             )
@@ -262,6 +415,7 @@ module.exports = {
 
                     .addSeparatorComponents(
                         new SeparatorBuilder()
+                            .setDivider(true)
                             .setSpacing(
                                 SeparatorSpacingSize.Small
                             )
