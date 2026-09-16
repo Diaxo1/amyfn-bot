@@ -20,12 +20,8 @@ const {
 } = require('../services/serverConfig');
 
 const {
-    createEmbed
-} = require('./embedStyle');
-
-const {
     downloadImage
-} = require('./dailyShopImage');
+} = require('../services/dailyShopImage');
 
 
 /*
