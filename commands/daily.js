@@ -13,7 +13,7 @@ const {
 
 const {
     getShop
-} = require('./fortniteApi');
+} = require('../services/fortniteApi');
 
 const {
     getAllServerConfigs
