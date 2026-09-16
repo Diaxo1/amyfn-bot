@@ -4,6 +4,8 @@ const {
     SectionBuilder,
     SeparatorBuilder,
     TextDisplayBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
     PermissionFlagsBits,
     MessageFlags,
     SeparatorSpacingSize
@@ -12,7 +14,6 @@ const {
 const {
     getLatestLeaks,
     getLeakStatus,
-    createLeakContainer,
     sendLeakToGuild
 } = require('../services/leakTracker');
 
@@ -96,9 +97,7 @@ module.exports = {
                     });
                 }
 
-                const latest =
-                    tweets
-                        .slice(0, 5);
+                const latest = tweets.slice(0, 5);
 
                 const logo =
                     interaction.client.user.displayAvatarURL({
@@ -114,51 +113,34 @@ module.exports = {
                                 SeparatorSpacingSize.Small
                             );
 
-                const header =
-                    new SectionBuilder()
-                        .addTextDisplayComponents(
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    '# __Latest Fortnite Leaks__'
-                                ),
+                /*
+                 * X/Twitter sometimes returns HTML entities in tweet text.
+                 * Decode the common ones so the Discord message shows
+                 * "&" instead of "&amp;", etc.
+                 */
+                const decodeText = (text) => {
+                    if (!text) return '*No tweet text*';
 
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    `**${latest.length}** newest leak${latest.length === 1 ? '' : 's'} detected by Amyfn.`
-                                )
-                        )
-                        .setThumbnailAccessory(
-                            thumbnail =>
-                                thumbnail
-                                    .setURL(logo)
-                                    .setDescription('Amyfn logo')
-                        );
-
-                const container =
-                    new ContainerBuilder()
-                        .setAccentColor(0x1493ff)
-                        .addSectionComponents(
-                            header
-                        )
-                        .addSeparatorComponents(
-                            separator()
-                        );
+                    return String(text)
+                        .replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&#39;/g, "'")
+                        .replace(/&#x27;/gi, "'")
+                        .replace(/&nbsp;/g, ' ');
+                };
 
                 /*
-                 * Keep each leak visually separate inside the same
-                 * Components V2 container.
+                 * Build ONE container per leak.
                  *
-                 * Videos/images are intentionally handled below as
-                 * attachments where applicable.
+                 * This is intentional:
+                 * - Each leak gets its own Discord message.
+                 * - Leaks are no longer merged into one giant panel.
+                 * - Tweet images are rendered inside the V2 container
+                 *   using MediaGalleryBuilder.
                  */
-                for (
-                    let i = 0;
-                    i < latest.length;
-                    i++
-                ) {
-
-                    const tweet =
-                        latest[i];
+                const buildLeakContainer = (tweet, index) => {
 
                     const author =
                         tweet.displayName ||
@@ -171,60 +153,162 @@ module.exports = {
                             : '';
 
                     const tweetText =
-                        tweet.text ||
-                        '*No tweet text*';
+                        decodeText(tweet.text);
 
                     const tweetLink =
                         tweet.url ||
                         'https://x.com';
 
+                    const container =
+                        new ContainerBuilder()
+                            .setAccentColor(0x1493ff)
+
+                            .addSectionComponents(
+                                new SectionBuilder()
+                                    .addTextDisplayComponents(
+                                        new TextDisplayBuilder()
+                                            .setContent(
+                                                `# __Fortnite Leak #${index + 1}__`
+                                            ),
+
+                                        new TextDisplayBuilder()
+                                            .setContent(
+                                                `**${author}** ${username}`
+                                            )
+                                    )
+                                    .setThumbnailAccessory(
+                                        thumbnail =>
+                                            thumbnail
+                                                .setURL(logo)
+                                                .setDescription('Amyfn logo')
+                                    )
+                            )
+
+                            .addSeparatorComponents(
+                                separator()
+                            )
+
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        tweetText
+                                    )
+                            );
+
+                    /*
+                     * Put tweet images INSIDE the V2 container.
+                     * Limit to Discord's media-gallery item limit.
+                     */
+                    const images =
+                        Array.isArray(tweet.images)
+                            ? tweet.images
+                                .filter(Boolean)
+                                .slice(0, 10)
+                            : [];
+
+                    if (images.length) {
+
+                        const gallery =
+                            new MediaGalleryBuilder();
+
+                        for (const image of images) {
+
+                            gallery.addItems(
+                                new MediaGalleryItemBuilder()
+                                    .setURL(image)
+                            );
+                        }
+
+                        container
+                            .addSeparatorComponents(
+                                separator()
+                            )
+                            .addMediaGalleryComponents(
+                                gallery
+                            );
+                    }
+
+                    /*
+                     * If a tweet has a video but it is not being downloaded
+                     * for this command, keep the video link visible inside
+                     * the V2 panel rather than silently losing it.
+                     */
+                    const videos =
+                        Array.isArray(tweet.videos)
+                            ? tweet.videos.filter(Boolean)
+                            : [];
+
+                    if (videos.length) {
+
+                        container
+                            .addSeparatorComponents(
+                                separator()
+                            )
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent(
+                                        `🎥 **[Watch Video](${videos[0]})**`
+                                    )
+                            );
+                    }
+
                     container
+                        .addSeparatorComponents(
+                            separator()
+                        )
                         .addTextDisplayComponents(
                             new TextDisplayBuilder()
                                 .setContent(
-                                    `## ${i + 1}. ${author} ${username}\n\n` +
-                                    tweetText
+                                    `🔗 **[View Original Post](${tweetLink})**`
                                 ),
 
                             new TextDisplayBuilder()
                                 .setContent(
-                                    `🔗 **[View Original Post](${tweetLink})**`
+                                    '-# AMYFN • FORTNITE LEAK TRACKER'
                                 )
                         );
 
-                    if (
-                        i <
-                        latest.length - 1
-                    ) {
-                        container.addSeparatorComponents(
-                            separator()
+                    return container;
+                };
+
+                /*
+                 * Send each leak separately.
+                 *
+                 * First leak replaces the deferred interaction.
+                 * Remaining leaks are follow-up messages.
+                 */
+                for (
+                    let i = 0;
+                    i < latest.length;
+                    i++
+                ) {
+
+                    const container =
+                        buildLeakContainer(
+                            latest[i],
+                            i
+                        );
+
+                    const payload = {
+                        components: [container],
+                        flags: MessageFlags.IsComponentsV2
+                    };
+
+                    if (i === 0) {
+
+                        await interaction.editReply(
+                            payload
+                        );
+
+                    } else {
+
+                        await interaction.followUp(
+                            payload
                         );
                     }
                 }
 
-                container
-                    .addSeparatorComponents(
-                        separator()
-                    )
-                    .addTextDisplayComponents(
-                        new TextDisplayBuilder()
-                            .setContent(
-                                '-# AMYFN • FORTNITE LEAK TRACKER'
-                            )
-                    );
-
-                /*
-                 * /leaks latest returns the V2 panel.
-                 *
-                 * We deliberately do not try to embed remote X videos
-                 * inside the container. The automatic tracker already
-                 * handles native Discord video attachments through
-                 * sendLeakToGuild().
-                 */
-                return interaction.editReply({
-                    components: [container],
-                    flags: MessageFlags.IsComponentsV2
-                });
+                return;
 
             } catch (error) {
 
@@ -233,9 +317,18 @@ module.exports = {
                     error
                 );
 
-                return interaction.editReply({
+                if (interaction.deferred || interaction.replied) {
+
+                    return interaction.editReply({
+                        content:
+                            'Failed to retrieve the latest leaks.'
+                    });
+                }
+
+                return interaction.reply({
                     content:
-                        'Failed to retrieve the latest leaks.'
+                        'Failed to retrieve the latest leaks.',
+                    flags: MessageFlags.Ephemeral
                 });
             }
         }

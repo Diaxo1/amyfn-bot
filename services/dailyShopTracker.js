@@ -13,19 +13,15 @@ const {
 
 const {
     getShop
-} = require('./fortniteApi');
+} = require('../services/fortniteApi');
 
 const {
     getAllServerConfigs
-} = require('./serverConfig');
-
-const {
-    createEmbed
-} = require('./embedStyle');
+} = require('../services/serverConfig');
 
 const {
     downloadImage
-} = require('./dailyShopImage');
+} = require('../services/dailyShopImage');
 
 
 /*
@@ -381,27 +377,15 @@ async function postToServer(
     result
 ) {
     try {
-        if (
-            !config ||
-            !config.channelId
-        ) {
-            console.log(
-                `ℹ️ No shop channel configured for server ${guildId}`
-            );
-
+        if (!config || !config.channelId) {
+            console.log(`ℹ️ No shop channel configured for server ${guildId}`);
             return;
         }
 
-        const channel =
-            await client.channels.fetch(
-                config.channelId
-            );
+        const channel = await client.channels.fetch(config.channelId);
 
         if (!channel) {
-            console.log(
-                `❌ Shop channel not found for server ${guildId}`
-            );
-
+            console.log(`❌ Shop channel not found for server ${guildId}`);
             return;
         }
 
@@ -410,14 +394,15 @@ async function postToServer(
             removedToday = []
         } = result;
 
+        const logo = client.user?.displayAvatarURL({
+            extension: 'png',
+            size: 256
+        });
 
-        const releasedNames = releasedToday
-            .map(item => item.name)
-            .filter(Boolean);
-
-        const removedNames = removedToday
-            .map(item => item.name)
-            .filter(Boolean);
+        const separator = () =>
+            new SeparatorBuilder()
+                .setDivider(true)
+                .setSpacing(SeparatorSpacingSize.Small);
 
         const formatList = (names, emptyText) => {
             if (!names.length) return emptyText;
@@ -428,14 +413,22 @@ async function postToServer(
 
             let text = visible
                 .map(name => `• ${name}`)
-                .join('\\n');
+                .join('\n');
 
             if (remaining > 0) {
-                text += `\\n\\n*+ ${remaining} more*`;
+                text += `\n\n*+ ${remaining} more*`;
             }
 
             return text;
         };
+
+        const releasedNames = releasedToday
+            .map(item => item.name)
+            .filter(Boolean);
+
+        const removedNames = removedToday
+            .map(item => item.name)
+            .filter(Boolean);
 
         const detectedAt = result.detectedAt
             ? new Date(result.detectedAt)
@@ -449,16 +442,6 @@ async function postToServer(
             minute: '2-digit'
         });
 
-        const logo = client.user.displayAvatarURL({
-            extension: 'png',
-            size: 256
-        });
-
-        const separator = () =>
-            new SeparatorBuilder()
-                .setDivider(true)
-                .setSpacing(SeparatorSpacingSize.Small);
-
         const container = new ContainerBuilder()
             .setAccentColor(0x1493ff)
             .addSectionComponents(
@@ -466,25 +449,25 @@ async function postToServer(
                     .addTextDisplayComponents(
                         new TextDisplayBuilder()
                             .setContent('# __Fortnite Shop Reset__'),
-
                         new TextDisplayBuilder()
                             .setContent(
                                 `**${releasedToday.length}** new cosmetic${releasedToday.length === 1 ? '' : 's'} ` +
-                                `and **${removedToday.length}** removed.\\n\\n` +
+                                `and **${removedToday.length}** removed.\n\n` +
                                 `Reset detected **${dateText}**.`
                             )
                     )
-                    .setThumbnailAccessory(thumbnail =>
-                        thumbnail
-                            .setURL(logo)
-                            .setDescription('Amyfn')
+                    .setThumbnailAccessory(
+                        thumbnail =>
+                            thumbnail
+                                .setURL(logo)
+                                .setDescription('Amyfn')
                     )
             )
             .addSeparatorComponents(separator())
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
                     .setContent(
-                        `## New In The Shop  •  ${releasedToday.length}\\n\\n` +
+                        `## New In The Shop  •  ${releasedToday.length}\n\n` +
                         formatList(
                             releasedNames,
                             'No new cosmetics were released.'
@@ -495,7 +478,7 @@ async function postToServer(
             .addTextDisplayComponents(
                 new TextDisplayBuilder()
                     .setContent(
-                        `## Removed From Shop  •  ${removedToday.length}\\n\\n` +
+                        `## Removed From Shop  •  ${removedToday.length}\n\n` +
                         formatList(
                             removedNames,
                             'No cosmetics were removed.'
@@ -510,91 +493,49 @@ async function postToServer(
 
         const roleId = config.roleId;
 
-        const content = roleId
-            ? `<@&${roleId}>`
-            : undefined;
-
-        await channel.send({
-            content,
-            components: [container],
-            flags: MessageFlags.IsComponentsV2,
-            allowedMentions: roleId
-                ? {
+        // Components V2 cannot use the legacy content + embeds layout.
+        // Send the role ping separately, then send the Daily V2 panel.
+        if (roleId) {
+            await channel.send({
+                content: `<@&${roleId}>`,
+                allowedMentions: {
                     roles: [roleId]
                 }
-                : {
-                    parse: []
-                }
-        });
-
-        console.log(
-            `✅ Daily shop posted to server ${guildId}`
-        );
-
-        /*
-        ==========================================
-        NEW COSMETIC IMAGES
-        ==========================================
-        */
-
-        const imageItems =
-            releasedToday
-                .filter(
-                    item =>
-                        item &&
-                        item.image
-                );
-
-
-        if (
-            imageItems.length === 0
-        ) {
-            console.log(
-                `ℹ️ No new cosmetic images for server ${guildId}`
-            );
-
-            return;
+            });
         }
 
+        await channel.send({
+            components: [container],
+            flags: MessageFlags.IsComponentsV2
+        });
+
+        console.log(`✅ Daily shop posted to server ${guildId}`);
+
+        const imageItems = releasedToday.filter(
+            item => item && item.image
+        );
+
+        if (imageItems.length === 0) {
+            console.log(`ℹ️ No new cosmetic images for server ${guildId}`);
+            return;
+        }
 
         console.log(
             `🖼️ Downloading ${imageItems.length} new cosmetic images for server ${guildId}...`
         );
 
-
-        /*
-        ==========================================
-        DOWNLOAD IMAGES
-        ==========================================
-        */
-
         const attachments = [];
 
-        for (
-            let i = 0;
-            i < imageItems.length;
-            i++
-        ) {
-            const item =
-                imageItems[i];
+        for (let i = 0; i < imageItems.length; i++) {
+            const item = imageItems[i];
 
             try {
-                const buffer =
-                    await downloadImage(
-                        item.image
-                    );
+                const buffer = await downloadImage(item.image);
 
-                const attachment =
-                    new AttachmentBuilder(
-                        buffer
-                    ).setName(
-                        `daily-shop-${i + 1}.png`
-                    );
+                const attachment = new AttachmentBuilder(buffer)
+                    .setName(`daily-shop-${i + 1}.png`);
 
-                attachments.push(
-                    attachment
-                );
-
+                attachments.push(attachment);
             } catch (error) {
                 console.error(
                     `⚠️ Failed to download image for ${item.name}:`,
@@ -603,69 +544,48 @@ async function postToServer(
             }
         }
 
-
-        if (
-            attachments.length === 0
-        ) {
+        if (attachments.length === 0) {
             console.log(
                 `⚠️ No daily images could be downloaded for server ${guildId}`
             );
-
             return;
         }
 
+        for (let i = 0; i < attachments.length; i += 10) {
+            const batch = attachments.slice(i, i + 10);
 
-        /*
-        ==========================================
-        SEND IMAGE GALLERY
-        ==========================================
-        */
+            const imageContainer = new ContainerBuilder()
+                .setAccentColor(0x1493ff)
+                .addSectionComponents(
+                    new SectionBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder()
+                                .setContent('# __New Shop Images__'),
+                            new TextDisplayBuilder()
+                                .setContent(
+                                    i === 0
+                                        ? `Images for **${imageItems.length}** newly released cosmetic${imageItems.length === 1 ? '' : 's'}.`
+                                        : 'More newly released cosmetics from this shop rotation.'
+                                )
+                        )
+                        .setThumbnailAccessory(
+                            thumbnail =>
+                                thumbnail
+                                    .setURL(logo)
+                                    .setDescription('Amyfn')
+                        )
+                )
+                .addSeparatorComponents(separator())
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder()
+                        .setContent('-# AMYFN • DAILY SHOP TRACKER')
+                );
 
-        for (
-            let i = 0;
-            i < attachments.length;
-            i += 10
-        ) {
-            const batch = attachments.slice(
-                i,
-                i + 10
-            );
-
-            const firstBatch = i === 0;
-
-            if (firstBatch) {
-                const imageContainer = new ContainerBuilder()
-                    .setAccentColor(0x1493ff)
-                    .addSectionComponents(
-                        new SectionBuilder()
-                            .addTextDisplayComponents(
-                                new TextDisplayBuilder()
-                                    .setContent('# __Daily Shop Images__'),
-
-                                new TextDisplayBuilder()
-                                    .setContent(
-                                        `**${attachments.length}** new cosmetic image${attachments.length === 1 ? '' : 's'} ` +
-                                        `from the latest Fortnite Shop reset.\\n\\n` +
-                                        `Reset detected **${dateText}**.`
-                                    )
-                            )
-                    )
-                    .addSeparatorComponents(separator())
-                    .addTextDisplayComponents(
-                        new TextDisplayBuilder()
-                            .setContent('-# AMYFN • DAILY SHOP TRACKER')
-                    );
-
-                await channel.send({
-                    components: [imageContainer],
-                    flags: MessageFlags.IsComponentsV2,
-                    files: batch
-                });
-            } else {
-                await channel.send({
-                    files: batch
-                });
-            }
+            await channel.send({
+                components: [imageContainer],
+                files: batch,
+                flags: MessageFlags.IsComponentsV2
+            });
         }
 
         console.log(
@@ -679,7 +599,6 @@ async function postToServer(
         );
     }
 }
-
 
 /*
 ==================================================

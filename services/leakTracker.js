@@ -7,6 +7,8 @@ const {
     SectionBuilder,
     SeparatorBuilder,
     TextDisplayBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
     AttachmentBuilder,
     MessageFlags,
     SeparatorSpacingSize
@@ -375,7 +377,7 @@ function runPythonBridge(manual = false) {
 // CREATE LEAK V2 CONTAINER
 // ==========================================
 
-function createLeakContainer(tweet, client) {
+function createLeakContainer(tweet, client, options = {}) {
 
     const logo =
         client?.user
@@ -402,9 +404,18 @@ function createLeakContainer(tweet, client) {
             ? `(@${tweet.username})`
             : '';
 
+    const decodeText = text =>
+        String(text || '*No tweet text*')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&#x27;/gi, "'")
+            .replace(/&nbsp;/g, ' ');
+
     const tweetText =
-        tweet.text ||
-        '*No tweet text*';
+        decodeText(tweet.text);
 
     const tweetLink =
         tweet.url ||
@@ -434,9 +445,64 @@ function createLeakContainer(tweet, client) {
         );
     }
 
-    return new ContainerBuilder()
-        .setAccentColor(0x1493ff)
-        .addSectionComponents(header)
+    const container =
+        new ContainerBuilder()
+            .setAccentColor(0x1493ff)
+            .addSectionComponents(header);
+
+    // Put the configured role mention INSIDE the V2 message.
+    // Components V2 messages cannot use legacy `content`.
+    if (options.roleMention) {
+        container.addTextDisplayComponents(
+            new TextDisplayBuilder()
+                .setContent(options.roleMention)
+        );
+    }
+
+    // Tweet images are attached to the same Discord message and
+    // rendered inside the V2 container using attachment:// URLs.
+    const imageNames =
+        Array.isArray(options.imageNames)
+            ? options.imageNames.filter(Boolean)
+            : [];
+
+    if (imageNames.length) {
+
+        container
+            .addSeparatorComponents(separator());
+
+        const gallery =
+            new MediaGalleryBuilder();
+
+        for (const filename of imageNames.slice(0, 10)) {
+
+            gallery.addItems(
+                new MediaGalleryItemBuilder()
+                    .setURL(
+                        `attachment://${filename}`
+                    )
+            );
+        }
+
+        container.addMediaGalleryComponents(
+            gallery
+        );
+    }
+
+    // If a video could not be uploaded, keep its X link inside the panel.
+    if (options.videoFallbackUrl) {
+
+        container
+            .addSeparatorComponents(separator())
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent(
+                        `🎥 **[Watch Video on X](${options.videoFallbackUrl})**`
+                    )
+            );
+    }
+
+    container
         .addSeparatorComponents(separator())
         .addTextDisplayComponents(
             new TextDisplayBuilder()
@@ -451,8 +517,9 @@ function createLeakContainer(tweet, client) {
                     '-# AMYFN • FORTNITE LEAK TRACKER'
                 )
         );
-}
 
+    return container;
+}
 
 // ==========================================
 // LEGACY LEAK EMBED
@@ -760,7 +827,6 @@ async function sendLeakToGuild(
             return false;
         }
 
-
         // ==========================================
         // ROLE MENTION
         // ==========================================
@@ -771,6 +837,78 @@ async function sendLeakToGuild(
                 ? `<@&${config.updatesRoleId}>`
                 : undefined;
 
+        // ==========================================
+        // DOWNLOAD TWEET IMAGES
+        // ==========================================
+
+        const imageUrls =
+            Array.isArray(tweet.images)
+                ? tweet.images
+                    .filter(Boolean)
+                    .slice(0, 10)
+                : [];
+
+        const imageAttachments = [];
+        const imageNames = [];
+
+        for (
+            let i = 0;
+            i < imageUrls.length;
+            i++
+        ) {
+
+            try {
+
+                const imageResponse =
+                    await fetch(
+                        imageUrls[i],
+                        {
+                            method: 'GET',
+                            redirect: 'follow',
+                            headers: {
+                                'User-Agent':
+                                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+                            }
+                        }
+                    );
+
+                if (!imageResponse.ok) {
+                    throw new Error(
+                        `HTTP ${imageResponse.status}`
+                    );
+                }
+
+                const imageBuffer =
+                    Buffer.from(
+                        await imageResponse.arrayBuffer()
+                    );
+
+                if (!imageBuffer.length) {
+                    throw new Error(
+                        'Empty image response'
+                    );
+                }
+
+                const filename =
+                    `fortnite-leak-${tweet.id}-image-${i + 1}.jpg`;
+
+                imageAttachments.push(
+                    new AttachmentBuilder(
+                        imageBuffer
+                    ).setName(filename)
+                );
+
+                imageNames.push(filename);
+
+            } catch (error) {
+
+                console.error(
+                    `⚠️ Failed to download leak image ${i + 1} for tweet ${tweet.id}:`,
+                    error.message
+                );
+
+            }
+        }
 
         // ==========================================
         // VIDEO
@@ -816,33 +954,6 @@ async function sendLeakToGuild(
             }
         }
 
-
-        // ==========================================
-        // MESSAGE CONTENT
-        // ==========================================
-
-        const contentParts = [];
-
-        if (roleMention) {
-            contentParts.push(roleMention);
-        }
-
-        /*
-         * Discord does not currently provide an MP4/video
-         * component inside ContainerBuilder.
-         *
-         * The V2 panel is therefore the leak card, while the
-         * actual video attachment is sent with the same message.
-         * Discord renders the native video directly with the post.
-         */
-        if (
-            videoUrl &&
-            !videoAttachment
-        ) {
-            contentParts.push(videoUrl);
-        }
-
-
         // ==========================================
         // CREATE V2 PANEL
         // ==========================================
@@ -850,21 +961,22 @@ async function sendLeakToGuild(
         const container =
             createLeakContainer(
                 tweet,
-                client
+                client,
+                {
+                    roleMention,
+                    imageNames,
+                    videoFallbackUrl:
+                        videoAttachment
+                            ? undefined
+                            : videoUrl
+                }
             );
-
 
         // ==========================================
         // SEND LEAK
         // ==========================================
 
         const messagePayload = {
-
-            content:
-                contentParts.length > 0
-                    ? contentParts.join('\n')
-                    : undefined,
-
             components: [
                 container
             ],
@@ -875,22 +987,29 @@ async function sendLeakToGuild(
             allowedMentions:
                 config.updatesRoleId
                     ? {
-                        roles: [
-                            config.updatesRoleId
-                        ]
+                        roles: pingRole
+                            ? [config.updatesRoleId]
+                            : []
                     }
                     : {
                         roles: []
                     }
-
         };
+
+        if (imageAttachments.length) {
+            messagePayload.files =
+                imageAttachments;
+        }
 
         if (videoAttachment) {
 
-            messagePayload.files = [
-                videoAttachment
-            ];
+            if (!messagePayload.files) {
+                messagePayload.files = [];
+            }
 
+            messagePayload.files.push(
+                videoAttachment
+            );
         }
 
         await channel.send(
@@ -909,7 +1028,6 @@ async function sendLeakToGuild(
         return false;
     }
 }
-
 
 // ==========================================
 // ANNOUNCE LEAK TO ALL SERVERS
