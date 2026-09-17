@@ -20,7 +20,8 @@ const {
 } = require('../services/serverConfig');
 
 const {
-    downloadImage
+    createDailyShopGallery,
+    getGalleryPageCount
 } = require('../services/dailyShopImage');
 
 
@@ -521,71 +522,85 @@ async function postToServer(
         }
 
         console.log(
-            `🖼️ Downloading ${imageItems.length} new cosmetic images for server ${guildId}...`
+            `🖼️ Creating ${imageItems.length} new cosmetic images for server ${guildId}...`
         );
 
-        const attachments = [];
+        const imageUrls = imageItems
+            .map(item => item.image)
+            .filter(Boolean);
 
-        for (let i = 0; i < imageItems.length; i++) {
-            const item = imageItems[i];
-
-            try {
-                const buffer = await downloadImage(item.image);
-
-                const attachment = new AttachmentBuilder(buffer)
-                    .setName(`daily-shop-${i + 1}.png`);
-
-                attachments.push(attachment);
-            } catch (error) {
-                console.error(
-                    `⚠️ Failed to download image for ${item.name}:`,
-                    error.message
-                );
-            }
-        }
-
-        if (attachments.length === 0) {
+        if (imageUrls.length === 0) {
             console.log(
-                `⚠️ No daily images could be downloaded for server ${guildId}`
+                `⚠️ No valid daily image URLs for server ${guildId}`
             );
             return;
         }
 
-        for (let i = 0; i < attachments.length; i += 10) {
-            const batch = attachments.slice(i, i + 10);
+        const pageCount = getGalleryPageCount(imageUrls);
 
-            const imageContainer = new ContainerBuilder()
-                .setAccentColor(0x1493ff)
-                .addSectionComponents(
-                    new SectionBuilder()
-                        .addTextDisplayComponents(
-                            new TextDisplayBuilder()
-                                .setContent('# __New Shop Images__'),
-                            new TextDisplayBuilder()
-                                .setContent(
-                                    i === 0
-                                        ? `Images for **${imageItems.length}** newly released cosmetic${imageItems.length === 1 ? '' : 's'}.`
-                                        : 'More newly released cosmetics from this shop rotation.'
-                                )
-                        )
-                        .setThumbnailAccessory(
-                            thumbnail =>
-                                thumbnail
-                                    .setURL(logo)
-                                    .setDescription('Amyfn')
-                        )
-                )
-                .addSeparatorComponents(separator())
-                .addTextDisplayComponents(
-                    new TextDisplayBuilder()
-                        .setContent('-# AMYFN • DAILY SHOP TRACKER')
+        for (let page = 1; page <= pageCount; page++) {
+            try {
+                // Uses the existing 3x3 Sharp gallery service.
+                // Nine cosmetics are combined into one 1600x1600 image.
+                const galleryBuffer = await createDailyShopGallery(
+                    imageUrls,
+                    page
                 );
 
-            await channel.send({
-                components: [imageContainer],
-                files: batch,
-                flags: MessageFlags.IsComponentsV2
-            });
+                const galleryAttachment = new AttachmentBuilder(
+                    galleryBuffer
+                ).setName(
+                    `daily-shop-gallery-${page}.png`
+                );
+
+                // Keep the V2 header separate from the actual gallery image.
+                // Discord will render the PNG normally as an attachment.
+                const galleryLabel = pageCount > 1
+                    ? `Gallery **${page}/${pageCount}** • **${imageItems.length}** newly released cosmetics.`
+                    : `**${imageItems.length}** newly released cosmetics.`;
+
+                const galleryContainer = new ContainerBuilder()
+                    .setAccentColor(0x1493ff)
+                    .addSectionComponents(
+                        new SectionBuilder()
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder()
+                                    .setContent('# __New Shop Images__'),
+                                new TextDisplayBuilder()
+                                    .setContent(galleryLabel)
+                            )
+                            .setThumbnailAccessory(
+                                thumbnail =>
+                                    thumbnail
+                                        .setURL(logo)
+                                        .setDescription('Amyfn')
+                            )
+                    )
+                    .addSeparatorComponents(separator())
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent('-# AMYFN • DAILY SHOP TRACKER')
+                    );
+
+                await channel.send({
+                    components: [galleryContainer],
+                    flags: MessageFlags.IsComponentsV2
+                });
+
+                // Image intentionally stays OUTSIDE the V2 container.
+                await channel.send({
+                    files: [galleryAttachment]
+                });
+
+                console.log(
+                    `🖼️ Sent Daily Shop gallery ${page}/${pageCount} to server ${guildId}`
+                );
+            } catch (error) {
+                console.error(
+                    `⚠️ Failed to create/send Daily Shop gallery ${page}/${pageCount} for server ${guildId}:`,
+                    error.message
+                );
+            }
         }
 
         console.log(
