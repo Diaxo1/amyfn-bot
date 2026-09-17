@@ -270,39 +270,31 @@ module.exports = {
             }
 
             // ==========================================
-            // HEADER + FIRST 10 IMAGES
+            // SEND HEADER
             // ==========================================
             //
-            // The first batch is attached directly to
-            // the original interaction response.
-            //
-            // This keeps the header and first images
-            // visually connected instead of creating
-            // a separate message immediately below it.
+            // Components V2 messages should not rely on
+            // regular file attachments for the gallery.
+            // Keep the header as its own V2 message.
             //
 
             await interaction.editReply({
                 components: [header],
-                files: batches[0],
                 flags: MessageFlags.IsComponentsV2
             });
 
             // ==========================================
-            // REMAINING BATCHES
+            // SEND ALL IMAGE BATCHES
             // ==========================================
             //
-            // Discord allows up to 10 attachments
-            // per message, so anything after the
-            // first batch is sent normally underneath.
+            // Send EVERY batch as a normal follow-up message.
+            // This makes sure the first batch renders just like
+            // all subsequent batches.
             //
 
-            for (
-                let i = 1;
-                i < batches.length;
-                i++
-            ) {
+            for (const batch of batches) {
                 await interaction.followUp({
-                    files: batches[i]
+                    files: batch
                 });
             }
 
