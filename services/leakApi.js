@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.LEAK_API_PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const API_KEY = process.env.LEAK_API_KEY;
 
 const CACHE_PATH = '/data/leakCache.json';
