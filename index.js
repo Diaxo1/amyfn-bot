@@ -124,9 +124,6 @@ const {
     startLeakTracker
 } = require('./services/leakTracker');
 
-const {
-    startLeakApi
-} = require('./services/leakApi');
 
 // ==========================================
 // DISCORD CLIENT
@@ -227,8 +224,6 @@ client.once(
         startNewsTracker(client);
 
         startLeakTracker(client);
-
-        startLeakApi();
 
         startGiveawayTracker(client);
 
