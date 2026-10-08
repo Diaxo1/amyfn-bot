@@ -46,7 +46,7 @@ const {
 
 const UPDATE = {
 
-    title: '🟢 AmyFN Update is here',
+    title: '🟢 AmyFN Update log',
 
     body: `
 ## What's New
