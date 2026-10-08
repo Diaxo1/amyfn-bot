@@ -147,7 +147,7 @@ function setServerConfig(
         logsChannelId:
             config.logsChannelId ??
             existing.logsChannelId ??
-            null
+            null,
 
     };
 

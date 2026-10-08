@@ -57,6 +57,13 @@ const {
 } = require('./commands/about');
 
 // ==========================================
+// ANNOUNCEMENT
+// ==========================================
+
+const announcementCommand =
+    require('./commands/announcement');
+
+// ==========================================
 // FORTNITE QUIZ
 // ==========================================
 
@@ -83,6 +90,8 @@ const giveawayService =
 
 const moderationCommand =
     require('./commands/moderation');
+
+    
 
 // ==========================================
 // LOGGING
@@ -215,19 +224,62 @@ client.once(
             10000
         );
 
-        // ==========================================
-        // AUTOMATIC TRACKERS
-        // ==========================================
+    // ==========================================
+// AUTOMATIC ANNOUNCEMENT CHECK
+// ==========================================
+//
+// Checks whether the developer update changed
+// since the previous deployment/startup.
+//
+// First startup establishes a baseline.
+// Changed updates are automatically published.
+// ==========================================
 
-        startShopTracker(client);
+announcementCommand
+    .checkForAnnouncementUpdate(
+        readyClient
+    )
+    .catch(error => {
 
-        startNewsTracker(client);
+        console.error(
+            '❌ Automatic announcement startup check failed:',
+            error
+        );
 
-        startLeakTracker(client);
+    });
 
-        startGiveawayTracker(client);
+
+// ==========================================
+// AUTOMATIC TRACKERS
+// ==========================================
+
+const testMode =
+    process.env.BOT_TEST_MODE === 'true';
+
+if (testMode) {
+
+    console.log(
+        '🧪 BOT_TEST_MODE enabled.'
+    );
+
+    console.log(
+        '🚫 Automatic trackers are disabled for local testing.'
+    );
+
+} else {
+
+    startShopTracker(client);
+
+    startNewsTracker(client);
+
+    startLeakTracker(client);
+
+    startGiveawayTracker(client);
+
+}
 
     }
+
 );
 
 // ==========================================
@@ -659,6 +711,8 @@ client.on(
 client.on(
     Events.InteractionCreate,
     async (interaction) => {
+
+        
 
                 // ==========================================
         // COSMETIC AUTOCOMPLETE

@@ -124,6 +124,13 @@ const commands = [
     require('./commands/giveaway').data.toJSON(),
 
     // ==========================================
+    // ANNOUNCEMENT
+    // ==========================================
+
+    require('./commands/announcement').data.toJSON(),
+
+
+    // ==========================================
     // FORTNITE QUIZ
     // ==========================================
 

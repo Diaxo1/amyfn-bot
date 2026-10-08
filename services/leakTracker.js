@@ -66,6 +66,11 @@ const CHECK_INTERVAL = 60 * 1000;
 const LEAK_PING_COOLDOWN = 10 * 60 * 1000;
 let lastLeakPingAt = 0;
 
+// Prevent overlapping leak checks.
+// A check can take longer than 60 seconds when processing
+// multiple images/videos, so only one check may run at a time.
+let leakCheckRunning = false;
+
 
 // ==========================================
 // DATA FOLDER
@@ -1086,9 +1091,22 @@ async function announceLeak(
 async function checkForLeaks(
     client
 ) {
+    // Prevent overlapping checks.
+    //
+    // Leak processing can take longer than the
+    // 60-second interval because images/videos
+    // may need to be downloaded and uploaded.
+    //
+    // Without this lock, another check could start
+    // before the previous one saves its snapshot,
+    // causing the same leaks to be detected again.
+    if (leakCheckRunning) {
+    return;
+}
+
+    leakCheckRunning = true;
 
     try {
-
         console.log(
             '🕵️ Checking Fortnite leaks...'
         );
@@ -1099,29 +1117,16 @@ async function checkForLeaks(
         if (
             !Array.isArray(tweets)
         ) {
-
             console.error(
                 '❌ Leak bridge did not return an array.'
             );
-
             return;
-
         }
 
         const snapshot =
             loadSnapshot();
-        
-        saveLeakCache(tweets);    
 
-        console.log(
-            '🧪 Leak debug latest tweets:',
-            tweets.slice(0, 10).map(tweet => ({
-                id: tweet.id,
-                username: tweet.username,
-                date: tweet.date,
-                seen: !!snapshot[tweet.id]
-            }))
-        );
+        saveLeakCache(tweets);
 
         // ==================================
         // FIRST RUN
@@ -1130,14 +1135,11 @@ async function checkForLeaks(
         if (
             !snapshot.initialized
         ) {
-
             tweets.forEach(
                 tweet => {
-
                     snapshot[
                         tweet.id
                     ] = true;
-
                 }
             );
 
@@ -1153,7 +1155,6 @@ async function checkForLeaks(
             );
 
             return;
-
         }
 
         // ==================================
@@ -1162,14 +1163,12 @@ async function checkForLeaks(
 
         const newTweets =
             tweets
-
                 .filter(
                     tweet =>
                         !snapshot[
                             tweet.id
                         ]
                 )
-
                 .sort(
                     (a, b) =>
                         new Date(a.date) -
@@ -1179,13 +1178,11 @@ async function checkForLeaks(
         if (
             newTweets.length === 0
         ) {
-
             console.log(
                 '🕵️ No new leaks.'
             );
 
             return;
-
         }
 
         console.log(
@@ -1199,7 +1196,6 @@ async function checkForLeaks(
         for (
             const tweet of newTweets
         ) {
-
             await announceLeak(
                 client,
                 tweet
@@ -1208,7 +1204,6 @@ async function checkForLeaks(
             snapshot[
                 tweet.id
             ] = true;
-
         }
 
         // ==================================
@@ -1219,12 +1214,10 @@ async function checkForLeaks(
             Object.keys(
                 snapshot
             )
-
                 .filter(
                     id =>
                         id !== 'initialized'
                 )
-
                 .slice(-500);
 
         const cleanedSnapshot = {
@@ -1233,11 +1226,9 @@ async function checkForLeaks(
 
         ids.forEach(
             id => {
-
                 cleanedSnapshot[
                     id
                 ] = true;
-
             }
         );
 
@@ -1246,14 +1237,16 @@ async function checkForLeaks(
         );
 
     } catch (error) {
-
         console.error(
             '❌ Leak tracker error:',
             error
         );
 
+    } finally {
+        // Always release the lock, even if
+        // something fails during the check.
+        leakCheckRunning = false;
     }
-
 }
 
 

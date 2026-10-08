@@ -1,14 +1,14 @@
 {
-  "hash": "6f2099e54ea997fec1a8b77ff1d8df1a4fc78641",
-  "date": "2026-09-16T15:21:01Z",
+  "hash": "f1aa4897113e341038908648afaa60ff7574d814",
+  "date": "2026-10-04T03:00:47Z",
   "ids": [
     "85b298129f7411142d89296b0cd05b9b",
+    "4266c62cd602086cbef17fcf18f8a1ce",
+    "e991acb02980daab8bc01d6e2b17470a",
     "23bb0202e8d281816bd1601b1b92949f",
-    "788192ca830b5b3cd85498f610befa24",
-    "ecc6586bad2a0fd6bf6a1267f30d87db",
-    "561a0ae5add2433fc81d2db7c125905a"
+    "788192ca830b5b3cd85498f610befa24"
   ],
-  "fingerprint": "ffd2fd7f52aadc7bbf6f298d39d5bc27dae7232a08da5580c3b11ee8b58b8b77",
+  "fingerprint": "39a5142ffd09acba2cf48a9eeb6fc31e826e9731e7f8194a91d44825bb766e52",
   "articles": [
     {
       "id": "85b298129f7411142d89296b0cd05b9b",
@@ -19,11 +19,27 @@
       "hidden": false
     },
     {
+      "id": "4266c62cd602086cbef17fcf18f8a1ce",
+      "title": "The Horror Is Here",
+      "body": "A cursed cartridge is spreading through the Island, corrupting everything it touches. Step into Battle Royale to see what hair-raising horrors await, including powerful new weapons, terrifying mechanics, horrifying bosses, and more!",
+      "image": "https://cdn-live.prm.ol.epicgames.com/prod/71f69967b38e4a4dbd3c5d6c7004dbea.jpeg?width=1920&height=1080&aspect=fill",
+      "sortingPriority": 90,
+      "hidden": false
+    },
+    {
+      "id": "e991acb02980daab8bc01d6e2b17470a",
+      "title": "Five Nights at Freddy's Gameplay",
+      "body": "It's showtime! Face down animatronic bosses in Battle Royale, with one always lurking at Freddy Fazbear's Pizza Parlor. Defeat any rogue robot you find to possess the suit and finish the fight Fazbear style.",
+      "image": "https://cdn-live.prm.ol.epicgames.com/prod/0565ca828ab54582a03c892eece95a12.jpeg?width=1920&height=1080&aspect=fill",
+      "sortingPriority": 80,
+      "hidden": false
+    },
+    {
       "id": "23bb0202e8d281816bd1601b1b92949f",
       "title": "Keep Collecting and Mastering",
       "body": "There are all new Sprites to discover and collect! Extract and equip them for game-changing Sprite Powers, level them up, and keep growing the Collection in Override. Sprites will now appear in Ranked too, with abilities disabled to maintain even competition.",
       "image": "https://cdn-live.prm.ol.epicgames.com/prod/b4813f9743f1429c96ca12a5c7d5ca51.jpeg?width=1920&height=1080&aspect=fill",
-      "sortingPriority": 90,
+      "sortingPriority": 70,
       "hidden": false
     },
     {
@@ -31,25 +47,9 @@
       "title": "Earn the Peril Peak Mali Style",
       "body": "Gifting the Override Battle Pass unlocks the Peril Peak Mali Style and matching accessories for both the gifter and the friend receiving it!",
       "image": "https://cdn-live.prm.ol.epicgames.com/prod/e1ac92314fd7416687e7991dfd8d3e0d.jpeg?width=1920&height=1080&aspect=fill",
-      "sortingPriority": 80,
-      "hidden": false
-    },
-    {
-      "id": "ecc6586bad2a0fd6bf6a1267f30d87db",
-      "title": "New Loot Hacks and Fresh Sprites",
-      "body": "More weapons have arrived via Loot Hacks! Spend Sprite Dust on a Loot Hack to customize what drops from Chests, shaking up matches with bonus items that can't be found anywhere else. Plus, try the new Prop Hunt Override and chase X-Ray, Onigiri, and more Sprites.",
-      "image": "https://cdn-live.prm.ol.epicgames.com/prod/b076983b75c64e858255c8bc40aadb13.jpeg?width=1920&height=1080&aspect=fill",
-      "sortingPriority": 70,
-      "hidden": false
-    },
-    {
-      "id": "561a0ae5add2433fc81d2db7c125905a",
-      "title": "KINGDOM HEARTS - September 17",
-      "body": "On September 17, answer the call of the Light!",
-      "image": "https://cdn-live.prm.ol.epicgames.com/prod/6f4c3cf4980a48069b7551db798e566c.jpeg?width=1920&height=1080&aspect=fill",
       "sortingPriority": 60,
       "hidden": false
     }
   ],
-  "updatedAt": "2026-09-16T20:40:39.507Z"
+  "updatedAt": "2026-10-08T16:53:31.723Z"
 }

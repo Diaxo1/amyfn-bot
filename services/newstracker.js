@@ -1988,35 +1988,23 @@ async function checkNews(
 
 
 
-        /*
-
+                /*
+        ==========================================
+        AUTOMATIC DISCORD ANNOUNCEMENT DISABLED
         ==========================================
 
-        SEND DISCORD ANNOUNCEMENT
+        Official AmyFN announcements are now handled
+        through /announcement.
 
         ==========================================
-
         */
 
-
-
-        await announceNews(
-
-
-
-            client,
-
-
-
-            newItems,
-
-
-
-            currentDate
-
-
-
-        );
+        // Automatic news announcements disabled.
+        // await announceNews(
+        //     client,
+        //     newItems,
+        //     currentDate
+        // );
 
 
 
