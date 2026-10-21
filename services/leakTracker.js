@@ -59,7 +59,15 @@ const OLD_SNAPSHOT_PATH = path.join(
     'leakSnapshot.json'
 );
 
-const CHECK_INTERVAL = 60 * 1000;
+function intervalFromEnv(name, fallbackMs, minimumMs = 10000) {
+    const value = Number(process.env[name]);
+    return Number.isFinite(value) && value >= minimumMs
+        ? Math.floor(value)
+        : fallbackMs;
+}
+
+const CHECK_INTERVAL = intervalFromEnv('LEAK_CHECK_INTERVAL_MS', 2 * 60 * 1000);
+const MAX_LEAK_CACHE_ITEMS = 500;
 
 // Only one leak role ping every 10 minutes globally.
 // Leak detection and posting continue normally during the cooldown.
@@ -70,6 +78,7 @@ let lastLeakPingAt = 0;
 // A check can take longer than 60 seconds when processing
 // multiple images/videos, so only one check may run at a time.
 let leakCheckRunning = false;
+let leakTrackerStarted = false;
 
 
 // ==========================================
@@ -178,14 +187,9 @@ function saveSnapshot(snapshot) {
 
     try {
 
-        fs.writeFileSync(
-            SNAPSHOT_PATH,
-            JSON.stringify(
-                snapshot,
-                null,
-                2
-            )
-        );
+        const serialized = JSON.stringify(snapshot, null, 2);
+        if (fs.existsSync(SNAPSHOT_PATH) && fs.readFileSync(SNAPSHOT_PATH, 'utf8') === serialized) return;
+        fs.writeFileSync(SNAPSHOT_PATH, serialized);
 
     } catch (error) {
 
@@ -208,14 +212,10 @@ function saveLeakCache(tweets) {
 
     try {
 
-        fs.writeFileSync(
-            LEAK_CACHE_PATH,
-            JSON.stringify(
-                tweets,
-                null,
-                2
-            )
-        );
+        const boundedTweets = tweets.slice(-MAX_LEAK_CACHE_ITEMS);
+        const serialized = JSON.stringify(boundedTweets, null, 2);
+        if (fs.existsSync(LEAK_CACHE_PATH) && fs.readFileSync(LEAK_CACHE_PATH, 'utf8') === serialized) return;
+        fs.writeFileSync(LEAK_CACHE_PATH, serialized);
 
     } catch (error) {
 
@@ -811,19 +811,42 @@ async function sendLeakToGuild(
             guildId
         );
 
-    if (
-        !config ||
-        !config.updatesChannelId
-    ) {
+    if (!config) {
         return false;
     }
 
     try {
-
-        const channel =
-            await client.channels.fetch(
-                config.updatesChannelId
-            );
+        const guild = client.guilds.cache.get(guildId);
+        const candidateIds = [
+            config.logsChannelId,
+            config.updatesChannelId,
+            config.newsChannelId,
+            config.leaksChannelId,
+            config.channelId
+        ]
+            .filter((id, index, all) => id && all.indexOf(id) === index);
+        let channel = null;
+        for (const id of candidateIds) {
+            try {
+                const candidate = await client.channels.fetch(id);
+                const permissions = candidate?.permissionsFor?.(guild?.members.me);
+                if (
+                    candidate?.guildId === guildId &&
+                    candidate.isTextBased() &&
+                    typeof candidate.send === 'function' &&
+                    permissions?.has('SendMessages') !== false
+                ) {
+                    channel = candidate;
+                    break;
+                }
+            } catch (_) { /* Try the next configured channel. */ }
+        }
+        if (!channel && guild) {
+            channel = guild.channels.cache.find(candidate =>
+                candidate.isTextBased() && typeof candidate.send === 'function' &&
+                candidate.permissionsFor(guild.members.me)?.has('SendMessages')
+            ) || null;
+        }
 
         if (
             !channel ||
@@ -850,17 +873,20 @@ async function sendLeakToGuild(
             Array.isArray(tweet.images)
                 ? tweet.images
                     .filter(Boolean)
-                    .slice(0, 10)
+                    .slice(0, 4)
                 : [];
 
         const imageAttachments = [];
         const imageNames = [];
+        let totalImageBytes = 0;
 
         for (
             let i = 0;
             i < imageUrls.length;
             i++
         ) {
+
+            if (totalImageBytes >= 8 * 1024 * 1024) break;
 
             try {
 
@@ -883,10 +909,10 @@ async function sendLeakToGuild(
                     );
                 }
 
-                const imageBuffer =
-                    Buffer.from(
-                        await imageResponse.arrayBuffer()
-                    );
+                const imageBuffer = await readLimitedResponse(
+                    imageResponse,
+                    Math.min(3 * 1024 * 1024, 8 * 1024 * 1024 - totalImageBytes)
+                );
 
                 if (!imageBuffer.length) {
                     throw new Error(
@@ -904,6 +930,7 @@ async function sendLeakToGuild(
                 );
 
                 imageNames.push(filename);
+                totalImageBytes += imageBuffer.length;
 
             } catch (error) {
 
@@ -1034,6 +1061,31 @@ async function sendLeakToGuild(
     }
 }
 
+async function readLimitedResponse(response, maxBytes) {
+    const length = Number(response.headers.get('content-length') || 0);
+    if (length > maxBytes) throw new Error(`Media exceeds ${maxBytes} byte limit`);
+    if (!response.body) throw new Error('Media response has no readable body');
+    const reader = response.body.getReader();
+    const chunks = [];
+    let size = 0;
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (!value) continue;
+            size += value.byteLength;
+            if (size > maxBytes) {
+                await reader.cancel();
+                throw new Error(`Media exceeds ${maxBytes} byte limit`);
+            }
+            chunks.push(Buffer.from(value));
+        }
+    } finally {
+        try { reader.releaseLock(); } catch (_) {}
+    }
+    return Buffer.concat(chunks, size);
+}
+
 // ==========================================
 // ANNOUNCE LEAK TO ALL SERVERS
 // ==========================================
@@ -1094,8 +1146,8 @@ async function checkForLeaks(
     // Prevent overlapping checks.
     //
     // Leak processing can take longer than the
-    // 60-second interval because images/videos
-    // may need to be downloaded and uploaded.
+    // Processing media may take longer than the configured interval;
+    // the running lock prevents overlapping checks.
     //
     // Without this lock, another check could start
     // before the previous one saves its snapshot,
@@ -1107,9 +1159,7 @@ async function checkForLeaks(
     leakCheckRunning = true;
 
     try {
-        console.log(
-            '🕵️ Checking Fortnite leaks...'
-        );
+        if (process.env.NODE_ENV !== 'production') console.log('🕵️ Checking Fortnite leaks...');
 
         const tweets =
             await runPythonBridge();
@@ -1150,9 +1200,7 @@ async function checkForLeaks(
                 snapshot
             );
 
-            console.log(
-                `📸 Leak baseline saved (${tweets.length} tweets).`
-            );
+            if (process.env.NODE_ENV !== 'production') console.log(`📸 Leak baseline saved (${tweets.length} tweets).`);
 
             return;
         }
@@ -1178,16 +1226,12 @@ async function checkForLeaks(
         if (
             newTweets.length === 0
         ) {
-            console.log(
-                '🕵️ No new leaks.'
-            );
+            if (process.env.NODE_ENV !== 'production') console.log('🕵️ No new leaks.');
 
             return;
         }
 
-        console.log(
-            `🚨 Found ${newTweets.length} new leak(s)!`
-        );
+        if (process.env.NODE_ENV !== 'production') console.log(`🚨 Found ${newTweets.length} new leak(s)!`);
 
         // ==================================
         // SEND NEW LEAKS
@@ -1257,6 +1301,9 @@ async function checkForLeaks(
 function startLeakTracker(
     client
 ) {
+
+    if (leakTrackerStarted) return;
+    leakTrackerStarted = true;
 
     console.log(
         '🕵️ Starting Fortnite leak tracker...'

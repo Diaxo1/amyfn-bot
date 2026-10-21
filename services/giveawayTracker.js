@@ -8,6 +8,11 @@ const {
 
 let trackerStarted = false;
 
+const configuredInterval = Number(process.env.GIVEAWAY_CHECK_INTERVAL_MS);
+const CHECK_INTERVAL = Number.isFinite(configuredInterval) && configuredInterval >= 10000
+    ? Math.floor(configuredInterval)
+    : 60000;
+
 async function checkGiveaways(client) {
 
     try {
@@ -65,10 +70,10 @@ function startGiveawayTracker(client) {
     // Check immediately
     checkGiveaways(client);
 
-    // Check every 10 seconds
+    // Expiry checks do not need to run every few seconds.
     setInterval(
         () => checkGiveaways(client),
-        10000
+        CHECK_INTERVAL
     );
 }
 
