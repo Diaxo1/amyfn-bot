@@ -818,11 +818,9 @@ async function sendLeakToGuild(
     try {
         const guild = client.guilds.cache.get(guildId);
         const candidateIds = [
-            config.logsChannelId,
             config.updatesChannelId,
             config.newsChannelId,
             config.leaksChannelId,
-            config.channelId
         ]
             .filter((id, index, all) => id && all.indexOf(id) === index);
         let channel = null;
