@@ -46,24 +46,45 @@ const {
 
 const UPDATE = {
 
-    title: '🟢 AmyFN Update log',
+    title: '🟢 AMY FN — Hosting & Service Update',
 
     body: `
-## What's New
+## AMY FN is back online 🚀
 
-AmyFN is officially back online.
+Hey everyone! 👋
 
-You may have noticed that the bot was unavailable for a while. We ran into some **hosting and deployment issues** while moving the bot to a new environment, which caused the downtime and took longer to resolve than expected.
+We wanted to give you a quick update regarding some of the issues AMY FN has experienced recently.
 
-Everything is now back up and running, and we're continuing to work on improving AmyFN.
+AMY FN is hosted using **Railway**, which handles the bot's hosting, deployments, and the infrastructure it runs on. Recently, Railway experienced a **security incident involving their infrastructure**, which temporarily affected deployments and other hosting operations while they investigated and secured their systems.
 
-### What's next?
+Because of this, some of you may have experienced:
 
-We're not stopping here. More features, improvements, commands, and updates are already being worked on and will be added over time.
+• ❌ Commands not responding
+• ⏳ Delayed responses
+• 🔄 Bot restarts or downtime
+• 🛠️ Updates and deployments being temporarily unavailable
 
-Thanks to everyone who waited while we got everything sorted out. We appreciate you using AmyFN and sticking around.
+We're genuinely sorry if you experienced any of these issues. ❤️
 
-**AmyFN is back. More is coming.**
+The situation has now been resolved on our side. We've updated our hosting setup, secured the necessary credentials, and **AMY FN has been redeployed with the latest optimized build.**
+
+Everything should now be back to normal. 🚀
+
+### 🛠️ Still having issues?
+
+If AMY FN isn't working properly for you, use **\`/about\`** to find our official Discord server and join us there.
+
+Once you're in the server, you can **contact us and report the issue directly** so we can look into it.
+
+When reporting an issue, please include as much information as possible — such as the command you used, any error message you received, and what happened.
+
+Thank you to everyone who stayed patient while we got everything sorted out. We really appreciate everyone using AMY FN and sticking around. ❤️
+
+### 🚀 AMY FN is back.
+
+More features, improvements, commands, and updates are already being worked on.
+
+— **AMY FN Team**
     `,
 
     color: 0x00c853,
@@ -71,7 +92,6 @@ Thanks to everyone who waited while we got everything sorted out. We appreciate 
     image: 'amyfn-announcement.png'
 
 };
-
 
 // ==========================================
 // ASSET
