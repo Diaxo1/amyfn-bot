@@ -56,6 +56,10 @@ const {
     execute: executeAbout
 } = require('./commands/about');
 
+const {
+    execute: executeGuilds
+} = require('./commands/guilds');
+
 // ==========================================
 // ANNOUNCEMENT
 // ==========================================
@@ -944,6 +948,22 @@ client.on(
             return;
 
         }
+
+        // ==========================================
+// PRIVATE GUILD LIST
+// ==========================================
+
+if (
+    interaction.commandName === 'guilds'
+) {
+
+    await executeGuilds(
+        interaction,
+        client
+    );
+
+    return;
+}
 
         // ==========================================
 // ABOUT

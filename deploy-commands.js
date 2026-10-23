@@ -7,6 +7,8 @@ const {
 
 const commands = [
 
+
+
     // ==========================================
     // BASIC
     // ==========================================
@@ -164,7 +166,9 @@ const commands = [
 
     require('./commands/moderation').lockData.toJSON(),
 
-    require('./commands/moderation').unlockData.toJSON()
+    require('./commands/moderation').unlockData.toJSON(),
+
+    require('./commands/guilds').data.toJSON(),
 
 ];
 
